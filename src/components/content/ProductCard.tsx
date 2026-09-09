@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { TextLink } from "@/components/foundation/TextLink";
 import { cn } from "@/lib/cn";
+import type { ProductCardItem } from "@/lib/products";
 import { ImagePlaceholder } from "./ImagePlaceholder";
 
 /**
@@ -14,16 +15,7 @@ import { ImagePlaceholder } from "./ImagePlaceholder";
  * standardized" — it is not, so the card has no price slot at all.
  */
 
-export type ProductCardItem = {
-  /** Short uppercase context label. */
-  category: string;
-  title: string;
-  description: string;
-  href: string;
-  /** §09 minimum launch shot this card is waiting on. */
-  shot: string;
-  action: string;
-};
+export type { ProductCardItem };
 
 export function ProductCard({
   item,

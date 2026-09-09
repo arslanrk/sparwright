@@ -1,4 +1,5 @@
 import { CTA } from "@/components/foundation/cta";
+import { PRODUCTS, productHref } from "@/lib/products";
 
 /**
  * Navigation model — Design System §08 Header and navigation, §08 Footer.
@@ -21,26 +22,23 @@ export type PrimaryNavItem = NavLink & {
 };
 
 /**
- * The Products dropdown (§08). Slugs land with the product template in PR 5 —
- * reconcile these three with `src/lib/products.ts` when that PR seeds content.
+ * The Products dropdown (§08), built from the catalogue so the menu can only
+ * ever offer pages that exist.
+ *
+ * §11 launches with two product pages, not three: the anchor product and one
+ * combined Fightwear and Club Apparel page. PR 3 guessed at three separate
+ * slugs before the catalogue existed; PR 5 reconciled them here.
  */
-export const PRODUCT_LINKS: NavLink[] = [
-  {
-    label: "Custom Boxing Gloves",
-    href: "/products/custom-boxing-gloves",
-    description: "Your logo, colours and specification.",
-  },
-  {
-    label: "Fightwear",
-    href: "/products/fightwear",
-    description: "Shorts, rash guards and training kit.",
-  },
-  {
-    label: "Club Apparel",
-    href: "/products/club-apparel",
-    description: "Coordinated kit for gyms and clubs.",
-  },
-];
+const PRODUCT_BLURBS: Record<string, string> = {
+  "custom-boxing-gloves": "Your logo, colours and specification.",
+  "fightwear-club-apparel": "Shorts, rashguards and coordinated club kit.",
+};
+
+export const PRODUCT_LINKS: NavLink[] = PRODUCTS.map((product) => ({
+  label: product.name,
+  href: productHref(product),
+  description: PRODUCT_BLURBS[product.slug],
+}));
 
 export const PRIMARY_NAV: PrimaryNavItem[] = [
   { label: "Products", href: "/products", children: PRODUCT_LINKS },
@@ -104,9 +102,23 @@ export const LEGAL_LINKS: NavLink[] = [
   { label: "Cookies", href: "/cookies" },
 ];
 
-/** Active-state test for navigation links. Anchors are never marked active. */
+/**
+ * Is this link the section the visitor is in? True for the exact page and for
+ * anything below it, so "Products" stays highlighted on a product page.
+ * Anchors and mail links are never active.
+ */
 export function isActivePath(pathname: string, href: string) {
   if (href.includes("#") || href.startsWith("mailto:")) return false;
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+/**
+ * Is this link the page the visitor is actually on? Only this earns
+ * `aria-current="page"`: putting it on the ancestor as well would announce two
+ * different links as the current page (§12).
+ */
+export function isCurrentPage(pathname: string, href: string) {
+  if (href.includes("#") || href.startsWith("mailto:")) return false;
+  return pathname === href;
 }

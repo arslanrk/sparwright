@@ -12,6 +12,7 @@ import {
   HEADER_CTA,
   PRIMARY_NAV,
   isActivePath,
+  isCurrentPage,
   type NavLink,
   type PrimaryNavItem,
 } from "./nav";
@@ -102,14 +103,14 @@ export function Header() {
 const NAV_ITEM =
   "inline-flex items-center gap-1.5 rounded-md px-3 py-2 font-body text-[0.9375rem] font-medium " +
   "text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)] " +
-  "aria-[current=page]:font-semibold aria-[current=page]:text-[var(--color-text)]";
+  "data-[active=true]:font-semibold data-[active=true]:text-[var(--color-text)]";
 
 function NavItemLink({ item, pathname }: { item: NavLink; pathname: string }) {
-  const active = isActivePath(pathname, item.href);
   return (
     <Link
       href={item.href}
-      aria-current={active ? "page" : undefined}
+      data-active={isActivePath(pathname, item.href)}
+      aria-current={isCurrentPage(pathname, item.href) ? "page" : undefined}
       className={NAV_ITEM}
     >
       {item.label}
@@ -167,7 +168,7 @@ function ProductsMenu({
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
-        aria-current={active ? "page" : undefined}
+        data-active={active}
         onClick={() => setOpen((value) => !value)}
         className={NAV_ITEM}
       >
@@ -212,15 +213,15 @@ function DropdownLink({
   pathname: string;
   onNavigate: () => void;
 }) {
-  const active = isActivePath(pathname, link.href);
+  const current = isCurrentPage(pathname, link.href);
   return (
     <Link
       href={link.href}
       onClick={onNavigate}
-      aria-current={active ? "page" : undefined}
+      aria-current={current ? "page" : undefined}
       className={cn(
         "block rounded-md px-3 py-2.5 transition-colors hover:bg-[var(--color-bone-50)]",
-        active && "bg-[var(--color-bone-50)]",
+        current && "bg-[var(--color-bone-50)]",
       )}
     >
       <span className="block font-body text-[0.9375rem] font-semibold text-[var(--color-text)]">

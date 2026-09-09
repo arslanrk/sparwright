@@ -5,7 +5,13 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/foundation/Button";
 import { Logo } from "@/components/foundation/Logo";
 import { cn } from "@/lib/cn";
-import { HEADER_CTA, PRIMARY_NAV, isActivePath, type NavLink } from "./nav";
+import {
+  HEADER_CTA,
+  PRIMARY_NAV,
+  isActivePath,
+  isCurrentPage,
+  type NavLink,
+} from "./nav";
 
 /**
  * MobileNavigation — Design System §08 Header and navigation, §12 accessibility.
@@ -162,7 +168,7 @@ function DrawerLink({
     <Link
       href={link.href}
       onClick={onNavigate}
-      aria-current={active ? "page" : undefined}
+      aria-current={isCurrentPage(pathname, link.href) ? "page" : undefined}
       className={cn(
         // 48px minimum target on a 360px screen (§12).
         "flex min-h-12 items-center rounded-md font-body",

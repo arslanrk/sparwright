@@ -13,15 +13,13 @@ import {
   ProcessStepper,
   type ProcessStage,
 } from "@/components/content/ProcessStepper";
-import {
-  ProductCard,
-  type ProductCardItem,
-} from "@/components/content/ProductCard";
+import { ProductCard } from "@/components/content/ProductCard";
 import { ProofBar, type ProofPoint } from "@/components/content/ProofBar";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
 import { CTA } from "@/components/foundation/cta";
+import { PRODUCTS, productCardItem } from "@/lib/products";
 
 /**
  * Homepage — Design System §11 Homepage order, §A Starter copy library.
@@ -47,39 +45,14 @@ const PROOF_POINTS: ProofPoint[] = [
 ];
 
 /**
- * Product categories follow the §10 description formula: what it is, who it is
- * for, what can be customized. PR 5 makes `src/lib/products.ts` the source of
- * truth and should move these there.
+ * Product cards come from the §11 catalogue, so the homepage can only ever
+ * link to pages that exist. §08 gives the card action as "Explore Custom
+ * Gloves → or equivalent".
  */
-const PRODUCTS: ProductCardItem[] = [
-  {
-    category: "Boxing gloves",
-    title: "Custom Boxing Gloves",
-    description:
-      "Training, sparring and bag gloves for clubs and fightwear brands. Choose the shell material, padding profile, colours, closure and logo placement.",
-    href: "/products/custom-boxing-gloves",
-    shot: "Full glove front",
-    action: CTA.exploreGloves,
-  },
-  {
-    category: "Fightwear",
-    title: "Fightwear",
-    description:
-      "Fight shorts and rashguards for clubs and growing brands. Specify fabric, panel layout, colours, sizing and printed or sublimated branding.",
-    href: "/products/fightwear",
-    shot: "Fight shorts",
-    action: CTA.exploreFightwear,
-  },
-  {
-    category: "Club apparel",
-    title: "Club Apparel",
-    description:
-      "T-shirts, hoodies and tracksuits for gyms ordering across their members. Match club colours, logo placement and sizing across the whole kit.",
-    href: "/products/club-apparel",
-    shot: "Club apparel flat lay",
-    action: CTA.exploreClubApparel,
-  },
-];
+const PRODUCT_ACTIONS: Record<string, string> = {
+  "custom-boxing-gloves": CTA.exploreGloves,
+  "fightwear-club-apparel": CTA.exploreFightwear,
+};
 
 /** Headings and body copy taken verbatim from the §A audience-page heroes. */
 const AUDIENCES: AudienceCardItem[] = [
@@ -183,11 +156,14 @@ export default function Home() {
         <SectionHeader
           eyebrow="Custom products"
           title="Custom gloves, fightwear and club apparel."
-          description="Three focused categories, each manufactured against your branding, colours and product specifications."
+          description="Two focused product pages, each manufactured against your branding, colours and product specifications."
         />
-        <div className="mt-[var(--space-7)] grid gap-[var(--space-5)] sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-[var(--space-7)] grid gap-[var(--space-5)] sm:grid-cols-2 xl:grid-cols-4">
           {PRODUCTS.map((product) => (
-            <ProductCard key={product.href} item={product} />
+            <ProductCard
+              key={product.slug}
+              item={productCardItem(product, PRODUCT_ACTIONS[product.slug])}
+            />
           ))}
         </div>
       </Section>

@@ -166,7 +166,7 @@ Establish proposition, proof and the primary conversion action.
 > process stepper carries `id="how-it-works"`, which is what the header's
 > How It Works item has been pointing at since PR 3.
 
-### PR 5 — Product catalog
+### PR 5 — Product catalog ✅
 
 A products index plus one reusable template that every product page renders from.
 
@@ -182,9 +182,33 @@ A products index plus one reusable template that every product page renders from
 - `src/lib/products.ts`
 - `src/components/content/ImageGallery.tsx`
 - `src/components/content/SpecificationTable.tsx`
+- `src/components/content/Testimonial.tsx` (built, rendered nowhere)
+- `src/components/content/CaseStudyCard.tsx` (built, rendered nowhere)
+- `src/components/navigation/nav.ts` (dropdown now built from the catalogue)
+- `src/app/page.tsx` (homepage cards now read the catalogue)
 
 **Design system refs:** §11 Product page template · §09 Image ratios
 **Depends on:** PR 4
+**Status:** Complete — typecheck, lint and build pass; both slugs prerender as static SSG
+
+> **Slug reconciliation, resolved.** PR 3 guessed at three product slugs before
+> the catalogue existed. §11 launches with two product pages — the anchor
+> product and one combined Fightwear and Club Apparel page — and non-negotiable
+> #7 rules out splitting that into thin category pages, so the catalogue seeds
+> `custom-boxing-gloves` and `fightwear-club-apparel`. The Products dropdown and
+> the homepage cards are now generated from `src/lib/products.ts`, so the menu
+> can only offer pages that exist.
+
+> Product copy states no MOQ, lead time or certification (non-negotiables #5,
+> #6): the MOQ and lead-time FAQ answers commit to confirming per order rather
+> than publishing a figure, and specification rows say what the buyer decides
+> and when it is fixed. `Testimonial` and `CaseStudyCard` are built but rendered
+> nowhere, and their props enforce §08 — an attributed name is required and
+> `permission` only accepts the literal `"granted"`. The product FAQ renders as
+> a description list; PR 10 swaps in `FAQAccordion` without moving the content.
+> One fix carried over from PR 3: nav links now separate `data-active` (the
+> section you are in) from `aria-current="page"` (the page you are on), so a
+> product page no longer announces two links as current.
 
 ### PR 6 — For Clubs and Gyms
 
