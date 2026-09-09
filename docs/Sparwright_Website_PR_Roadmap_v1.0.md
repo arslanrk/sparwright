@@ -210,7 +210,7 @@ A products index plus one reusable template that every product page renders from
 > section you are in) from `aria-current="page"` (the page you are on), so a
 > product page no longer announces two links as current.
 
-### PR 6 — For Clubs and Gyms
+### PR 6 — For Clubs and Gyms ✅
 
 The primary audience landing page — club identity across a full kit.
 
@@ -222,6 +222,15 @@ The primary audience landing page — club identity across a full kit.
 
 **Design system refs:** §11 For Clubs template
 **Depends on:** PR 5
+**Status:** Complete — typecheck, lint and build pass; `/for-clubs` prerenders static
+
+> All eight template sections in order, with the §A hero copy verbatim. Product
+> options render from the catalogue rather than a second hand-written list. The
+> page carries one conversion action throughout — the mockup — and "Build Your
+> Club Kit" appears only where §10 permits it, on the coordinated-kit section
+> whose destination is unambiguous. No MOQ, price break or lead time anywhere
+> (#5, #6); the reorder section describes retention of the approved
+> specification, which is non-negotiable #11.
 
 ### PR 7 — Private Label
 
