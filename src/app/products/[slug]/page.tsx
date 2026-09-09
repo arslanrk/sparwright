@@ -172,7 +172,8 @@ export default async function ProductPage({
         <SectionHeader
           eyebrow="Quality control"
           title="What is checked before dispatch"
-          description="Only checks the team performs and records — §11 rules out publishing any we would not."
+          // §11: only checks the team will consistently perform and record.
+          description="Every one of these is performed and recorded before the order leaves the workshop."
         />
         <ul className="mt-[var(--space-5)] flex flex-col gap-3">
           {product.qualityPoints.map((point) => (

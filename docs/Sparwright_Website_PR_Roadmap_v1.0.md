@@ -232,7 +232,7 @@ The primary audience landing page — club identity across a full kit.
 > (#5, #6); the reorder section describes retention of the approved
 > specification, which is non-negotiable #11.
 
-### PR 7 — Private Label
+### PR 7 — Private Label ✅
 
 Development, labelling and packaging story for fightwear-brand buyers.
 
@@ -244,6 +244,17 @@ Development, labelling and packaging story for fightwear-brand buyers.
 
 **Design system refs:** §11 Private-label template
 **Depends on:** PR 5
+**Status:** Complete — typecheck, lint and build pass; `/private-label` prerenders static
+
+> All nine template sections in order, §A hero copy verbatim. The audience is a
+> brand owner rather than a club, so the action is "Send Your Product Brief"
+> rather than the mockup. Section 9 is the entry point to the structured quote
+> form — it lists what to include in a brief; the form itself ships in PR 9.
+
+> Review fix applied across PR 5 and PR 7: two pages had leaked design-system
+> section numbers into buyer-facing copy ("§11 rules out publishing any we
+> would not"). The rationale now lives in a code comment and the visible
+> sentence states the commitment plainly.
 
 ### PR 8 — Manufacturing and Quality
 
