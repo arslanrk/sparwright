@@ -124,7 +124,7 @@ Header, mobile navigation and footer, wired into the root layout for every route
 
 The six launch pathways from the information architecture, each built as a reviewable PR against its own template.
 
-### PR 4 — Homepage
+### PR 4 — Homepage ✅
 
 Establish proposition, proof and the primary conversion action.
 
@@ -139,11 +139,32 @@ Establish proposition, proof and the primary conversion action.
 - `src/components/content/ProofBar.tsx`
 - `src/components/content/ProcessStepper.tsx`
 - `src/components/content/CallToAction.tsx`
+- `src/components/content/ProductCard.tsx`
+- `src/components/content/AudienceCard.tsx`
+- `src/components/content/CustomizationCard.tsx`
+- `src/components/content/ImagePlaceholder.tsx` (named §09 shot slots)
+- `src/components/foundation/cta.ts` (§08 "or equivalent" product actions)
+- `src/components/foundation/Container.tsx` (`Section density`)
+- `src/app/layout.tsx` (single `<main>` landmark)
+- `src/app/globals.css` (`.section-band-compact`)
 
 **Design system refs:** §11 Homepage order · §A Starter copy
 **Depends on:** PR 3
+**Status:** Complete — typecheck, lint and build pass; `/` prerenders static with all eight bands in order
 
-> Open question: the source doc illustrates the homepage section stack as a figure, not an itemized list. This PR assumes Hero → Proof bar → product/audience overview → customization panel → process stepper → manufacturing teaser → final CTA. Confirm the exact order before merging.
+> Open question, still open: the source doc illustrates the homepage section stack as a figure, not an itemized list. This PR ships Hero → Proof bar → products → audiences → customization panel → process stepper → manufacturing teaser → final CTA. Confirm the exact order before merging.
+
+> Hero, proof bar, customization panel and process stepper are §08/§A verbatim.
+> Three things to know. **No photography exists**, and §09 rules out stock and
+> AI imagery, so every image region renders an `ImagePlaceholder` naming the
+> §09 minimum-launch shot it waits on (`Hero boxing-glove image`, `Full glove
+> front`, `Fight shorts`, `Club apparel flat lay`, `Workshop wide view`) —
+> visible, trackable, and a PR 13 blocker. **§A gives the final CTA as "REQUEST
+> A QUOTE"**, which is not in the §08 CTA library; the button renders
+> "Get a Manufacturing Quote" and `cta.ts` gained three §08 "or equivalent"
+> labels for the other product cards and the private-label pathway. And the
+> process stepper carries `id="how-it-works"`, which is what the header's
+> How It Works item has been pointing at since PR 3.
 
 ### PR 5 — Product catalog
 

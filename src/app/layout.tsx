@@ -43,9 +43,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <Header />
-        <div id="main-content" tabIndex={-1} className="flex-1">
+        {/* One main landmark for every route, so a page renders its bands
+            directly and the skip link always has somewhere to land. */}
+        <main id="main-content" tabIndex={-1} className="flex-1">
           {children}
-        </div>
+        </main>
         <Footer />
         <MobileActionBar />
       </body>

@@ -52,8 +52,15 @@ export function Container({
 /** §04 theme recipes. A section overrides the page roles for its own band. */
 export type SectionTheme = "light" | "white" | "dark" | "action";
 
+/**
+ * Vertical rhythm. `compact` is for a band that reads as part of the one above
+ * it — the proof bar sitting directly under the hero (§11).
+ */
+export type SectionDensity = "default" | "compact";
+
 type SectionProps = {
   theme?: SectionTheme;
+  density?: SectionDensity;
   /** Width of the container this section renders around its children. */
   width?: ContainerWidth;
   /** Opt out of the container for full-bleed content. */
@@ -66,6 +73,7 @@ type SectionProps = {
 
 export function Section({
   theme = "light",
+  density = "default",
   width = "work",
   contained = true,
   as: Tag = "section",
@@ -77,7 +85,11 @@ export function Section({
     <Tag
       id={id}
       data-theme={theme}
-      className={cn("section-band", className)}
+      className={cn(
+        "section-band",
+        density === "compact" && "section-band-compact",
+        className,
+      )}
     >
       {contained ? <Container width={width}>{children}</Container> : children}
     </Tag>

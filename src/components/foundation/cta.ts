@@ -18,6 +18,15 @@ export const CTA = {
   products: "View Custom Products",
   gloves: "View Custom Gloves",
   exploreGloves: "Explore Custom Gloves",
+  /**
+   * §08 specifies the product-card action as "Explore Custom Gloves → or
+   * equivalent". These are the equivalents for the other two categories and
+   * for the private-label pathway: verb plus a specific destination, never a
+   * vague "Learn more".
+   */
+  exploreFightwear: "Explore Fightwear",
+  exploreClubApparel: "Explore Club Apparel",
+  privateLabel: "View Private Label Manufacturing",
   process: "See How Production Works",
   howItWorks: "How It Works",
   manufacturing: "View Manufacturing Process",

@@ -279,6 +279,12 @@
   color: var(--color-text);
 }
 
+/* A band that reads as part of the one above it (§11 proof bar). Unlayered
+   like .section-band, so it wins on source order rather than specificity. */
+.section-band-compact {
+  padding-block: clamp(2rem, 4vw, 3rem);
+}
+
 /* Keyboard focus needs to stay visible on dark and action bands. */
 [data-theme="dark"] :focus-visible,
 [data-theme="action"] :focus-visible {
