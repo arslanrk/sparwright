@@ -141,7 +141,13 @@ export default function Home() {
         description="Boxing gloves, fightwear and club apparel manufactured in Sialkot with your colours, logo and specifications."
         actions={
           <>
-            <Button href="/quote" variant="primary" arrow>
+            <Button
+              href="/quote?intent=mockup"
+              variant="primary"
+              arrow
+              data-analytics="hero_mockup_click"
+              data-analytics-surface="hero"
+            >
               {CTA.mockup}
             </Button>
             <Button href="/products" variant="secondary">
@@ -201,7 +207,12 @@ export default function Home() {
           ))}
         </div>
         <div className="mt-[var(--space-7)]">
-          <Button href="/quote" variant="inverse" arrow>
+          <Button
+            href="/quote?intent=mockup"
+            variant="inverse"
+            arrow
+            data-analytics="hero_mockup_click"
+          >
             {CTA.mockup}
           </Button>
         </div>
@@ -247,7 +258,11 @@ export default function Home() {
       <CallToAction
         title="Ready to develop your custom fight gear?"
         description="Send your product, branding, quantity and destination."
-        action={{ label: CTA.quote, href: "/quote" }}
+        action={{
+          label: CTA.quote,
+          href: "/quote",
+          analytics: "hero_quote_click",
+        }}
       />
     </>
   );

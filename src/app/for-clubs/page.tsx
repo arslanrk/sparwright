@@ -95,7 +95,12 @@ export default function ForClubsPage() {
         description="Custom gloves, fightwear and apparel created around your club colours, logo and practical ordering requirements."
         actions={
           <>
-            <Button href="/quote" variant="primary" arrow>
+            <Button
+              href="/quote?intent=mockup"
+              variant="primary"
+              arrow
+              data-analytics="hero_mockup_click"
+            >
               {CTA.mockup}
             </Button>
             <Button href="/products" variant="secondary">
@@ -196,7 +201,12 @@ export default function ForClubsPage() {
           </ul>
         </div>
         <div className="mt-[var(--space-7)]">
-          <Button href="/quote" variant="inverse" arrow>
+          <Button
+            href="/quote?intent=mockup"
+            variant="inverse"
+            arrow
+            data-analytics="hero_mockup_click"
+          >
             {CTA.mockup}
           </Button>
         </div>
@@ -265,7 +275,11 @@ export default function ForClubsPage() {
       <CallToAction
         title="Ready to build your club kit?"
         description="Send your club colours, logo, products and approximate quantity."
-        action={{ label: CTA.mockup, href: "/quote" }}
+        action={{
+          label: CTA.mockup,
+          href: "/quote?intent=mockup",
+          analytics: "hero_mockup_click",
+        }}
       />
     </>
   );

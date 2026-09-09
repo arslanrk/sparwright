@@ -433,7 +433,7 @@ Every page, every breakpoint, no mouse required.
 > development tool and deliberately not added to `package.json`, since this PR
 > is fixes only.
 
-### PR 12 — Analytics and lead ops
+### PR 12 — Analytics and lead ops ✅
 
 Measure the commercial funnel, not just traffic.
 
@@ -443,10 +443,47 @@ Measure the commercial funnel, not just traffic.
 
 **Files**
 - `src/lib/analytics.ts`
-- `src/app/api/quote/route.ts` (extend)
+- `src/components/analytics/AnalyticsListener.tsx` (one delegated listener)
+- `src/app/api/quote/route.ts`, `src/lib/leads.ts` (lead record extended)
+- CTA wiring across the homepage, product, for-clubs, header, drawer and footer
 
 **Design system refs:** §14 Analytics events · §14 Commercial funnel
 **Depends on:** PR 9
+**Status:** Complete — all twelve §14 events defined and wired; funnel verified end to end in a real browser, with consent on and off
+
+> **Consent gates everything.** `track` drops the event unless the visitor
+> accepted analytics on the PR 10 banner, and events are not queued for
+> retroactive replay. Verified: a session that chooses "Essential Only" records
+> zero events through a full click-through.
+
+> **No vendor is wired in** — which analytics product to use is a launch
+> decision. Events push to `window.dataLayer` (the shape GTM and GA4 read) and
+> dispatch a DOM event alongside; adding the vendor script later costs one
+> `<script>` tag. `NEXT_PUBLIC_ANALYTICS_DEBUG=true` logs the funnel to the
+> console so it can be checked before any vendor exists. Event names are a
+> closed union of the §14 twelve: a typo fails to compile rather than quietly
+> creating a new event.
+
+> Pages stay server components — measured CTAs carry `data-analytics` and one
+> delegated listener in the layout does the work, rather than turning every
+> page into a client component for a counter.
+
+> **The funnel test found a real attribution bug.** The header, drawer and
+> sticky-bar CTAs all say "Request Your Mockup" but linked to a bare `/quote`,
+> so every mockup request that did not start at a hero was recorded as a plain
+> quote. They now carry `intent=mockup` and report `hero_mockup_click` with a
+> `surface` property (hero / header / drawer / action_bar) — §14 fixes the
+> twelve names, so surfaces are told apart by a property, not an invented name.
+
+> Lead records now carry `stage` (starting at `new`, with the §14 follow-up
+> stages typed), `source` (intent, entry path, external referrer) and a
+> `summary` of the four fields the commercial funnel reports on — product,
+> quantity, destination, artwork — lifted out so the destination system does
+> not need to know our field names. Verified against a local receiver.
+
+> §14 also lists WhatsApp as the secondary contact. It sits in the footer, not
+> as a floating launcher, so it cannot compete with the primary CTA (§15), and
+> it appears only when `NEXT_PUBLIC_WHATSAPP_NUMBER` is set — no invented number.
 
 ### PR 13 — Launch readiness
 

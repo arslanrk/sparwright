@@ -49,6 +49,8 @@ export function ProductCard({
             minimum; the card comfortably clears it. */}
         <Link
           href={item.href}
+          data-analytics="product_card_open"
+          data-analytics-product={item.title}
           className="rounded-sm after:absolute after:inset-0 after:content-['']"
         >
           {item.title}

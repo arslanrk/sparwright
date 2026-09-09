@@ -76,10 +76,21 @@ export default async function ProductPage({
               description={product.summary}
             />
             <div className="mt-[var(--space-6)] flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
-              <Button href="/quote" variant="primary" arrow>
+              <Button
+                href="/quote?intent=mockup"
+                variant="primary"
+                arrow
+                data-analytics="hero_mockup_click"
+                data-analytics-product={product.name}
+              >
                 {CTA.mockup}
               </Button>
-              <Button href="/quote" variant="secondary">
+              <Button
+                href="/quote"
+                variant="secondary"
+                data-analytics="hero_quote_click"
+                data-analytics-product={product.name}
+              >
                 {CTA.quote}
               </Button>
             </div>
@@ -161,7 +172,13 @@ export default async function ProductPage({
           ))}
         </ol>
         <div className="mt-[var(--space-7)]">
-          <Button href="/quote" variant="inverse" arrow>
+          <Button
+            href="/quote"
+            variant="inverse"
+            arrow
+            data-analytics="sample_request"
+            data-analytics-product={product.name}
+          >
             {CTA.sample}
           </Button>
         </div>

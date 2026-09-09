@@ -69,7 +69,12 @@ export function Header() {
           </nav>
 
           <div className="hidden lg:block">
-            <Button href={HEADER_CTA.href} variant="primary">
+            <Button
+              href={HEADER_CTA.href}
+              variant="primary"
+              data-analytics="hero_mockup_click"
+              data-analytics-surface="header"
+            >
               {HEADER_CTA.label}
             </Button>
           </div>

@@ -46,6 +46,7 @@ export default function QuotePage() {
           Prefer email? Write to{" "}
           <a
             href={`mailto:${CONTACT.email}`}
+            data-analytics="email_click"
             className="rounded-sm font-semibold text-[var(--color-text)] underline underline-offset-4"
           >
             {CONTACT.email}

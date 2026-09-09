@@ -96,6 +96,19 @@ export async function POST(request: Request) {
     reference: createReference(),
     receivedAt: new Date().toISOString(),
     owner: assignOwner(values.category),
+    // Every lead starts here; the destination system owns what happens next.
+    stage: "new",
+    source: {
+      intent: readSource(form, "sourceIntent") || "quote",
+      path: readSource(form, "sourcePath"),
+      referrer: readSource(form, "sourceReferrer"),
+    },
+    summary: {
+      product: values.productType,
+      quantity: values.quantity,
+      destination: values.country,
+      hasArtwork: Boolean(file),
+    },
     request: values,
     artwork: file
       ? { name: file.name, size: file.size, type: file.type }
@@ -119,6 +132,16 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ reference: lead.reference }, { status: 201 });
+}
+
+/**
+ * Attribution fields, read separately from the buyer's own answers. They are
+ * capped hard: they come from the browser, and nothing but a short string
+ * belongs in a lead record's source.
+ */
+function readSource(form: FormData, field: string): string {
+  const raw = form.get(field);
+  return typeof raw === "string" ? raw.slice(0, 512).trim() : "";
 }
 
 /**

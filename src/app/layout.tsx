@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo, Inter } from "next/font/google";
+import { AnalyticsListener } from "@/components/analytics/AnalyticsListener";
 import { CookieBanner } from "@/components/navigation/CookieBanner";
 import { Footer } from "@/components/navigation/Footer";
 import { Header } from "@/components/navigation/Header";
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Footer />
         <MobileActionBar />
         <CookieBanner />
+        <AnalyticsListener />
       </body>
     </html>
   );

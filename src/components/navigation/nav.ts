@@ -50,8 +50,18 @@ export const PRIMARY_NAV: PrimaryNavItem[] = [
   { label: CTA.howItWorks, href: "/#how-it-works" },
 ];
 
-/** Primary header action. §08 keeps one conversion action in the header. */
-export const HEADER_CTA = { label: CTA.mockup, href: "/quote" } as const;
+/**
+ * Primary header action. §08 keeps one conversion action in the header.
+ *
+ * It carries the mockup intent because it is a mockup CTA: without it, every
+ * lead that came through the header, the drawer or the sticky bar was recorded
+ * as a plain quote, which is the wrong answer to "where do mockup requests come
+ * from?" (§14 lead source).
+ */
+export const HEADER_CTA = {
+  label: CTA.mockup,
+  href: "/quote?intent=mockup",
+} as const;
 
 /**
  * Contact details are unconfirmed placeholders on a working brand (§03). The
@@ -62,6 +72,20 @@ export const CONTACT = {
   email: "hello@sparwright.com",
   location: "Sialkot, Pakistan",
 } as const;
+
+/**
+ * §14 lists WhatsApp as the secondary contact, and §15 requires it not to
+ * compete with the primary CTA — so it lives in the footer, not as a floating
+ * launcher. The number is not invented: set `NEXT_PUBLIC_WHATSAPP_NUMBER` (digits
+ * only, with country code) and the link appears; leave it unset and it does not.
+ */
+export function whatsappHref(): string | null {
+  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(
+    /[^0-9]/g,
+    "",
+  );
+  return number ? `https://wa.me/${number}` : null;
+}
 
 export type FooterColumn = { heading: string; links: NavLink[] };
 

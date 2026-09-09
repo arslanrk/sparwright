@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
+import { track } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import {
   ACCEPTED_ARTWORK,
@@ -88,8 +89,12 @@ export function FileUpload({
       return;
     }
 
+    // The file is accepted into the form here; the bytes move on submit.
+    track("logo_upload_start", { file_type: file.type || "unknown" });
+
     if (!onUpload) {
       onChange({ status: "success", file });
+      track("logo_upload_complete", { file_type: file.type || "unknown" });
       return;
     }
 
@@ -99,6 +104,7 @@ export function FileUpload({
         onChange({ status: "uploading", file, progress: fraction });
       });
       onChange({ status: "success", file });
+      track("logo_upload_complete", { file_type: file.type || "unknown" });
     } catch (error) {
       onChange({
         status: "error",

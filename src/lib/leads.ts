@@ -26,10 +26,46 @@ import type { QuoteRequest } from "./quote";
  * dependency of this project, so the boundary is held by that discipline.
  */
 
+/**
+ * §14 "Lead status and follow-up tracking". Every lead leaves here at
+ * `new`; the destination system owns the stages after that, which is why the
+ * type lists them rather than the code trying to advance them.
+ */
+export const LEAD_STAGES = [
+  "new",
+  "qualifying",
+  "concept_sent",
+  "sample_agreed",
+  "quoted",
+  "won",
+  "lost",
+] as const;
+
+export type LeadStage = (typeof LEAD_STAGES)[number];
+
+/** Where the request came from — §14 asks the record to carry source. */
+export type LeadSourceRecord = {
+  intent: string;
+  path: string;
+  referrer: string;
+};
+
 export type Lead = {
   reference: string;
   receivedAt: string;
   owner: string;
+  stage: LeadStage;
+  source: LeadSourceRecord;
+  /**
+   * The four fields the §14 commercial funnel reports on, lifted out of the
+   * request so the destination system does not have to know our field names.
+   */
+  summary: {
+    product: string;
+    quantity: string;
+    destination: string;
+    hasArtwork: boolean;
+  };
   request: QuoteRequest;
   artwork?: { name: string; size: number; type: string };
 };
@@ -93,6 +129,14 @@ export async function deliverLead(
   body.append("reference", lead.reference);
   body.append("receivedAt", lead.receivedAt);
   body.append("owner", lead.owner);
+  body.append("stage", lead.stage);
+  body.append("sourceIntent", lead.source.intent);
+  body.append("sourcePath", lead.source.path);
+  body.append("sourceReferrer", lead.source.referrer);
+  body.append("summaryProduct", lead.summary.product);
+  body.append("summaryQuantity", lead.summary.quantity);
+  body.append("summaryDestination", lead.summary.destination);
+  body.append("summaryHasArtwork", String(lead.summary.hasArtwork));
   for (const [field, value] of Object.entries(lead.request)) {
     body.append(field, value);
   }

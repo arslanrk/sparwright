@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/foundation/Container";
 import { Logo } from "@/components/foundation/Logo";
-import { CONTACT, FOOTER_COLUMNS, LEGAL_LINKS } from "./nav";
+import { CONTACT, FOOTER_COLUMNS, LEGAL_LINKS, whatsappHref } from "./nav";
 
 /**
  * Footer — Design System §08 Footer, §04 dark theme recipe.
@@ -11,6 +11,8 @@ import { CONTACT, FOOTER_COLUMNS, LEGAL_LINKS } from "./nav";
  */
 export function Footer() {
   const year = new Date().getFullYear();
+  // §14 secondary contact. Absent until a real number is configured.
+  const whatsapp = whatsappHref();
 
   return (
     <footer
@@ -41,6 +43,11 @@ export function Footer() {
                     <FooterLink href={link.href}>{link.label}</FooterLink>
                   </li>
                 ))}
+                {column.heading === "Contact" && whatsapp ? (
+                  <li>
+                    <FooterLink href={whatsapp}>WhatsApp</FooterLink>
+                  </li>
+                ) : null}
               </ul>
             </nav>
           ))}
@@ -73,9 +80,24 @@ function FooterLink({
   const className =
     "inline-flex min-h-6 items-center rounded-sm font-body text-small text-[var(--color-text-secondary)] underline-offset-4 transition-colors hover:text-[var(--color-white)] hover:underline";
 
+  // §14 measures both contact routes out of the site.
   if (href.startsWith("mailto:")) {
     return (
-      <a href={href} className={className}>
+      <a href={href} data-analytics="email_click" className={className}>
+        {children}
+      </a>
+    );
+  }
+
+  if (href.startsWith("https://wa.me/")) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-analytics="whatsapp_click"
+        className={className}
+      >
         {children}
       </a>
     );

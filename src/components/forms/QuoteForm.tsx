@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Button } from "@/components/foundation/Button";
+import { readLeadSource, track } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import {
   CATEGORY_CHOICES,
@@ -51,8 +52,22 @@ export function QuoteForm() {
   const [status, setStatus] = useState<Status>("editing");
   const [step, setStep] = useState<1 | 2>(1);
   const stepHeadingRef = useRef<HTMLHeadingElement>(null);
+  // §14 separates the two entry points into the same form. Reported once, on
+  // the first answer — arriving at the page is not starting the form.
+  const startReported = useRef(false);
+
+  function reportStart() {
+    if (startReported.current) return;
+    startReported.current = true;
+    const source = readLeadSource();
+    track(
+      source.intent === "mockup" ? "mockup_form_start" : "quote_form_start",
+      { entry_path: source.entryPath },
+    );
+  }
 
   function set<K extends QuoteField>(field: K, value: QuoteRequest[K]) {
+    reportStart();
     setValues((current) => ({ ...current, [field]: value }));
     // Clear the error the moment the buyer addresses it, not on the next submit.
     setErrors((current) => {
@@ -105,6 +120,12 @@ export function QuoteForm() {
     for (const [field, value] of Object.entries(values)) {
       body.append(field, value);
     }
+    // §14: the lead record carries source alongside product, quantity and
+    // destination, so follow-up can be attributed.
+    const source = readLeadSource();
+    body.append("sourceIntent", source.intent);
+    body.append("sourcePath", source.entryPath);
+    body.append("sourceReferrer", source.referrer);
     const file = artwork.status === "success" ? artwork.file : undefined;
     if (file) body.append("artwork", file);
 
@@ -114,6 +135,13 @@ export function QuoteForm() {
         if (file) setArtwork({ status: "uploading", file, progress: fraction });
       });
       setStatus("submitted");
+      track("quote_form_submit", {
+        product: values.productType,
+        quantity: values.quantity,
+        destination: values.country,
+        intent: source.intent,
+        has_artwork: Boolean(file),
+      });
     } catch (error) {
       if (file) setArtwork({ status: "success", file });
       setStatus("editing");

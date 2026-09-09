@@ -139,6 +139,8 @@ export function MobileNavigation({
             variant="primary"
             className="w-full"
             onClick={onClose}
+            data-analytics="hero_mockup_click"
+            data-analytics-surface="drawer"
           >
             {HEADER_CTA.label}
           </Button>
@@ -193,7 +195,13 @@ export function MobileActionBar() {
       data-theme="white"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--color-border)] bg-[var(--color-bg)] px-5 py-3 lg:hidden"
     >
-      <Button href={HEADER_CTA.href} variant="primary" className="w-full">
+      <Button
+        href={HEADER_CTA.href}
+        variant="primary"
+        className="w-full"
+        data-analytics="hero_mockup_click"
+        data-analytics-surface="action_bar"
+      >
         {HEADER_CTA.label}
       </Button>
     </div>

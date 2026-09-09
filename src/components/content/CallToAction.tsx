@@ -12,7 +12,8 @@ import { Section } from "@/components/foundation/Container";
 type CallToActionProps = {
   title: string;
   description: string;
-  action: { label: string; href: string };
+  /** `analytics` names the §14 event this band's action reports. */
+  action: { label: string; href: string; analytics?: string };
 };
 
 export function CallToAction({
@@ -28,7 +29,12 @@ export function CallToAction({
           <p className="mt-3 text-body-large">{description}</p>
         </div>
         <div className="shrink-0">
-          <Button href={action.href} variant="inverse" arrow>
+          <Button
+            href={action.href}
+            variant="inverse"
+            arrow
+            data-analytics={action.analytics}
+          >
             {action.label}
           </Button>
         </div>

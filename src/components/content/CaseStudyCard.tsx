@@ -45,7 +45,12 @@ export function CaseStudyCard({
   if (permission !== "granted") return null;
 
   const heading = href ? (
-    <Link href={href} className="rounded-sm">
+    <Link
+      href={href}
+      data-analytics="case_study_open"
+      data-analytics-customer={customerName}
+      className="rounded-sm"
+    >
       {customerName}
     </Link>
   ) : (
