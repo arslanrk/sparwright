@@ -5,6 +5,13 @@ import { CookieBanner } from "@/components/navigation/CookieBanner";
 import { Footer } from "@/components/navigation/Footer";
 import { Header } from "@/components/navigation/Header";
 import { MobileActionBar } from "@/components/navigation/MobileNavigation";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TAGLINE,
+  isProductionSite,
+  siteUrl,
+} from "@/lib/site";
 import "./globals.css";
 
 // §05 — Archivo (600/700) for display, Inter (400/500/600) for body and UI.
@@ -21,14 +28,35 @@ const inter = Inter({
   display: "swap",
 });
 
-// §01 positioning statement and supporting statement.
+// §01 positioning statement and supporting statement, plus the §15 launch
+// metadata. `metadataBase` is what makes the Open Graph image URL absolute;
+// without it a share preview resolves against the wrong origin.
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
-    default: "Sparwright — Custom fight gear for clubs and brands",
-    template: "%s | Sparwright",
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Boxing gloves, fightwear and club apparel manufactured in Sialkot with your logo, colours and specifications.",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    locale: "en_GB",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+  },
+  alternates: { canonical: "/" },
+  // Belt and braces with robots.ts: nothing is indexed until launch is called.
+  robots: isProductionSite()
+    ? { index: true, follow: true }
+    : { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

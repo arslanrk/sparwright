@@ -8,7 +8,7 @@ Thirteen sequential, reviewable pull requests that take `sparwright` from the cu
 | Scope | 13 PRs across 4 phases |
 | Stack | Next.js 16.3.4 · App Router · Tailwind v4 |
 | Prepared | 09 September 2026 |
-| Status | Draft — pending scope confirmation |
+| Status | All 13 PRs built · launch **blocked** on nine non-code items (see PR 13) |
 
 > This repo runs Next.js 16.3.4, which differs from training-era Next.js in places (see `AGENTS.md`). Before implementing any PR below, check the relevant guide under `node_modules/next/dist/docs/` — routing conventions, `next/font`, metadata files and typed route props have all moved since most training data.
 
@@ -485,7 +485,7 @@ Measure the commercial funnel, not just traffic.
 > as a floating launcher, so it cannot compete with the primary CTA (§15), and
 > it appears only when `NEXT_PUBLIC_WHATSAPP_NUMBER` is set — no invented number.
 
-### PR 13 — Launch readiness
+### PR 13 — Launch readiness ✅ (built) · ⛔ NO-GO to publish
 
 SEO metadata and the full §15 checklist run against the live preview.
 
@@ -498,9 +498,102 @@ SEO metadata and the full §15 checklist run against the live preview.
 - `src/app/opengraph-image.tsx`
 - `src/app/sitemap.ts`
 - `src/app/robots.ts`
+- `src/lib/site.ts` (canonical origin, indexing gate)
+- `src/app/layout.tsx` (`metadataBase`, Open Graph, robots directive)
 
 **Design system refs:** §15 Launch checklist
 **Depends on:** PR 1–12
+**Status:** Metadata complete and verified. **The launch checklist does not pass — see the go/no-go below.**
+
+> **Indexing is off until someone turns it on.** `robots.ts` and the layout's
+> robots directive both return `noindex` unless `NEXT_PUBLIC_SITE_URL` is set
+> *and* `NEXT_PUBLIC_ALLOW_INDEXING=true`. §15 gates launch on a go/no-go
+> decision, and a preview build getting quietly indexed would make that
+> decision for us. Verified in both modes: unset gives `Disallow: /` and
+> `noindex, nofollow`; set gives the full sitemap of 11 URLs at the real
+> origin, `Allow: /` with `/api/` excluded, and `index, follow`.
+
+> The Open Graph image is typographic, not photographic — the same reason the
+> logo is. A link preview is where a borrowed stock image would do the most
+> damage, since it is the first thing a buyer sees. It renders at build time
+> (1200×630 PNG, verified) and swaps for a real one when the shoot lands. The
+> sitemap is generated from the catalogue, so a new product page cannot be
+> added and quietly left out.
+
+#### §15 launch checklist, run against a production build
+
+Run locally with `next build && next start`, not against a deployed preview —
+no deployment exists yet. Everything below marked ✅ was checked, not assumed.
+
+**Brand and content**
+
+| Item | |
+|---|---|
+| Working or final name used consistently | ✅ one `SITE_NAME`, no stray spellings |
+| Product, buyer and manufacturing model clear above the fold | ✅ §A hero copy verbatim on every landing page |
+| No invented customer, capacity or satisfaction statistics | ✅ proof bar is four factual points; `Testimonial`/`CaseStudyCard` render nowhere |
+| Every MOQ, material, lead-time and process statement confirmed internally | ⛔ **not confirmed** — the site publishes no MOQ or lead time by design, but the material and process wording still needs a read by the team |
+| Primary CTA language consistent | ✅ every label comes from the locked `cta.ts` |
+| Sialkot origin and team roles presented accurately | ⛔ **five roles have no name** |
+
+**Design and responsive QA**
+
+| Item | |
+|---|---|
+| All pages tested at 360/390/768/1024/1280/1440 | ✅ 11 routes × 6 widths, automated |
+| No clipped text, overflow, broken grids, overlapping sticky controls | ✅ clean |
+| Hero and product imagery crops correctly at every breakpoint | ⛔ **no imagery exists to crop** |
+| Forms comfortable on mobile and preserve input | ✅ verified through a 503, a validation failure and a rejected upload |
+| Typography, colour, radius and spacing use approved tokens | ✅ (with the three §04 contrast corrections from PR 11) |
+| WhatsApp does not compete with the primary CTA | ✅ footer only, and only when a number is configured |
+
+**Accessibility and interaction**
+
+| Item | |
+|---|---|
+| Keyboard navigation without traps | ✅ 30 focus stops, skip link first, drawer traps and releases correctly |
+| Visible focus on every control | ✅ |
+| Contrast in all states | ✅ 21 pairings, computed from the shipped tokens |
+| Reduced motion respected | ✅ zero elements animate under `reduce` |
+| Alt text on informative imagery | n/a — no `<img>` exists yet; **becomes a blocker the moment photography lands** |
+
+**Operations**
+
+| Item | |
+|---|---|
+| Email or CRM notification with assigned owner | ✅ built and verified against a receiver — ⛔ **no destination configured** |
+| Lead status and follow-up tracking | ✅ stage, source and funnel summary on every lead |
+| Basic analytics events and funnel reporting | ✅ all twelve §14 events verified — ⛔ **no vendor chosen** |
+| Approved artwork and specification storage process | ⛔ **not decided** — the site describes retention; the process behind it does not exist yet |
+
+#### Go/no-go
+
+**NO-GO.** The build is complete and every automated check passes, but §15 is
+explicit that trust lost through an unsupported claim costs more than an
+unfinished feature — and the site cannot yet honour what it would be saying.
+Nine things block publication, none of them code:
+
+1. **Photography.** 18 named §09 shots are still placeholders, including the
+   homepage hero and every production stage. §09 rules out stock and AI
+   imagery, so this is a shoot, not a sourcing task.
+2. **Named roles.** Five responsibilities on `/manufacturing` render
+   "Name to be confirmed before launch".
+3. **Company identification.** Registered name, number, address and
+   data-protection contact are marked gaps on `/privacy`.
+4. **Governing law** and company identification are marked gaps on `/terms`.
+5. **Legal review.** Both pages were written to describe what the site
+   actually does; neither has been read by anyone qualified.
+6. **Contact details.** `hello@sparwright.com` is an unconfirmed placeholder
+   and no WhatsApp number exists.
+7. **Lead destination.** `QUOTE_WEBHOOK_URL` is unset, so the form correctly
+   refuses submissions in production rather than dropping them.
+8. **Analytics vendor.** Events fire into `dataLayer` with nothing reading it.
+9. **Artwork retention process.** The site promises approved specifications
+   are kept; the operational process behind that promise is undecided.
+
+Items 6–8 are configuration and could be done in an afternoon. Items 1–5 and 9
+need the business, not the repo. **Do not set `NEXT_PUBLIC_ALLOW_INDEXING`
+until items 1–5 are closed** — the staging gate is the last thing to remove.
 
 ---
 
@@ -528,6 +621,6 @@ SEO metadata and the full §15 checklist run against the live preview.
 | Plan | Sparwright website PR roadmap |
 | Based on | Design system v1.0 |
 | Prepared | 09 September 2026 |
-| Status | Draft — pending scope confirmation |
-| Review trigger | Before PR 4 and PR 9 merge |
+| Status | All 13 PRs built; see PR 13 for the go/no-go |
+| Review trigger | Before PR 4 and PR 9 merge — PR 4 order still unconfirmed, PR 9 destination still unconfigured |
 | Working brand | Sparwright (replaceable) |
