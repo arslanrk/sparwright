@@ -81,7 +81,7 @@ The small set of components every page and pattern composes from.
 
 > CTA copy is locked. Only use approved labels (Request Your Mockup, Get a Manufacturing Quote, View Custom Products, How It Works…). Never Submit, Click Here, Discover More or Shop Now — §08.
 
-### PR 3 — Navigation shell
+### PR 3 — Navigation shell ✅
 
 Header, mobile navigation and footer, wired into the root layout for every route.
 
@@ -94,14 +94,29 @@ Header, mobile navigation and footer, wired into the root layout for every route
 
 **Files**
 - `src/components/navigation/Header.tsx`
-- `src/components/navigation/MobileNavigation.tsx`
+- `src/components/navigation/MobileNavigation.tsx` (drawer + `MobileActionBar`)
 - `src/components/navigation/Footer.tsx`
 - `src/components/navigation/Breadcrumb.tsx`
 - `src/components/navigation/CookieBanner.tsx`
+- `src/components/navigation/nav.ts` (shared navigation model)
 - `src/app/layout.tsx` (wire in)
+- `src/app/globals.css` (shell metrics, skip link)
 
 **Design system refs:** §08 Header and navigation · §08 Footer
 **Depends on:** PR 2
+**Status:** Complete — typecheck, lint and build pass; `/` still prerenders static with the shell in place
+
+> Header, drawer and footer read one `nav.ts` model so they cannot drift. The
+> two header heights and the action bar are published as `--header-height` and
+> `--action-bar-height`: `body` reserves the bar's height, and anything else
+> fixed to the bottom of the viewport — the cookie banner, and the WhatsApp
+> launcher when it lands — offsets against that token, which is how the §08
+> no-overlap rule is held. A skip link ships alongside, since a keyboard user
+> now has a header to skip past. Two follow-ups: the Products dropdown assumes
+> slugs `custom-boxing-gloves`, `fightwear` and `club-apparel`, which PR 5 must
+> reconcile with its seed content; and `CONTACT.email` in `nav.ts` is an
+> unconfirmed placeholder for the PR 13 checklist. `Breadcrumb` and
+> `CookieBanner` are built but not mounted — PR 10 wires them to real content.
 
 ---
 

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Archivo, Inter } from "next/font/google";
+import { Footer } from "@/components/navigation/Footer";
+import { Header } from "@/components/navigation/Header";
+import { MobileActionBar } from "@/components/navigation/MobileNavigation";
 import "./globals.css";
 
 // §05 — Archivo (600/700) for display, Inter (400/500/600) for body and UI.
@@ -32,7 +35,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${archivo.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {/* §08 navigation shell — the same header, footer and sticky mobile
+            action bar on every route. */}
+        {/* §12 — the first stop for a keyboard user on every page. */}
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
+        <Header />
+        <div id="main-content" tabIndex={-1} className="flex-1">
+          {children}
+        </div>
+        <Footer />
+        <MobileActionBar />
+      </body>
     </html>
   );
 }

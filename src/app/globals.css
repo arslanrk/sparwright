@@ -115,7 +115,8 @@
   /* -- Border and elevation (§06) ---------------------------------------- */
   --border-standard: 1px solid var(--color-line-200);
   --border-selected: 2px solid var(--color-forge-600);
-  --shadow-card: 0 1px 2px rgb(11 13 16 / 0.04), 0 8px 24px rgb(11 13 16 / 0.05);
+  --shadow-card:
+    0 1px 2px rgb(11 13 16 / 0.04), 0 8px 24px rgb(11 13 16 / 0.05);
   --shadow-overlay: 0 24px 60px rgb(11 13 16 / 0.16);
 
   /* -- Motion (§07) ------------------------------------------------------- */
@@ -146,15 +147,37 @@
 
   /* The site is a light brand surface; it does not follow OS dark mode. */
   color-scheme: light;
+
+  /* §08 navigation shell metrics. Kept out of @theme because nothing should
+     generate a utility from them — they are read directly, and everything
+     fixed to the bottom of the viewport (the cookie banner, and the WhatsApp
+     launcher when it lands) offsets against --action-bar-height so it can
+     never overlap the sticky mobile action bar. */
+  --header-height: 4rem; /* 64px — mobile header */
+  --action-bar-height: 4.25rem; /* 68px — sticky mobile action bar */
+}
+
+@media (width >= 64rem) {
+  :root {
+    --header-height: 4.75rem; /* 76px — desktop header */
+    --action-bar-height: 0rem; /* the desktop header carries the action */
+  }
 }
 
 @layer base {
+  html {
+    /* Anchor targets must clear the sticky header. */
+    scroll-padding-top: calc(var(--header-height) + var(--space-4));
+  }
+
   body {
     background-color: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-body);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
+    /* Nothing hides behind the sticky mobile action bar. */
+    padding-bottom: var(--action-bar-height);
   }
 
   h1,
@@ -178,7 +201,7 @@
    A section overrides the page-level roles for its own band, so children can
    read var(--color-text) / var(--color-border) and stay correct in any theme.
 -------------------------------------------------------------------------- */
-[data-theme='light'] {
+[data-theme="light"] {
   --color-bg: var(--color-bone-50);
   --color-surface: var(--color-white);
   --color-text: var(--color-ink-950);
@@ -190,7 +213,7 @@
   --color-link-hover: var(--color-forge-700);
 }
 
-[data-theme='white'] {
+[data-theme="white"] {
   --color-bg: var(--color-white);
   --color-surface: var(--color-bone-50);
   --color-text: var(--color-ink-950);
@@ -202,7 +225,7 @@
   --color-link-hover: var(--color-forge-700);
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   --color-bg: var(--color-ink-950);
   --color-surface: var(--color-carbon-900);
   --color-text: var(--color-white);
@@ -216,7 +239,7 @@
 }
 
 /* Short conversion moments only. §04 forbids long paragraphs on red. */
-[data-theme='action'] {
+[data-theme="action"] {
   --color-bg: var(--color-forge-600);
   --color-surface: transparent;
   --color-text: var(--color-white);
@@ -228,6 +251,27 @@
   --color-link-hover: var(--color-white);
 }
 
+/* §12 — skip link. Off-screen until it takes keyboard focus, then it lands
+   above the sticky header. */
+.skip-link {
+  position: fixed;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 60;
+  transform: translateY(calc(-100% - var(--space-6)));
+  border-radius: var(--radius-md);
+  background-color: var(--color-ink-950);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  font-weight: 600;
+  padding: var(--space-3) var(--space-4);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
 /* §13 foundation utility — section vertical rhythm. */
 .section-band {
   padding-block: clamp(3.5rem, 8vw, 7rem);
@@ -236,8 +280,8 @@
 }
 
 /* Keyboard focus needs to stay visible on dark and action bands. */
-[data-theme='dark'] :focus-visible,
-[data-theme='action'] :focus-visible {
+[data-theme="dark"] :focus-visible,
+[data-theme="action"] :focus-visible {
   outline-color: var(--color-white);
 }
 
