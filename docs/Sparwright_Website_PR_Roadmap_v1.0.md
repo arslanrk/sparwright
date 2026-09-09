@@ -33,14 +33,14 @@ Thirteen sequential, reviewable pull requests that take `sparwright` from the cu
 
 Tokens, typography and the primitives every later page is built from. Nothing user-facing ships yet beyond a bare-bones layout.
 
-### PR 1 — Design tokens & typography
+### PR 1 — Design tokens & typography ✅
 
 Replace the default Next.js scaffold's colours and fonts with the Sparwright token set.
 
 **Ships**
 - Archivo (600/700) + Inter (400/500/600) via `next/font/google`, replacing Geist
 - Full colour, spacing, radius and motion tokens in `@theme`
-- Container widths: page shell 1280px, prose 720px, form 640px
+- Container widths: page shell 1280px, working area 1200px, prose 720px, form 640px
 - Metadata title/description set to the positioning statement
 - Remove default scaffold assets (next/vercel/file/globe/window SVGs, sample homepage copy)
 
@@ -51,6 +51,9 @@ Replace the default Next.js scaffold's colours and fonts with the Sparwright tok
 
 **Design system refs:** §04 Colour system · §05 Typography · §06 Layout · §07 Motion · §13 Tokens
 **Depends on:** nothing
+**Status:** Complete — typecheck, lint and build pass; `/` prerenders static
+
+> Two deviations for PR 2 onward. Tokens are declared with `@theme static`: a plain `@theme` tree-shakes any token that generates no utility, so `--space-*`, `--motion-*` and `--border-*` were emitted zero times and `var(--space-5)` would have resolved to nothing. And the 720px prose container is `--container-copy` (`max-w-copy`), not `--container-prose` — `max-w-prose` is a built-in Tailwind utility hardcoded to 65ch that overrides the theme token. The spacing scale is deliberately not mapped into Tailwind's `--spacing-*` namespace, since §06 diverges from the numeric scale above `space-4`; use `var(--space-5)`, not `p-5`.
 
 ### PR 2 — Foundation primitives
 
