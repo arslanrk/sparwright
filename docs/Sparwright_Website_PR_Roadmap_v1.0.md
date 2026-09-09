@@ -291,7 +291,7 @@ The credibility page — real process, named roles, inspectable QC.
 
 The workflow that turns a visitor into a qualified, trackable lead.
 
-### PR 9 — Quote & mockup request flow
+### PR 9 — Quote & mockup request flow ✅
 
 Replace the generic contact form with the two-stage structured workflow.
 
@@ -307,11 +307,34 @@ Replace the generic contact form with the two-stage structured workflow.
 - `src/components/forms/QuoteForm.tsx`
 - `src/components/forms/FileUpload.tsx`
 - `src/components/forms/FormField.tsx`
+- `src/components/forms/SelectField.tsx`, `RadioCard.tsx`, `Checkbox.tsx`, `Alert.tsx`, `SuccessPanel.tsx`
+- `src/lib/quote.ts` (field set, options and validation shared by browser and server)
+- `src/lib/leads.ts` (delivery adapter and sales-owner assignment)
 
 **Design system refs:** §08 Quote and mockup form · §08 File upload states · §14 Manual-first workflow
 **Depends on:** PR 2
+**Status:** Complete — typecheck, lint and build pass; route handler exercised end to end (201 with reference, 422 field errors, 415 bad artwork, 413 oversize, 503 unconfigured)
 
-> Open question: confirm CRM/email destination and the sales owner assignment rule before wiring the route handler — the design system specifies the workflow, not the tooling.
+> **Open question, answered with a pluggable default — confirm before launch.**
+> §14 specifies the workflow, not the tooling, so delivery sits behind one
+> adapter in `src/lib/leads.ts` chosen by environment variable:
+> `QUOTE_WEBHOOK_URL` (multipart POST, artwork included — works with any CRM,
+> mailer or automation platform), optional `QUOTE_WEBHOOK_TOKEN`, and
+> `QUOTE_SALES_OWNERS` as declarative `category=owner` pairs with a `*`
+> fallback. Verified against a local receiver: the webhook gets the bearer
+> token, the fields and the file. With nothing configured the lead is logged in
+> development and **refused with a 503 in production** — accepting a lead we
+> cannot deliver is worse than an honest error. Swapping in the real
+> destination is a config change, not a rewrite.
+
+> Progress on the upload is genuinely the browser's upload progress:
+> `XMLHttpRequest`, because `fetch` still cannot report request-body progress
+> and §08 asks for real progress, not an animated bar. Artwork rides in the
+> same multipart submission, so there is one network call and one thing that
+> can fail. Both steps stay mounted and nothing is cleared on error — a failure
+> returns the buyer to the step that needs attention with every answer intact
+> (§08, §12). No price, preview or response time is promised anywhere (§14,
+> non-negotiables #6 and #9).
 
 ### PR 10 — FAQ and legal pages
 
