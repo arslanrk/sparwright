@@ -46,7 +46,7 @@ export function ProcessStepper({
             key={stage.number}
             className="border-t-2 border-[var(--color-border)] pt-[var(--space-4)]"
           >
-            <p className="font-display text-heading-4 text-[var(--color-action)]">
+            <p className="font-display text-heading-4 text-[var(--color-action-text)]">
               {stage.number}
             </p>
             <h3 className="mt-2 font-body text-body-large font-semibold">

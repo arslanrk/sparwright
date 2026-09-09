@@ -180,7 +180,7 @@ export default function ManufacturingPage() {
           {STAGES.map((stage, index) => (
             <li key={stage.title}>
               <ImagePlaceholder shot={stage.shot} ratio="process" />
-              <p className="mt-[var(--space-4)] font-display text-heading-4 text-[var(--color-action)]">
+              <p className="mt-[var(--space-4)] font-display text-heading-4 text-[var(--color-action-text)]">
                 {String(index + 1).padStart(2, "0")}
               </p>
               <h3 className="mt-1 font-body text-body-large font-semibold">

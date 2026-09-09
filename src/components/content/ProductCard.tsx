@@ -19,15 +19,22 @@ export type { ProductCardItem };
 
 export function ProductCard({
   item,
+  headingLevel: Heading = "h3",
   className,
 }: {
   item: ProductCardItem;
+  /**
+   * §12 requires a logical heading order on every page, and that depends on
+   * what the card sits under. On /products the cards follow the h1 directly,
+   * so they are h2; inside a section with its own h2 they stay h3.
+   */
+  headingLevel?: "h2" | "h3";
   className?: string;
 }) {
   return (
     <article
       className={cn(
-        "group flex h-full flex-col rounded-lg border border-[var(--color-border)] bg-[var(--color-white)] p-[var(--space-5)]",
+        "group relative flex h-full flex-col rounded-lg border border-[var(--color-border)] bg-[var(--color-white)] p-[var(--space-5)]",
         className,
       )}
     >
@@ -35,13 +42,18 @@ export function ProductCard({
       <p className="mt-[var(--space-5)] text-eyebrow uppercase text-[var(--color-text-muted)]">
         {item.category}
       </p>
-      <h3 className="mt-2 text-heading-4">
-        {/* The whole card is the target, but only the title carries the link so
-            the accessible name stays the product category (§12). */}
-        <Link href={item.href} className="rounded-sm">
+      <Heading className="mt-2 text-heading-4">
+        {/* Only the title carries the link, so the accessible name stays the
+            product category — but its ::after covers the card, which makes the
+            whole card the tap target. A 22px text link fails WCAG 2.5.8's 24px
+            minimum; the card comfortably clears it. */}
+        <Link
+          href={item.href}
+          className="rounded-sm after:absolute after:inset-0 after:content-['']"
+        >
           {item.title}
         </Link>
-      </h3>
+      </Heading>
       <p className="mt-3 text-body text-[var(--color-text-secondary)]">
         {item.description}
       </p>

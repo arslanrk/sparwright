@@ -239,7 +239,7 @@ export default function PrivateLabelPage() {
               key={step}
               className="flex gap-[var(--space-4)] border-t border-[var(--color-border)] pt-[var(--space-4)]"
             >
-              <span className="font-display text-body-large font-semibold text-[var(--color-action)]">
+              <span className="font-display text-body-large font-semibold text-[var(--color-action-text)]">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <span className="text-body text-[var(--color-text-secondary)]">

@@ -18,8 +18,16 @@
   --color-ink-950: #0b0d10;
   --color-carbon-900: #15191f;
   --color-steel-700: #39424e;
-  --color-slate-500: #69737e;
+  /* §04 Slate, darkened from #69737e. At the documented value, muted text
+     scored 4.27:1 on the Bone band — §12 requires sufficient contrast in all
+     states, and 12px eyebrows are exactly where it mattered. Now 4.66 on Bone,
+     5.26 on White. */
+  --color-slate-500: #636d78;
   --color-line-200: #dde1e4;
+  /* Line is a 1.32:1 hairline: right for a decorative divider, not legal as
+     the boundary of a form control, which WCAG 1.4.11 holds to 3:1. Inputs,
+     radios and checkboxes use this instead — 4.07 on White, 3.61 on Bone. */
+  --color-border-strong: #767f87;
   --color-bone-50: #f4f1e8;
   --color-white: #ffffff;
   --color-forge-100: #fbe6e0;
@@ -144,6 +152,10 @@
   --color-action: var(--color-forge-600);
   --color-action-hover: var(--color-forge-700);
   --color-link-hover: var(--color-forge-700);
+  /* Forge as *text*. Forge 600 is 4.09:1 on Bone, so anything below large text
+     uses Forge 700 (5.29:1). Fills keep --color-action, which only has to
+     clear the 3:1 non-text threshold. */
+  --color-action-text: var(--color-forge-700);
 
   /* The site is a light brand surface; it does not follow OS dark mode. */
   color-scheme: light;
@@ -210,6 +222,7 @@
   --color-border: var(--color-line-200);
   --color-action: var(--color-forge-600);
   --color-action-hover: var(--color-forge-700);
+  --color-action-text: var(--color-forge-700);
   --color-link-hover: var(--color-forge-700);
 }
 
@@ -222,6 +235,7 @@
   --color-border: var(--color-line-200);
   --color-action: var(--color-forge-600);
   --color-action-hover: var(--color-forge-700);
+  --color-action-text: var(--color-forge-700);
   --color-link-hover: var(--color-forge-700);
 }
 
@@ -234,6 +248,9 @@
   --color-border: rgb(255 255 255 / 0.14);
   --color-action: var(--color-forge-600);
   --color-action-hover: var(--color-forge-700);
+  /* Forge on Ink is 4.21:1 — large text and stage numbers only. Small text on
+     a dark band uses the muted role instead. */
+  --color-action-text: var(--color-forge-600);
   /* Forge on Ink does not clear contrast for small text; keep links white. */
   --color-link-hover: var(--color-white);
 }
@@ -248,6 +265,7 @@
   --color-border: transparent;
   --color-action: var(--color-ink-950);
   --color-action-hover: var(--color-carbon-900);
+  --color-action-text: var(--color-white);
   --color-link-hover: var(--color-white);
 }
 

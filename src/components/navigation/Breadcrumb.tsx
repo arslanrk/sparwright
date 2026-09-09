@@ -41,7 +41,7 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
               ) : (
                 <Link
                   href={crumb.href}
-                  className="rounded-sm text-[var(--color-text-muted)] underline-offset-4 transition-colors hover:text-[var(--color-text)] hover:underline"
+                  className="inline-flex min-h-6 items-center rounded-sm text-[var(--color-text-muted)] underline-offset-4 transition-colors hover:text-[var(--color-text)] hover:underline"
                 >
                   {crumb.label}
                 </Link>

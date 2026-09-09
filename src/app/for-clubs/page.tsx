@@ -215,7 +215,7 @@ export default function ForClubsPage() {
               key={item.title}
               className="border-t-2 border-[var(--color-border)] pt-[var(--space-4)]"
             >
-              <p className="font-display text-heading-4 text-[var(--color-action)]">
+              <p className="font-display text-heading-4 text-[var(--color-action-text)]">
                 {String(index + 1).padStart(2, "0")}
               </p>
               <h3 className="mt-2 font-body text-body-large font-semibold">
@@ -242,7 +242,7 @@ export default function ForClubsPage() {
               key={step}
               className="flex gap-[var(--space-4)] border-t border-[var(--color-border)] pt-[var(--space-4)]"
             >
-              <span className="font-display text-body-large font-semibold text-[var(--color-action)]">
+              <span className="font-display text-body-large font-semibold text-[var(--color-action-text)]">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <span className="text-body text-[var(--color-text-secondary)]">

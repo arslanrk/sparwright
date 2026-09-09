@@ -151,7 +151,7 @@ export default async function ProductPage({
               key={step}
               className="border-t-2 border-[var(--color-border)] pt-[var(--space-4)]"
             >
-              <p className="font-display text-heading-4 text-[var(--color-action)]">
+              <p className="font-display text-heading-4 text-[var(--color-action-text)]">
                 {String(index + 1).padStart(2, "0")}
               </p>
               <p className="mt-2 text-body text-[var(--color-text-secondary)]">

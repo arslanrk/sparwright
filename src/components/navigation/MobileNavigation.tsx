@@ -175,7 +175,7 @@ function DrawerLink({
         level === "primary"
           ? "text-heading-4 font-semibold text-[var(--color-text)]"
           : "pl-4 text-body text-[var(--color-text-secondary)]",
-        active && "text-[var(--color-action)]",
+        active && "text-[var(--color-action-text)]",
       )}
     >
       {link.label}

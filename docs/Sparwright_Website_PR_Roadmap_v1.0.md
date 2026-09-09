@@ -383,7 +383,7 @@ Answer the nine standard buyer questions; ship the pages the footer already link
 
 No new surface area — these PRs audit and fix what already shipped, against the launch checklist.
 
-### PR 11 — Accessibility, responsive & motion audit
+### PR 11 — Accessibility, responsive & motion audit ✅
 
 Every page, every breakpoint, no mouse required.
 
@@ -397,6 +397,41 @@ Every page, every breakpoint, no mouse required.
 
 **Design system refs:** §12 Responsive & accessibility · §15 Design and responsive QA
 **Depends on:** PR 1–10
+**Status:** Complete — audited in a real browser (Playwright/Chromium) across 6 widths × 11 routes; all findings fixed and the suite re-run clean
+
+**What the audit covered and found**
+
+| Check | Result |
+|---|---|
+| Horizontal overflow at 360/390/768/1024/1280/1440 | Clean on all 11 routes, first run |
+| Sticky mobile bar vs. content | Clean — `body` reserves `--action-bar-height` |
+| Heading order | **3 fixed** — `/products` jumped h1 → h3 |
+| Tap targets (WCAG 2.5.8, 24px) | **2 fixed** — footer/breadcrumb link lists, product-card titles |
+| Contrast, every text/background pairing | **6 fixed** — see below |
+| Keyboard walkthrough, 30 focus stops | Clean — visible ring on every stop, skip link first |
+| Mobile drawer | Clean — scroll locked, Escape closes, focus returns |
+| `prefers-reduced-motion` | Clean — zero elements animate under reduce |
+| Alt text | Nothing to check yet: no `<img>` exists, only named §09 shot slots |
+| Form data preserved through errors | Clean — verified through a real 503, a validation failure and a rejected upload |
+
+> **The contrast failures were real, and three were in the §04 palette itself.**
+> Slate #69737e scored 4.27:1 on the Bone band — under 4.5 for the 12px
+> eyebrows and hints that use it everywhere — so it is darkened to #636d78
+> (4.66 on Bone, 5.26 on White). Forge 600 as *text* is 4.09:1 on Bone, so a
+> new `--color-action-text` role resolves to Forge 700 on light bands while
+> fills keep Forge 600, which only owes 3:1. And Line #dde1e4 is a 1.32:1
+> hairline: correct for a divider, not legal as the boundary of a form control,
+> which WCAG 1.4.11 holds to 3:1 — inputs, radios and checkboxes now use a new
+> `--color-border-strong` (#767f87). The customization spec tag dropped Forge
+> for the muted role: it is 12px on the dark band, where Forge is 4.21:1.
+> The contrast check reads the tokens straight out of `globals.css`, so it
+> cannot drift from what ships; all 21 pairings pass.
+
+> The product-card title is now a stretched link — its `::after` covers the
+> card — so the activation area is the whole card rather than 22px of text.
+> Reproducing the audit needs Playwright with Chromium; it was run as a
+> development tool and deliberately not added to `package.json`, since this PR
+> is fixes only.
 
 ### PR 12 — Analytics and lead ops
 

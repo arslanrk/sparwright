@@ -79,7 +79,7 @@ export function SuccessPanel({
             key={step}
             className="flex gap-3 text-body text-[var(--color-text-secondary)]"
           >
-            <span className="font-display font-semibold text-[var(--color-action)]">
+            <span className="font-display font-semibold text-[var(--color-action-text)]">
               {String(index + 1).padStart(2, "0")}
             </span>
             <span>{step}</span>

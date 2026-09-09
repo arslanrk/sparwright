@@ -148,7 +148,7 @@ export function FileUpload({
           "rounded-md border border-dashed p-[var(--space-5)] transition-colors",
           dragging
             ? "border-[var(--color-action)] bg-[var(--color-forge-100)]"
-            : "border-[var(--color-border)] bg-[var(--color-white)]",
+            : "border-[var(--color-border-strong)] bg-[var(--color-white)]",
         )}
       >
         {/* Always present, whatever the state — §12 requires the upload to work

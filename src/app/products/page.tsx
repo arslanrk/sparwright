@@ -50,6 +50,7 @@ export default function ProductsPage() {
           {PRODUCTS.map((product) => (
             <ProductCard
               key={product.slug}
+              headingLevel="h2"
               item={productCardItem(product, PRODUCT_ACTIONS[product.slug])}
             />
           ))}

@@ -66,7 +66,7 @@ export function Checkbox({
             "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-sm border",
             checked
               ? "border-[var(--color-action)] bg-[var(--color-action)] text-white"
-              : "border-[var(--color-text-muted)] bg-[var(--color-white)]",
+              : "border-[var(--color-border-strong)] bg-[var(--color-white)]",
           )}
         >
           {checked ? (

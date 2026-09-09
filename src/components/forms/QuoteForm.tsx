@@ -459,7 +459,7 @@ function StepIndicator({ step }: { step: 1 | 2 }) {
                 "flex size-6 items-center justify-center rounded-full border text-[0.75rem]",
                 current
                   ? "border-[var(--color-action)] bg-[var(--color-action)] text-white"
-                  : "border-[var(--color-border)]",
+                  : "border-[var(--color-border-strong)]",
               )}
             >
               {number}

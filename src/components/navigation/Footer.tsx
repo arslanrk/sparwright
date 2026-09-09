@@ -68,8 +68,10 @@ function FooterLink({
   href: string;
   children: React.ReactNode;
 }) {
+  // min-h-6 is WCAG 2.5.8's 24px minimum target; these are listed links, not
+  // links inside a sentence, so the inline exception does not apply.
   const className =
-    "rounded-sm font-body text-small text-[var(--color-text-secondary)] underline-offset-4 transition-colors hover:text-[var(--color-white)] hover:underline";
+    "inline-flex min-h-6 items-center rounded-sm font-body text-small text-[var(--color-text-secondary)] underline-offset-4 transition-colors hover:text-[var(--color-white)] hover:underline";
 
   if (href.startsWith("mailto:")) {
     return (

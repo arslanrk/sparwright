@@ -29,7 +29,10 @@ export function CustomizationCard({
         className,
       )}
     >
-      <p className="text-eyebrow uppercase text-[var(--color-action)]">
+      {/* Muted, not Forge: this tag is 12px and the card sits on the dark
+          band, where Forge 600 is 4.21:1 — under the 4.5 §12 needs for small
+          text. §09 describes the spec-tag motif as restrained regardless. */}
+      <p className="text-eyebrow uppercase text-[var(--color-text-muted)]">
         {item.tag}
       </p>
       <h3 className="mt-3 text-heading-4">{item.title}</h3>

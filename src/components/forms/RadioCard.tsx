@@ -93,7 +93,7 @@ export function RadioCardGroup({
                 "group flex cursor-pointer items-start gap-3 rounded-md border bg-[var(--color-white)] p-4 transition-colors",
                 selected
                   ? "border-2 border-[var(--color-action)] p-[calc(1rem-1px)]"
-                  : "border-[var(--color-border)] hover:border-[var(--color-text-muted)]",
+                  : "border-[var(--color-border-strong)] hover:border-[var(--color-text)]",
                 // The visible focus ring belongs on the card, not the hidden input.
                 "has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-[3px] has-[:focus-visible]:outline-[var(--color-ink-950)]",
               )}

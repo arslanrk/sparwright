@@ -20,7 +20,7 @@ const TONES: Record<AlertTone, string> = {
 };
 
 const ICON_TONES: Record<AlertTone, string> = {
-  error: "text-[var(--color-action)]",
+  error: "text-[var(--color-action-text)]",
   success: "text-[var(--color-success-600)]",
   info: "text-[var(--color-text-muted)]",
 };

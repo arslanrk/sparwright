@@ -16,8 +16,8 @@ import { cn } from "@/lib/cn";
 
 export const FIELD_CONTROL =
   "w-full rounded-md border bg-[var(--color-white)] px-4 py-3 font-body text-body text-[var(--color-text)] " +
-  "border-[var(--color-border)] transition-colors placeholder:text-[var(--color-text-muted)] " +
-  "hover:border-[var(--color-text-muted)] disabled:cursor-not-allowed disabled:opacity-50 " +
+  "border-[var(--color-border-strong)] transition-colors placeholder:text-[var(--color-text-muted)] " +
+  "hover:border-[var(--color-text)] disabled:cursor-not-allowed disabled:opacity-50 " +
   "aria-[invalid=true]:border-2 aria-[invalid=true]:border-[var(--color-action)]";
 
 export type FieldRenderProps = {
@@ -102,7 +102,7 @@ export function FieldError({
   return (
     <p
       id={id}
-      className="flex items-start gap-2 font-body text-small font-medium text-[var(--color-action)]"
+      className="flex items-start gap-2 font-body text-small font-medium text-[var(--color-action-text)]"
     >
       <ErrorIcon />
       <span>{children}</span>
