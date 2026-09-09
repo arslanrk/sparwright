@@ -55,7 +55,7 @@ Replace the default Next.js scaffold's colours and fonts with the Sparwright tok
 
 > Two deviations for PR 2 onward. Tokens are declared with `@theme static`: a plain `@theme` tree-shakes any token that generates no utility, so `--space-*`, `--motion-*` and `--border-*` were emitted zero times and `var(--space-5)` would have resolved to nothing. And the 720px prose container is `--container-copy` (`max-w-copy`), not `--container-prose` — `max-w-prose` is a built-in Tailwind utility hardcoded to 65ch that overrides the theme token. The spacing scale is deliberately not mapped into Tailwind's `--spacing-*` namespace, since §06 diverges from the numeric scale above `space-4`; use `var(--space-5)`, not `p-5`.
 
-### PR 2 — Foundation primitives
+### PR 2 — Foundation primitives ✅
 
 The small set of components every page and pattern composes from.
 
@@ -63,16 +63,21 @@ The small set of components every page and pattern composes from.
 - `Button` — primary / secondary / inverse / text-link, 52px height, 6px radius, full state set (hover, focus-visible, disabled, loading)
 - `Logo` — primary lockup, wordmark-only, maker's mark, with clear-space rules baked in
 - `TextLink`, `SectionHeader`, `Container`/`Section` layout helpers
+- §04 theme recipes (light / white / dark / action band) as `data-theme` role overrides, so a band restyles its children through the semantic tokens
 
 **Files**
 - `src/components/foundation/Button.tsx`
 - `src/components/foundation/Logo.tsx`
 - `src/components/foundation/TextLink.tsx`
 - `src/components/foundation/SectionHeader.tsx`
-- `src/components/foundation/Container.tsx`
+- `src/components/foundation/Container.tsx` (Container + Section)
+- `src/components/foundation/cta.ts` (locked §08/§10 CTA labels)
+- `src/lib/cn.ts`
+- `src/app/globals.css` (theme recipes, `.section-band`)
 
 **Design system refs:** §03 Logo system · §08 Button system · §13 Required states
 **Depends on:** PR 1
+**Status:** Complete — typecheck, lint and build pass; every button variant verified in the prerendered HTML
 
 > CTA copy is locked. Only use approved labels (Request Your Mockup, Get a Manufacturing Quote, View Custom Products, How It Works…). Never Submit, Click Here, Discover More or Shop Now — §08.
 
