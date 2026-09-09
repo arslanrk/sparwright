@@ -256,7 +256,7 @@ Development, labelling and packaging story for fightwear-brand buyers.
 > would not"). The rationale now lives in a code comment and the visible
 > sentence states the commitment plainly.
 
-### PR 8 — Manufacturing and Quality
+### PR 8 — Manufacturing and Quality ✅
 
 The credibility page — real process, named roles, inspectable QC.
 
@@ -269,6 +269,21 @@ The credibility page — real process, named roles, inspectable QC.
 
 **Design system refs:** §11 Manufacturing template · §11 QC evidence matrix
 **Depends on:** PR 5
+**Status:** Complete — typecheck, lint and build pass; `/manufacturing` prerenders static
+
+> Opens with the §A ten-years line, then named ownership, six production
+> stages and the §11 QC evidence matrix verbatim. `QualityMatrix` is a real
+> `<table>` with `scope` and a caption — the check-to-evidence pairing is
+> information a description list would lose — and it scrolls inside its own
+> container rather than making the page scroll sideways at 360px.
+
+> **Two launch blockers are visible on the page by design.** §11 wants each
+> responsibility named, and non-negotiable #5 forbids inventing a person to do
+> it, so all five roles render "Name to be confirmed before launch" until the
+> real names are added. Every production stage names the §09 shot it waits on
+> (`Pattern cutting`, `Stitching process`, `Printing or embroidery`,
+> `Quality inspection`, `Packaging`, `Workshop wide view`). No certification is
+> claimed anywhere.
 
 ---
 
