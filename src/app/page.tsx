@@ -3,6 +3,7 @@ import {
   type AudienceCardItem,
 } from "@/components/content/AudienceCard";
 import { CallToAction } from "@/components/content/CallToAction";
+import { FAQAccordion } from "@/components/content/FAQAccordion";
 import {
   CustomizationCard,
   type CustomizationItem,
@@ -19,6 +20,7 @@ import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
 import { CTA } from "@/components/foundation/cta";
+import { SITE_FAQS } from "@/lib/faq";
 import { PRODUCTS, productCardItem } from "@/lib/products";
 
 /**
@@ -229,6 +231,15 @@ export default function Home() {
           </div>
           <ImagePlaceholder shot="Workshop wide view" ratio="process" />
         </div>
+      </Section>
+
+      <Section theme="light" width="copy">
+        <SectionHeader
+          eyebrow="Questions"
+          title="The nine things buyers ask first."
+          description="If your question is not here, send it with your requirements — a person reads every request."
+        />
+        <FAQAccordion items={SITE_FAQS} className="mt-[var(--space-6)]" />
       </Section>
 
       {/* §A gives this action as "REQUEST A QUOTE"; the §08 CTA library is

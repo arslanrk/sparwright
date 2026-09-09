@@ -336,7 +336,7 @@ Replace the generic contact form with the two-stage structured workflow.
 > (§08, §12). No price, preview or response time is promised anywhere (§14,
 > non-negotiables #6 and #9).
 
-### PR 10 — FAQ and legal pages
+### PR 10 — FAQ and legal pages ✅
 
 Answer the nine standard buyer questions; ship the pages the footer already links to.
 
@@ -349,9 +349,33 @@ Answer the nine standard buyer questions; ship the pages the footer already link
 - `src/app/privacy/page.tsx`
 - `src/app/terms/page.tsx`
 - `src/app/cookies/page.tsx`
+- `src/components/content/LegalPage.tsx` (shared shell for the three)
+- `src/components/navigation/CookieSettings.tsx` (§11 "cookie settings")
+- `src/lib/faq.ts` (the §08 nine, site-wide)
+- `src/app/layout.tsx` (CookieBanner mounted), `src/app/page.tsx`, `src/app/products/[slug]/page.tsx`
 
 **Design system refs:** §08 FAQ accordion · §11 Legal row
 **Depends on:** PR 3
+**Status:** Complete — typecheck, lint and build pass; all three legal routes prerender static
+
+> `FAQAccordion` is built on native `<details>`/`<summary>`. §12 requires a
+> keyboard-operable accordion and the platform gives that away free — Enter and
+> Space toggle, the open state reaches assistive technology with no
+> `aria-expanded` bookkeeping, and it works before JavaScript loads. Answers open
+> independently: §08 does not ask for one-at-a-time, and closing someone's answer
+> because they opened another is a small hostility on a page meant to answer
+> questions. The site-wide nine sit on the homepage; product pages keep their own
+> narrower set, which replaces PR 5's description list.
+
+> **The legal pages describe what the site actually does** — a quote form that
+> reaches a person, and one consent value in local storage — and claim no
+> certification or processor we have not chosen. Company name, registration,
+> data-protection contact and governing law render as marked gaps rather than
+> plausible inventions (non-negotiable #5); that is four blockers on each of
+> Privacy and Terms for the PR 13 checklist. **These pages need review by someone
+> qualified before launch.** The cookie page carries the §11 "cookie settings"
+> control, so a visitor can change their mind without clearing site data, and the
+> banner is now mounted in the root layout.
 
 ---
 

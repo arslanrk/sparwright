@@ -99,8 +99,11 @@ export function Button(props: ButtonProps) {
     );
   }
 
-  const { type = "button", disabled, ...buttonProps } =
-    rest as ComponentPropsWithoutRef<"button">;
+  const {
+    type = "button",
+    disabled,
+    ...buttonProps
+  } = rest as ComponentPropsWithoutRef<"button">;
 
   return (
     <button

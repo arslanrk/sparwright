@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CallToAction } from "@/components/content/CallToAction";
+import { FAQAccordion } from "@/components/content/FAQAccordion";
 import { ImageGallery } from "@/components/content/ImageGallery";
 import { ProductCard } from "@/components/content/ProductCard";
 import { SpecificationTable } from "@/components/content/SpecificationTable";
@@ -23,9 +24,8 @@ import {
  * cases, materials and construction, customization, sample and approval,
  * quality-control points, related products, product FAQ, quote CTA.
  *
- * The FAQ renders as a description list here. PR 10 builds the keyboard-operable
- * `FAQAccordion` and swaps the presentation; the content already lives in
- * `src/lib/products.ts` and does not need to move.
+ * The FAQ section renders the product's own narrower question set through
+ * `FAQAccordion` (§08); the site-wide nine live on the homepage.
  */
 
 export function generateStaticParams() {
@@ -202,27 +202,13 @@ export default async function ProductPage({
         </Section>
       ) : null}
 
-      {/* 9 — Product-specific FAQ. PR 10 replaces this with FAQAccordion. */}
+      {/* 9 — Product-specific FAQ. */}
       <Section theme="white" width="copy">
         <SectionHeader
           eyebrow="Questions"
           title={`${product.name} — common questions`}
         />
-        <dl className="mt-[var(--space-6)] flex flex-col gap-[var(--space-5)]">
-          {product.faqs.map((faq) => (
-            <div
-              key={faq.question}
-              className="border-t border-[var(--color-border)] pt-[var(--space-4)]"
-            >
-              <dt className="font-body text-body-large font-semibold">
-                {faq.question}
-              </dt>
-              <dd className="m-0 mt-2 text-body text-[var(--color-text-secondary)]">
-                {faq.answer}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <FAQAccordion items={product.faqs} className="mt-[var(--space-6)]" />
       </Section>
 
       {/* 10 — Quote or mockup CTA. */}
