@@ -14,13 +14,14 @@ import {
   ProcessStepper,
   type ProcessStage,
 } from "@/components/content/ProcessStepper";
-import { ProductCard } from "@/components/content/ProductCard";
+import { ProductSlider } from "@/components/content/ProductSlider";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
+import { TextLink } from "@/components/foundation/TextLink";
 import { CTA } from "@/components/foundation/cta";
 import { SITE_FAQS } from "@/lib/faq";
-import { PRODUCTS, productCardItem } from "@/lib/products";
+import { PRODUCT_RANGE } from "@/lib/product-range";
 
 /**
  * Homepage — Design System §11 Homepage order, §A Starter copy library.
@@ -59,16 +60,6 @@ const HERO_PROOF = [
   "Gloves and apparel under one identity",
   "Your artwork and specs kept for reorders",
 ];
-
-/**
- * Product cards come from the §11 catalogue, so the homepage can only ever
- * link to pages that exist. §08 gives the card action as "Explore Custom
- * Gloves → or equivalent".
- */
-const PRODUCT_ACTIONS: Record<string, string> = {
-  "custom-boxing-gloves": CTA.exploreGloves,
-  "fightwear-club-apparel": CTA.exploreFightwear,
-};
 
 /** Headings and body copy taken verbatim from the §A audience-page heroes. */
 const AUDIENCES: AudienceCardItem[] = [
@@ -173,18 +164,22 @@ export default function Home() {
       />
 
       <Section theme="light" width="work">
-        <SectionHeader
-          eyebrow="Custom products"
+        {/*
+          The range, not the routing. A cold buyer's first question is whether
+          we make their product at all, and two catalogue cards do not answer
+          it — the seven §08 product choices do. Each slide still routes to
+          whichever of the two pages covers it.
+        */}
+        <ProductSlider
+          items={PRODUCT_RANGE}
+          eyebrow="Custom product range"
           title="Custom gloves, fightwear and club apparel."
-          description="Two focused product pages, each manufactured against your branding, colours and product specifications."
+          description="Every product is made to a specification you approve. Step through the range to see what gets decided before anything is sampled."
+          action={CTA.exploreProduct}
         />
-        <div className="mt-[var(--space-7)] grid gap-[var(--space-5)] sm:grid-cols-2 xl:grid-cols-4">
-          {PRODUCTS.map((product) => (
-            <ProductCard
-              key={product.slug}
-              item={productCardItem(product, PRODUCT_ACTIONS[product.slug])}
-            />
-          ))}
+
+        <div className="mt-[var(--space-6)]">
+          <TextLink href="/products">{CTA.products}</TextLink>
         </div>
       </Section>
 

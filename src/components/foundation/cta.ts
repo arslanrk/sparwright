@@ -24,6 +24,7 @@ export const CTA = {
    * for the private-label pathway: verb plus a specific destination, never a
    * vague "Learn more".
    */
+  exploreProduct: "Explore this product",
   exploreFightwear: "Explore Fightwear",
   exploreClubApparel: "Explore Club Apparel",
   privateLabel: "View Private Label Manufacturing",

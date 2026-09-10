@@ -331,6 +331,23 @@
   }
 }
 
+/* Slide change (§07 short fade-and-slide). Keyed on the slide index in the
+   markup, so React remounts the node and the animation replays. */
+.slide-in {
+  animation: slide-in var(--motion-emphasis) var(--ease-standard) both;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Each line draws along its own length; the dash values are set per element. */
 .constellation-line {
   opacity: 0.22;
