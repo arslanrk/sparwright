@@ -28,6 +28,12 @@ export type RangeItem = {
   shot: string;
   /** One paragraph: what it is and what gets decided. */
   styleProfile: string;
+  /**
+   * The four §09 specification tags — "MODEL / USE / SHELL / BRANDING". Model
+   * is the product name itself, so these are the other three plus the
+   * construction line that decides most of the rest.
+   */
+  use: string;
   fabric: string;
   construction: string;
   branding: string;
@@ -44,6 +50,7 @@ export const PRODUCT_RANGE: RangeItem[] = [
     shot: "Full glove front",
     styleProfile:
       "Training, sparring and bag gloves built to a padding profile chosen for the session, with the closure and branding fixed before sampling.",
+    use: "Training, sparring and bag work",
     fabric: "Synthetic or leather shell",
     construction: "Padding profile per intended use",
     branding: "Print, patch or embroidery",
@@ -55,6 +62,7 @@ export const PRODUCT_RANGE: RangeItem[] = [
     shot: "MMA gloves, front and palm",
     styleProfile:
       "Open-palm gloves specified around padding, hand opening and closure, then fixed by the sample you approve.",
+    use: "Grappling and striking",
     fabric: "Synthetic or leather shell",
     construction: "Open palm and secured closure",
     branding: "Print, patch or embroidery",
@@ -66,6 +74,7 @@ export const PRODUCT_RANGE: RangeItem[] = [
     shot: "Focus mitts and pads",
     styleProfile:
       "Coaching mitts and pads specified for repeated pad work, with padding density and strap arrangement agreed before sampling.",
+    use: "Coaching and pad rounds",
     fabric: "Synthetic or leather shell",
     construction: "Padding density and strap fit",
     branding: "Print or embroidery",
@@ -77,6 +86,7 @@ export const PRODUCT_RANGE: RangeItem[] = [
     shot: "Fight shorts",
     styleProfile:
       "Shorts built around panel layout, waistband and length, with your colours and branding applied to the approved specification.",
+    use: "Training and competition",
     fabric: "Woven shell or stretch panel",
     construction: "Panel layout and waistband",
     branding: "Print, sublimation or embroidery",
@@ -88,6 +98,7 @@ export const PRODUCT_RANGE: RangeItem[] = [
     shot: "Rashguard",
     styleProfile:
       "Rashguards specified by fabric weight, sleeve length and panel design, decorated to your artwork across the panels.",
+    use: "Grappling and base layer",
     fabric: "Performance knit",
     construction: "Panel design and sleeve length",
     branding: "Sublimation or print",
@@ -99,6 +110,7 @@ export const PRODUCT_RANGE: RangeItem[] = [
     shot: "Club apparel flat lay",
     styleProfile:
       "Club tees ordered across member sizes, with one colour reference and one logo placement carried through the whole order.",
+    use: "Club and member kit",
     fabric: "Cotton or blended jersey",
     construction: "Fit and neck finish",
     branding: "Print or embroidery",
@@ -110,6 +122,7 @@ export const PRODUCT_RANGE: RangeItem[] = [
     shot: "Club hoodie and tracksuit",
     styleProfile:
       "Heavier club kit specified by fabric weight, fit and trim, with labels and branding agreed alongside the rest of the order.",
+    use: "Travel and warm-up kit",
     fabric: "Fleece or brushed knit",
     construction: "Fit, cuffs and trim",
     branding: "Embroidery, print or applied badge",

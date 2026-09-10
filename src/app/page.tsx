@@ -14,7 +14,7 @@ import {
   ProcessStepper,
   type ProcessStage,
 } from "@/components/content/ProcessStepper";
-import { ProductSlider } from "@/components/content/ProductSlider";
+import { ProductShowcase } from "@/components/content/ProductShowcase";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
@@ -167,18 +167,21 @@ export default function Home() {
         {/*
           The range, not the routing. A cold buyer's first question is whether
           we make their product at all, and two catalogue cards do not answer
-          it — the seven §08 product choices do. Each slide still routes to
+          it — the seven §08 product choices do. Each entry still routes to
           whichever of the two pages covers it.
+
+          The section keeps its own heading outside the panel, so the panel is
+          the product and nothing else.
         */}
-        <ProductSlider
-          items={PRODUCT_RANGE}
+        <SectionHeader
           eyebrow="Custom product range"
           title="Custom gloves, fightwear and club apparel."
-          description="Every product is made to a specification you approve. Step through the range to see what gets decided before anything is sampled."
-          action={CTA.exploreProduct}
+          description="Every product is made to a specification you approve. Step through the range to see what gets decided before anything is cut."
         />
-
         <div className="mt-[var(--space-6)]">
+          <ProductShowcase items={PRODUCT_RANGE} action={CTA.exploreProduct} />
+        </div>
+        <div className="mt-[var(--space-5)]">
           <TextLink href="/products">{CTA.products}</TextLink>
         </div>
       </Section>

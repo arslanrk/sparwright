@@ -331,16 +331,16 @@
   }
 }
 
-/* Slide change (§07 short fade-and-slide). Keyed on the slide index in the
+/* Panel change (§07 short fade-and-slide). Keyed on the selected index in the
    markup, so React remounts the node and the animation replays. */
-.slide-in {
-  animation: slide-in var(--motion-emphasis) var(--ease-standard) both;
+.panel-in {
+  animation: panel-in var(--motion-standard) var(--ease-standard) both;
 }
 
-@keyframes slide-in {
+@keyframes panel-in {
   from {
     opacity: 0;
-    transform: translateX(12px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
