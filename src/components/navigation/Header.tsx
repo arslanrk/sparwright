@@ -50,8 +50,8 @@ export function Header() {
             className="shrink-0 rounded-sm"
           >
             <Logo
-              variant="wordmark"
-              height={26}
+              variant="horizontal"
+              height={30}
               clearSpace={false}
               decorative
               priority

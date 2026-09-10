@@ -520,9 +520,13 @@ SEO metadata and the full §15 checklist run against the live preview.
 > the light and dark lockups are *different renderings*, so the box measured
 > from one sliced the S and the T off the other's wordmark. `Logo` imports the
 > files statically, so each tone's aspect ratio comes from its own artwork.
-> The header uses the wordmark variant — the supplied primary lockup is stacked
-> and falls under §03's 140px minimum in a 64px mobile header. **A horizontal
-> mark-plus-wordmark lockup, if wanted there, needs to come from the designer.**
+> The header, drawer and footer all carry the mark. The supplied set has no
+> horizontal lockup and the stacked one falls under §03's 140px minimum in a 64px
+> header, so the build script composes one: the mark set to the height of the
+> wordmark block, and the gap between them taken from the stacked lockup's own
+> mark-to-wordmark spacing, applied on the other axis. That keeps it a
+> rearrangement of the brand's spacing rather than an invention. **Replace it
+> with a real horizontal lockup when the designer supplies one.**
 
 > The Open Graph image is no longer typographic: it carries the real inverse
 > wordmark. It is still not photographic, for the same reason the rest of the

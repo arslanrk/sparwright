@@ -147,7 +147,7 @@ export function MobileNavigation({
         </div>
 
         <div className="mt-[var(--space-7)]">
-          <Logo variant="wordmark" height={24} clearSpace={false} />
+          <Logo variant="horizontal" height={28} clearSpace={false} />
         </div>
       </div>
     </div>

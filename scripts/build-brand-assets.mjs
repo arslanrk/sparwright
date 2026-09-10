@@ -31,6 +31,21 @@ const WORDMARK_WIDTH = 700;
 const MARK_WIDTH = 192;
 
 /**
+ * The horizontal lockup is composed here, because the supplied artwork has no
+ * horizontal arrangement — only the stacked one — and a 64px header cannot fit
+ * a stacked lockup above §03's 140px minimum width.
+ *
+ * Two things are taken from the artwork rather than chosen: the mark is set to
+ * the height of the wordmark block, and the gap between them is the same
+ * optical gap the stacked lockup already uses between its mark and wordmark,
+ * measured as a fraction of the mark's height and applied on the other axis.
+ * That keeps this a rearrangement of the brand's own spacing rather than an
+ * invention. If the designer supplies a real horizontal lockup, drop this and
+ * crop that instead.
+ */
+const HORIZONTAL_HEIGHT = 120;
+
+/**
  * Content bounds, and the horizontal bands within them.
  *
  * Works whether the background is transparent or opaque: the top-left pixel is
@@ -150,6 +165,58 @@ for (const [tone, source] of Object.entries(markSources)) {
   const { union } = await scan(source);
   markBoxes[tone] = union;
   await crop(source, union, MARK_WIDTH, `${IMAGES}/logo-mark-${tone}.png`);
+}
+
+for (const [tone, source] of [
+  ["light", `${IMAGES}/logo-light.png`],
+  ["dark", `${IMAGES}/logo-dark.png`],
+]) {
+  const { boxes } = await scan(source);
+  const markBand = boxes[0];
+  const wordmarkBand = unite(boxes.slice(1));
+  // The stacked lockup's own mark-to-wordmark gap, as a fraction of mark height.
+  const gapRatio = (wordmarkBand.top - (markBand.top + markBand.height)) / markBand.height;
+
+  const markHeight = HORIZONTAL_HEIGHT;
+  const markBox = markBoxes[tone];
+  const markWidth = Math.round(markHeight * (markBox.width / markBox.height));
+  const wordmarkHeight = HORIZONTAL_HEIGHT;
+  const wordmarkWidth = Math.round(
+    wordmarkHeight * (wordmarkBand.width / wordmarkBand.height),
+  );
+  const gap = Math.round(markHeight * gapRatio);
+
+  const markBuffer = await sharp(markSources[tone])
+    .extract(markBox)
+    .resize({ width: markWidth, height: markHeight })
+    .png()
+    .toBuffer();
+  const wordmarkBuffer = await sharp(source)
+    .extract(wordmarkBand)
+    .resize({ width: wordmarkWidth, height: wordmarkHeight })
+    .png()
+    .toBuffer();
+
+  const out = `${IMAGES}/logo-horizontal-${tone}.png`;
+  await sharp({
+    create: {
+      width: markWidth + gap + wordmarkWidth,
+      height: HORIZONTAL_HEIGHT,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    },
+  })
+    .composite([
+      { input: markBuffer, left: 0, top: 0 },
+      { input: wordmarkBuffer, left: markWidth + gap, top: 0 },
+    ])
+    .png({ compressionLevel: 9, palette: true })
+    .toFile(out);
+
+  const meta = await sharp(out).metadata();
+  console.log(
+    `  ${out}  ${meta.width}x${meta.height}  gap=${gap}px  ${(meta.size / 1024).toFixed(0)} KB`,
+  );
 }
 
 /**

@@ -1,5 +1,7 @@
 import Image, { type StaticImageData } from "next/image";
 import { cn } from "@/lib/cn";
+import horizontalDark from "../../../public/images/logo-horizontal-dark.png";
+import horizontalLight from "../../../public/images/logo-horizontal-light.png";
 import lockupDark from "../../../public/images/logo-lockup-dark.png";
 import lockupLight from "../../../public/images/logo-lockup-light.png";
 import markDark from "../../../public/images/logo-mark-dark.png";
@@ -24,14 +26,14 @@ import wordmarkLight from "../../../public/images/logo-wordmark-light.png";
  * footer actually has to fit. Width follows each file's own ratio, and §03's
  * minimum widths are checked against the result.
  *
- * A note for whoever owns the brand assets: the supplied primary lockup is
- * *stacked* — mark above wordmark. At a 64px mobile header that lands under
- * §03's 140px minimum width, so the header uses the wordmark variant. If a
- * horizontal mark-plus-wordmark lockup is wanted there, it needs to come from
- * the designer rather than be assembled here.
+ * The `horizontal` variant is not in the supplied artwork — it is composed by
+ * the build script, because a stacked lockup cannot sit in a 64px header
+ * without falling under §03's 140px minimum width. Its proportions come from
+ * the brand's own spacing, not from taste; the script explains how. Replace it
+ * the moment the designer supplies a real horizontal lockup.
  */
 
-export type LogoVariant = "primary" | "wordmark" | "mark";
+export type LogoVariant = "primary" | "horizontal" | "wordmark" | "mark";
 export type LogoTone = "ink" | "inverse";
 
 type VariantSpec = {
@@ -55,6 +57,14 @@ const VARIANTS: Record<LogoVariant, VariantSpec> = {
     inverse: lockupDark,
     minWidth: 140,
     defaultHeight: 64,
+    clearSpace: 124 / 611,
+  },
+  horizontal: {
+    ink: horizontalLight,
+    inverse: horizontalDark,
+    // Carries the mark, so it holds the primary lockup's minimum.
+    minWidth: 140,
+    defaultHeight: 30,
     clearSpace: 124 / 611,
   },
   wordmark: {
@@ -114,7 +124,9 @@ export function Logo({
   }
 
   const label =
-    variant === "primary" ? "Sparwright — Custom Fight Gear" : "Sparwright";
+    variant === "primary" || variant === "horizontal"
+      ? "Sparwright — Custom Fight Gear"
+      : "Sparwright";
   const padding = clearSpace
     ? Math.round(renderedHeight * spec.clearSpace)
     : undefined;
