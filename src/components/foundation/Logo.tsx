@@ -1,92 +1,141 @@
+import Image, { type StaticImageData } from "next/image";
 import { cn } from "@/lib/cn";
+import lockupDark from "../../../public/images/logo-lockup-dark.png";
+import lockupLight from "../../../public/images/logo-lockup-light.png";
+import markDark from "../../../public/images/logo-mark-dark.png";
+import markLight from "../../../public/images/logo-mark-light.png";
+import wordmarkDark from "../../../public/images/logo-wordmark-dark.png";
+import wordmarkLight from "../../../public/images/logo-wordmark-light.png";
 
 /**
  * Logo — Design System §03 Logo system.
  *
- * Typographic lockups built from the display face. No drawn artwork exists yet
- * and "Sparwright" is a working brand (§03: the system stays valid if the name
- * changes), so the wordmark is set rather than imported. Swap the internals for
- * an SVG when final artwork lands — the clear-space and minimum-size rules
- * below travel with the component either way.
+ * The real artwork, cut into §03's three variants by
+ * `scripts/build-brand-assets.mjs`. Each variant ships a light and an inverse
+ * file, so the mark is never recoloured with a CSS filter.
+ *
+ * The files are imported rather than referenced by path, which means their
+ * dimensions come from the artwork itself. That matters more than it looks:
+ * the supplied light and dark lockups are *different renderings* — the dark
+ * one's wordmark is wider and its tagline taller — so a single hard-coded
+ * aspect ratio would be wrong for one of the two tones.
+ *
+ * Sizing is expressed as a rendered height, because that is what a header or a
+ * footer actually has to fit. Width follows each file's own ratio, and §03's
+ * minimum widths are checked against the result.
+ *
+ * A note for whoever owns the brand assets: the supplied primary lockup is
+ * *stacked* — mark above wordmark. At a 64px mobile header that lands under
+ * §03's 140px minimum width, so the header uses the wordmark variant. If a
+ * horizontal mark-plus-wordmark lockup is wanted there, it needs to come from
+ * the designer rather than be assembled here.
  */
 
 export type LogoVariant = "primary" | "wordmark" | "mark";
 export type LogoTone = "ink" | "inverse";
 
-/** §03 minimum digital sizes. */
-const MIN_WIDTH: Record<LogoVariant, string> = {
-  primary: "140px",
-  wordmark: "100px",
-  mark: "24px",
+type VariantSpec = {
+  ink: StaticImageData;
+  inverse: StaticImageData;
+  /** §03 minimum digital size. */
+  minWidth: number;
+  /** Default rendered height, in px. */
+  defaultHeight: number;
+  /**
+   * §03 protected zone, as a fraction of the rendered height. Primary and
+   * wordmark reserve the cap height of the SPARWRIGHT wordmark — the "height of
+   * the S" §03 asks for. The mark reserves half its own width.
+   */
+  clearSpace: number;
 };
 
-/**
- * §03 clear space. Primary and wordmark reserve the height of the S on all
- * sides — the cap height of the display face, ~0.72em. The maker's mark
- * reserves half its own width.
- */
-const CLEAR_SPACE: Record<LogoVariant, string> = {
-  primary: "0.72em",
-  wordmark: "0.72em",
-  mark: "50%",
+const VARIANTS: Record<LogoVariant, VariantSpec> = {
+  primary: {
+    ink: lockupLight,
+    inverse: lockupDark,
+    minWidth: 140,
+    defaultHeight: 64,
+    clearSpace: 124 / 611,
+  },
+  wordmark: {
+    ink: wordmarkLight,
+    inverse: wordmarkDark,
+    minWidth: 100,
+    defaultHeight: 26,
+    clearSpace: 124 / 197,
+  },
+  mark: {
+    ink: markLight,
+    inverse: markDark,
+    minWidth: 24,
+    defaultHeight: 24,
+    // Half its own width, expressed against height via the artwork ratio.
+    clearSpace: 0.5 * (192 / 163),
+  },
 };
 
 type LogoProps = {
   variant?: LogoVariant;
   tone?: LogoTone;
+  /** Rendered height in px. Width follows the artwork ratio. */
+  height?: number;
   /** Reserve the §03 protected zone around the mark. */
   clearSpace?: boolean;
+  /**
+   * The logo usually sits inside a link that already names the destination, in
+   * which case it is decorative and should not be announced twice.
+   */
+  decorative?: boolean;
+  /** Set on the one logo above the fold, so it is not lazy-loaded. */
+  priority?: boolean;
   className?: string;
 };
 
 export function Logo({
   variant = "primary",
   tone = "ink",
+  height,
   clearSpace = true,
+  decorative = false,
+  priority = false,
   className,
 }: LogoProps) {
+  const spec = VARIANTS[variant];
+  const source = tone === "inverse" ? spec.inverse : spec.ink;
+  const renderedHeight = height ?? spec.defaultHeight;
+  const renderedWidth = Math.round(
+    renderedHeight * (source.width / source.height),
+  );
+
+  if (process.env.NODE_ENV !== "production" && renderedWidth < spec.minWidth) {
+    console.warn(
+      `[Logo] ${variant} renders ${renderedWidth}px wide, under the §03 minimum of ${spec.minWidth}px.`,
+    );
+  }
+
   const label =
     variant === "primary" ? "Sparwright — Custom Fight Gear" : "Sparwright";
+  const padding = clearSpace
+    ? Math.round(renderedHeight * spec.clearSpace)
+    : undefined;
 
   return (
     <span
-      role="img"
-      aria-label={label}
-      className={cn(
-        "inline-block font-display",
-        tone === "inverse" ? "text-white" : "text-ink-950",
-        className,
-      )}
-      style={{
-        minWidth: MIN_WIDTH[variant],
-        padding: clearSpace ? CLEAR_SPACE[variant] : undefined,
-      }}
+      className={cn("inline-block", className)}
+      style={{ padding: padding ? `${padding}px` : undefined }}
     >
-      {variant === "mark" ? (
-        // Rectangular maker's stamp (§03 construction direction).
-        <span
-          aria-hidden="true"
-          className="inline-flex items-center justify-center border-2 border-current px-1.5 py-1 text-[0.8125rem] font-bold leading-none tracking-[0.06em]"
-        >
-          SW
-        </span>
-      ) : (
-        <span aria-hidden="true" className="block">
-          <span className="block text-[1.125rem] font-bold uppercase leading-none tracking-[0.14em]">
-            Sparwright
-          </span>
-          {variant === "primary" ? (
-            <span
-              className={cn(
-                "mt-1 block font-body text-[0.5625rem] uppercase leading-none tracking-[0.22em]",
-                tone === "inverse" ? "text-mist-300" : "text-slate-500",
-              )}
-            >
-              Custom Fight Gear
-            </span>
-          ) : null}
-        </span>
-      )}
+      <Image
+        src={source}
+        alt={decorative ? "" : label}
+        width={renderedWidth}
+        height={renderedHeight}
+        priority={priority}
+        // No `sizes`: this is a fixed-size image, so Next emits a tight 1x/2x
+        // srcSet from the width. With `sizes` it emits every device width up to
+        // 3840 and points the no-JS fallback `src` at the largest — an upscale
+        // of a 700px source, for a logo rendered at 178px.
+        style={{ height: renderedHeight, width: "auto" }}
+      />
     </span>
   );
 }

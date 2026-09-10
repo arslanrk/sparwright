@@ -49,7 +49,13 @@ export function Header() {
             aria-label="Sparwright — home"
             className="shrink-0 rounded-sm"
           >
-            <Logo variant="primary" clearSpace={false} />
+            <Logo
+              variant="wordmark"
+              height={26}
+              clearSpace={false}
+              decorative
+              priority
+            />
           </Link>
 
           <nav aria-label="Primary" className="hidden lg:block">

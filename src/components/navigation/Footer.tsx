@@ -22,7 +22,12 @@ export function Footer() {
       <Container width="shell" className="py-[var(--space-9)]">
         <div className="grid gap-[var(--space-7)] md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <Logo variant="primary" tone="inverse" clearSpace={false} />
+            <Logo
+              variant="primary"
+              tone="inverse"
+              height={72}
+              clearSpace={false}
+            />
             <p className="mt-[var(--space-4)] max-w-[34ch] text-body text-[var(--color-text-secondary)]">
               Boxing gloves, fightwear and club apparel manufactured in Sialkot
               with your logo, colours and specifications.

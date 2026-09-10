@@ -513,8 +513,20 @@ SEO metadata and the full §15 checklist run against the live preview.
 > `noindex, nofollow`; set gives the full sitemap of 11 URLs at the real
 > origin, `Allow: /` with `/api/` excluded, and `index, follow`.
 
-> The Open Graph image is typographic, not photographic — the same reason the
-> logo is. A link preview is where a borrowed stock image would do the most
+> **Brand artwork, added after the thirteen PRs.** The supplied sources live in
+> `public/images` and `scripts/build-brand-assets.mjs` (`npm run brand`) cuts
+> them into §03's three variants plus the browser icons. The crops are measured
+> at run time rather than hard-coded, which is what caught the real trap here:
+> the light and dark lockups are *different renderings*, so the box measured
+> from one sliced the S and the T off the other's wordmark. `Logo` imports the
+> files statically, so each tone's aspect ratio comes from its own artwork.
+> The header uses the wordmark variant — the supplied primary lockup is stacked
+> and falls under §03's 140px minimum in a 64px mobile header. **A horizontal
+> mark-plus-wordmark lockup, if wanted there, needs to come from the designer.**
+
+> The Open Graph image is no longer typographic: it carries the real inverse
+> wordmark. It is still not photographic, for the same reason the rest of the
+> site is not. A link preview is where a borrowed stock image would do the most
 > damage, since it is the first thing a buyer sees. It renders at build time
 > (1200×630 PNG, verified) and swaps for a real one when the shoot lands. The
 > sitemap is generated from the catalogue, so a new product page cannot be
@@ -529,12 +541,13 @@ no deployment exists yet. Everything below marked ✅ was checked, not assumed.
 
 | Item | |
 |---|---|
-| Working or final name used consistently | ✅ one `SITE_NAME`, no stray spellings |
+| Working or final name used consistently | ✅ one `SITE_NAME`, and the real §03 wordmark now renders in the header, footer, drawer and link preview |
 | Product, buyer and manufacturing model clear above the fold | ✅ §A hero copy verbatim on every landing page |
 | No invented customer, capacity or satisfaction statistics | ✅ proof bar is four factual points; `Testimonial`/`CaseStudyCard` render nowhere |
 | Every MOQ, material, lead-time and process statement confirmed internally | ⛔ **not confirmed** — the site publishes no MOQ or lead time by design, but the material and process wording still needs a read by the team |
 | Primary CTA language consistent | ✅ every label comes from the locked `cta.ts` |
 | Sialkot origin and team roles presented accurately | ⛔ **five roles have no name** |
+| Brand artwork in place | ✅ supplied logo and mark cut into the §03 variants, plus browser icons |
 
 **Design and responsive QA**
 
@@ -575,7 +588,9 @@ Nine things block publication, none of them code:
 
 1. **Photography.** 18 named §09 shots are still placeholders, including the
    homepage hero and every production stage. §09 rules out stock and AI
-   imagery, so this is a shoot, not a sourcing task.
+   imagery, so this is a shoot, not a sourcing task. *(Brand artwork has since
+   landed and is wired in — this blocker is product and manufacturing
+   photography only.)*
 2. **Named roles.** Five responsibilities on `/manufacturing` render
    "Name to be confirmed before launch".
 3. **Company identification.** Registered name, number, address and
