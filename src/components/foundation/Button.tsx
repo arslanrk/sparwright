@@ -23,7 +23,10 @@ const VARIANTS: Record<ButtonVariant, string> = {
   // Forge fill, white text.
   primary: `${SIZED} bg-forge-600 text-white hover:bg-forge-700`,
   // Transparent surface, Ink border and text.
-  secondary: `${SIZED} border border-ink-950 bg-transparent text-ink-950 hover:bg-ink-950 hover:text-white`,
+  // Reads the band's own text colour, so an outline button stays visible on a
+  // dark section instead of drawing Ink on Ink. On a light band this resolves
+  // to exactly the Ink border and text it always was.
+  secondary: `${SIZED} border border-[var(--color-text)] bg-transparent text-[var(--color-text)] hover:bg-[var(--color-text)] hover:text-[var(--color-bg)]`,
   // White fill for dark surfaces and the action band.
   inverse: `${SIZED} bg-white text-ink-950 hover:bg-bone-50`,
   // Visible arrow or underline, no box.

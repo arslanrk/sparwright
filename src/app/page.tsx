@@ -8,14 +8,13 @@ import {
   CustomizationCard,
   type CustomizationItem,
 } from "@/components/content/CustomizationCard";
-import { Hero } from "@/components/content/Hero";
+import { HeroBanner } from "@/components/content/HeroBanner";
 import { ImagePlaceholder } from "@/components/content/ImagePlaceholder";
 import {
   ProcessStepper,
   type ProcessStage,
 } from "@/components/content/ProcessStepper";
 import { ProductCard } from "@/components/content/ProductCard";
-import { ProofBar, type ProofPoint } from "@/components/content/ProofBar";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
@@ -26,24 +25,30 @@ import { PRODUCTS, productCardItem } from "@/lib/products";
 /**
  * Homepage — Design System §11 Homepage order, §A Starter copy library.
  *
- * Section stack: hero, proof bar, products, audiences, customization, process,
+ * Section stack: hero, products, audiences, customization, process,
  * manufacturing, final CTA. §11 illustrates the recommended stack as a figure
  * rather than an ordered list, so this is the roadmap's stated assumption; the
  * roadmap flags it for confirmation before merge.
+ *
+ * §08 specifies the four proof points twice — once as the Hero's own "Proof"
+ * field and again as the proof bar beneath it. Running both would state the
+ * same four things twice in a row, so they live in the hero, where they carry
+ * the photograph. `ProofBar` is still available for a page that wants the
+ * expanded form.
  *
  * There is no case-study or testimonial section here, deliberately: §11 says to
  * remove it until genuine evidence exists, and non-negotiable #12 says the same.
  */
 
-/** §08 Proof bar — four factual points, no invented totals or scores. */
-const PROOF_POINTS: ProofPoint[] = [
-  { title: "10+ years", description: "Hands-on manufacturing experience." },
-  { title: "Custom branding", description: "Club or private-label identity." },
-  { title: "Sample first", description: "Approval before bulk production." },
-  {
-    title: "Made in Sialkot",
-    description: "Transparent manufacturing origin.",
-  },
+/**
+ * §08 Hero "Proof" — the four short labels, verbatim. Non-negotiable #5 rules
+ * out inventing a throughput figure or a customer count to sit alongside them.
+ */
+const HERO_PROOF = [
+  "10+ years of hands-on manufacturing",
+  "Custom club and private-label branding",
+  "Approved sample before bulk production",
+  "Made in Sialkot",
 ];
 
 /**
@@ -135,10 +140,11 @@ const STAGES: ProcessStage[] = [
 export default function Home() {
   return (
     <>
-      <Hero
+      <HeroBanner
         eyebrow="Custom fight-gear manufacturing"
         title="Custom fight gear, built for your club."
         description="Boxing gloves, fightwear and club apparel manufactured in Sialkot with your colours, logo and specifications."
+        proof={HERO_PROOF}
         actions={
           <>
             <Button
@@ -155,10 +161,7 @@ export default function Home() {
             </Button>
           </>
         }
-        media={<ImagePlaceholder shot="Hero boxing-glove image" ratio="hero" />}
       />
-
-      <ProofBar points={PROOF_POINTS} />
 
       <Section theme="light" width="work">
         <SectionHeader
@@ -240,7 +243,7 @@ export default function Home() {
               </Button>
             </div>
           </div>
-          <ImagePlaceholder shot="Workshop wide view" ratio="process" />
+          <ImagePlaceholder shot="Stitching process" ratio="process" />
         </div>
       </Section>
 

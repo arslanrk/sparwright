@@ -310,13 +310,76 @@
 }
 
 /* §07 — essential state changes stay understandable with animation disabled. */
+/* -- Hero entrance (§07) ---------------------------------------------------
+   One-shot only. §07 approves short fade-and-slide movement and rules out
+   constant floating objects, so these play once on load and then hold. Each
+   element's final state is the resting state, so if the animation never runs
+   the hero is simply there.
+-------------------------------------------------------------------------- */
+.hero-rise {
+  animation: hero-rise var(--motion-emphasis) var(--ease-standard) both;
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Each line draws along its own length; the dash values are set per element. */
+.constellation-line {
+  opacity: 0.22;
+  animation: constellation-line 900ms var(--ease-standard) both;
+}
+
+@keyframes constellation-line {
+  from {
+    stroke-dashoffset: var(--line-length, 240);
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 0.22;
+  }
+}
+
+.constellation-node {
+  opacity: 0.5;
+  animation: constellation-node var(--motion-emphasis) var(--ease-standard) both;
+}
+
+@keyframes constellation-node {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    /* Without this, a staggered entrance keeps its delay and the content sits
+       invisible for up to a second before snapping in — worse than the
+       animation it is meant to replace. */
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* A line that never animates must not keep its draw-in offset. */
+  .constellation-line {
+    stroke-dashoffset: 0 !important;
   }
 }
