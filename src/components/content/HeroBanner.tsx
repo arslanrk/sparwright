@@ -26,7 +26,7 @@ import banner from "../../../public/images/banner.jpg";
 
 /** §12 alternative-text pattern: describe the work, not the file. */
 const BANNER_ALT =
-  "Team members stitching boxing gloves and headguards at the Sialkot workshop.";
+  "Team members stitching boxing gloves and headguards on the production floor.";
 
 type HeroBannerProps = {
   eyebrow: string;

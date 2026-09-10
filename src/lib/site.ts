@@ -31,7 +31,21 @@ export function isProductionSite(): boolean {
 
 export const SITE_NAME = "Sparwright";
 
+/**
+ * The meta description for the homepage, the Open Graph body and the footer
+ * brand line — one string, so the three cannot drift apart.
+ *
+ * Written to the ~155 characters a search result will actually show, leading
+ * with the product terms a buyer searches and closing on the differentiator
+ * rather than on where we are.
+ */
 export const SITE_DESCRIPTION =
-  "Boxing gloves, fightwear and club apparel manufactured in Sialkot with your logo, colours and specifications.";
+  "Custom boxing gloves, fightwear and club apparel made to your specification — your logo, your colours, and an approved sample before bulk production.";
 
-export const SITE_TAGLINE = "Custom fight gear for clubs and brands";
+/**
+ * Renders as the homepage title tag, "Sparwright — {tagline}". Front-loaded
+ * with the terms a buyer searches, and "manufacturer" is the word that
+ * separates a buying query from a shopping one. 60 characters with the brand,
+ * which is about what a result will show before truncating.
+ */
+export const SITE_TAGLINE = "Custom boxing gloves and fightwear manufacturer";

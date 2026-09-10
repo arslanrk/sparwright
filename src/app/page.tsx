@@ -41,14 +41,23 @@ import { PRODUCTS, productCardItem } from "@/lib/products";
  */
 
 /**
- * §08 Hero "Proof" — the four short labels, verbatim. Non-negotiable #5 rules
- * out inventing a throughput figure or a customer count to sit alongside them.
+ * §08 Hero "Proof".
+ *
+ * §08 gives these as "10+ Years; Custom Branding; Sample Before Bulk; Made in
+ * Sialkot". Two of those are supplier credentials rather than buyer outcomes —
+ * how long we have traded, and where we are — and the brief is to sell what the
+ * buyer gets. Origin still earns its place on /manufacturing, where a buyer
+ * doing due diligence goes looking for it.
+ *
+ * What replaced them has to clear non-negotiables #5 and #6 the same way: every
+ * line here is a commitment the rest of the site already makes, and none of it
+ * is a throughput figure, a customer count, an MOQ or a lead time.
  */
 const HERO_PROOF = [
-  "10+ years of hands-on manufacturing",
   "Custom club and private-label branding",
   "Approved sample before bulk production",
-  "Made in Sialkot",
+  "Gloves and apparel under one identity",
+  "Your artwork and specs kept for reorders",
 ];
 
 /**
@@ -141,9 +150,9 @@ export default function Home() {
   return (
     <>
       <HeroBanner
-        eyebrow="Custom fight-gear manufacturing"
-        title="Custom fight gear, built for your club."
-        description="Boxing gloves, fightwear and club apparel manufactured in Sialkot with your colours, logo and specifications."
+        eyebrow="Custom fight gear manufacturer"
+        title="Custom boxing gloves and fightwear, built to your specification."
+        description="Gloves, fightwear and club apparel made with your logo, your colours and your construction — approved on a sample before anything goes to bulk."
         proof={HERO_PROOF}
         actions={
           <>
@@ -232,10 +241,16 @@ export default function Home() {
       <Section theme="white" width="work">
         <div className="grid items-center gap-[var(--space-7)] lg:grid-cols-2">
           <div>
+            {/*
+              §10 headline formula, proof + stage. The §A manufacturing intro
+              leads on years traded and location; both are supplier credentials,
+              and they still open /manufacturing, where a buyer checking us out
+              goes looking for them.
+            */}
             <SectionHeader
               eyebrow="Manufacturing"
-              title="Ten years of hands-on fight-gear manufacturing experience."
-              description="Based in Sialkot, our production work is built around clear product requirements, approved samples and checks before dispatch."
+              title="Manufacturing you can inspect before bulk."
+              description="Clear product requirements, a sample you sign off, and checks recorded against that sample before anything is packed. Nothing about the process is a black box."
             />
             <div className="mt-[var(--space-6)]">
               <Button href="/manufacturing" variant="secondary">

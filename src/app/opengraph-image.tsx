@@ -83,7 +83,7 @@ export default function OpengraphImage() {
             maxWidth: 900,
           }}
         >
-          Custom fight gear, built for your club.
+          Custom boxing gloves and fightwear, built to your specification.
         </div>
         <div
           style={{
@@ -108,7 +108,7 @@ export default function OpengraphImage() {
             color: MIST,
           }}
         >
-          Made in Sialkot
+          Built to your specification
         </div>
       </div>
     </div>,

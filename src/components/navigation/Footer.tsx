@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/foundation/Container";
 import { Logo } from "@/components/foundation/Logo";
+import { SITE_DESCRIPTION } from "@/lib/site";
 import { CONTACT, FOOTER_COLUMNS, LEGAL_LINKS, whatsappHref } from "./nav";
 
 /**
@@ -28,9 +29,10 @@ export function Footer() {
               height={72}
               clearSpace={false}
             />
+            {/* The one positioning line, shared with the meta description and
+                the Open Graph card so the three cannot drift apart. */}
             <p className="mt-[var(--space-4)] max-w-[34ch] text-body text-[var(--color-text-secondary)]">
-              Boxing gloves, fightwear and club apparel manufactured in Sialkot
-              with your logo, colours and specifications.
+              {SITE_DESCRIPTION}
             </p>
             <p className="mt-[var(--space-4)] text-small text-[var(--color-text-muted)]">
               {CONTACT.location}
