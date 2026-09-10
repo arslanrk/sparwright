@@ -22,13 +22,15 @@ import { ImagePlaceholder } from "./ImagePlaceholder";
  * at the panel edge it does the work a second photograph would otherwise do —
  * useful, given there is no photography yet.
  *
- * The rail. A carousel that hides six of seven products behind two arrows
- * answers "do you make my thing" badly. Every product name stays on the rail,
- * so the range is legible at a glance and the arrows are a convenience rather
- * than the only way through.
+ * The index. A carousel that hides six of seven products behind two arrows
+ * answers "do you make my thing" badly, and a tab strip under the panel is
+ * just that carousel with the arrows spelled out. So the navigation is a
+ * drawing's contents column instead: every product stays readable, and it
+ * fills the height the plate creates rather than adding a strip beneath
+ * everything.
  *
  * §07 rules out *automatic* carousels, not carousels: nothing advances on its
- * own, so there is no timer and no need for a pause control. The rail is a
+ * own, so there is no timer and no need for a pause control. The index is a
  * real tablist, so arrow keys, Home and End work and the panel is labelled by
  * the product it belongs to (§12).
  */
@@ -96,77 +98,25 @@ export function ProductShowcase({ items, action }: ProductShowcaseProps) {
       }}
     >
       <div className="p-[var(--space-6)] md:p-[var(--space-8)]">
-        <div
-          id={panelId}
-          role="tabpanel"
-          aria-labelledby={tabId(selected)}
-          tabIndex={0}
-          className="grid items-center gap-[var(--space-7)] rounded-sm lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:gap-[var(--space-8)]"
-        >
-          {/* Identity and the pitch for this one product. */}
-          <div key={`copy-${selected}`} className="panel-in">
-            <p className="text-eyebrow uppercase text-[var(--color-text-muted)]">
-              {current.family}
-            </p>
-            <h3 className="mt-3 text-heading-1">{current.name}</h3>
-            <p className="mt-[var(--space-5)] max-w-copy text-body-large text-[var(--color-text-secondary)]">
-              {current.styleProfile}
-            </p>
-
-            {/* One spec strip, hairline-divided, rather than floating cards. */}
-            <dl className="mt-[var(--space-6)] grid border-t border-[var(--color-border)] sm:grid-cols-3">
-              <Spec label="Shell" value={current.fabric} />
-              <Spec label="Construction" value={current.construction} />
-              <Spec label="Branding" value={current.branding} />
-            </dl>
-
-            <div className="mt-[var(--space-6)]">
-              <Button href={current.href} variant="inverse" arrow>
-                {action}
-              </Button>
-            </div>
-          </div>
-
+        <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)_minmax(0,0.74fr)] lg:gap-x-[var(--space-7)] lg:gap-y-[var(--space-6)]">
           {/*
-            The plate: the product presented the way a sample is. The numeral
-            and the crop marks are both anchored to the plate itself, not to
-            the column, so they stay registered to it at every width.
+            The index. A drawing's contents column rather than a tab bar:
+            every product stays readable, and it fills the height the plate
+            creates instead of adding a strip under everything.
           */}
-          <div className="relative mx-auto w-full max-w-[20rem]">
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-3 -top-12 select-none font-display text-[9rem] font-bold leading-none tracking-tighter text-white/[0.07] md:-right-6 md:-top-16 md:text-[12rem]"
-            >
-              {String(selected + 1).padStart(2, "0")}
-            </span>
-            <div key={`plate-${selected}`} className="panel-in relative">
-              <CropMarks />
-              <ImagePlaceholder
-                shot={current.shot}
-                ratio="portrait"
-                className="border-[var(--color-border)] bg-white/[0.04]"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/*
-          The rail. Every product, always readable.
-
-          It stacks below md: sharing a row with the arrows on a 360px screen
-          squeezed the rail to 136px — narrower than a single product name —
-          which is worse than no rail at all.
-        */}
-        <div className="mt-[var(--space-7)] flex flex-col gap-4 border-t border-[var(--color-border)] pt-[var(--space-5)] md:flex-row md:items-center md:gap-[var(--space-5)]">
           <div
             role="tablist"
             aria-label="Product range"
+            aria-orientation="vertical"
             onKeyDown={onRailKeyDown}
-            // Scrolls on a phone, wraps from md up. It must not clip: the
-            // whole point of the rail is that the range is readable at a
-            // glance, and a hidden seventh product defeats it.
-            className="-mx-1 flex min-w-0 gap-1 overflow-x-auto px-1 md:mx-0 md:flex-1 md:flex-wrap md:overflow-visible md:px-0"
+            className={cn(
+              "-mx-1 flex gap-1 overflow-x-auto px-1 pb-2",
+              "lg:row-span-2 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0",
+            )}
           >
+            <p className="hidden text-eyebrow uppercase text-[var(--color-text-muted)] lg:mb-4 lg:block">
+              Range
+            </p>
             {items.map((item, i) => {
               const isSelected = i === selected;
               return (
@@ -183,11 +133,12 @@ export function ProductShowcase({ items, action }: ProductShowcaseProps) {
                   tabIndex={isSelected ? 0 : -1}
                   onClick={() => select(i, false)}
                   className={cn(
-                    "flex shrink-0 items-baseline gap-2 whitespace-nowrap rounded-md px-2.5 py-2 transition-colors",
+                    "flex shrink-0 items-baseline gap-2.5 whitespace-nowrap rounded-md px-2.5 py-2 text-left transition-colors",
                     // Weight and a rule carry the state, not colour alone (§12).
+                    "lg:w-full lg:whitespace-normal lg:rounded-none lg:border-l-2 lg:px-3 lg:py-2.5",
                     isSelected
-                      ? "bg-white/10 font-semibold text-[var(--color-text)]"
-                      : "text-[var(--color-text-secondary)] hover:bg-white/5 hover:text-[var(--color-text)]",
+                      ? "bg-white/10 font-semibold text-[var(--color-text)] lg:border-[var(--color-action)] lg:bg-white/[0.06]"
+                      : "text-[var(--color-text-secondary)] hover:bg-white/5 hover:text-[var(--color-text)] lg:border-transparent lg:hover:border-[var(--color-border)]",
                   )}
                 >
                   <span
@@ -206,17 +157,65 @@ export function ProductShowcase({ items, action }: ProductShowcaseProps) {
             })}
           </div>
 
-          <div className="flex shrink-0 items-center justify-end gap-2">
-            <Arrow
-              direction="previous"
-              controls={panelId}
-              onClick={() => select(selected - 1, false)}
-            />
-            <Arrow
-              direction="next"
-              controls={panelId}
-              onClick={() => select(selected + 1, false)}
-            />
+          {/* Identity and the pitch for this one product. */}
+          <div
+            id={panelId}
+            role="tabpanel"
+            aria-labelledby={tabId(selected)}
+            tabIndex={0}
+            key={`copy-${selected}`}
+            // Centred against the plate, which is the taller of the two.
+            className="panel-in mt-[var(--space-6)] rounded-sm lg:mt-0 lg:self-center"
+          >
+            <p className="text-eyebrow uppercase text-[var(--color-text-muted)]">
+              {current.family}
+            </p>
+            <h3 className="mt-3 text-heading-1">{current.name}</h3>
+            <p className="mt-[var(--space-5)] max-w-copy text-body-large text-[var(--color-text-secondary)]">
+              {current.styleProfile}
+            </p>
+          </div>
+
+          {/*
+            The plate: the product presented the way a sample is. The numeral
+            and the crop marks are both anchored to the plate itself, not to
+            the column, so they stay registered to it at every width.
+          */}
+          <div className="relative mx-auto mt-[var(--space-7)] w-full max-w-[20rem] lg:mt-0 lg:self-center">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-3 -top-12 select-none font-display text-[9rem] font-bold leading-none tracking-tighter text-white/[0.07] md:-right-6 md:-top-16 md:text-[12rem]"
+            >
+              {String(selected + 1).padStart(2, "0")}
+            </span>
+            <div key={`plate-${selected}`} className="panel-in relative">
+              <CropMarks />
+              <ImagePlaceholder
+                shot={current.shot}
+                ratio="portrait"
+                className="border-[var(--color-border)] bg-white/[0.04]"
+              />
+            </div>
+          </div>
+
+          {/* Specification and the action, under the copy column. */}
+          <div
+            key={`spec-${selected}`}
+            // Spans the copy and plate columns: confined to the copy column the
+            // three specs were ~135px each and every value broke over four
+            // lines.
+            className="panel-in mt-[var(--space-6)] lg:col-span-2 lg:mt-0 lg:self-start"
+          >
+            <dl className="grid border-t border-[var(--color-border)] sm:grid-cols-3">
+              <Spec label="Shell" value={current.fabric} />
+              <Spec label="Construction" value={current.construction} />
+              <Spec label="Branding" value={current.branding} />
+            </dl>
+            <div className="mt-[var(--space-6)]">
+              <Button href={current.href} variant="inverse" arrow>
+                {action}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -249,44 +248,5 @@ function CropMarks() {
       <span className={cn(corner, "bottom-0 left-0 border-b-2 border-l-2")} />
       <span className={cn(corner, "bottom-0 right-0 border-b-2 border-r-2")} />
     </div>
-  );
-}
-
-function Arrow({
-  direction,
-  controls,
-  onClick,
-}: {
-  direction: "previous" | "next";
-  controls: string;
-  onClick: () => void;
-}) {
-  const isNext = direction === "next";
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-controls={controls}
-      // §12: a bare chevron has no accessible name of its own.
-      aria-label={isNext ? "Next product" : "Previous product"}
-      className="inline-flex size-11 shrink-0 items-center justify-center rounded-pill border border-[var(--color-border)] text-[var(--color-text)] transition-colors hover:bg-white/10"
-    >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 16 16"
-        className="size-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {isNext ? (
-          <path d="M6 3.5 10.5 8 6 12.5" />
-        ) : (
-          <path d="M10 3.5 5.5 8 10 12.5" />
-        )}
-      </svg>
-    </button>
   );
 }
