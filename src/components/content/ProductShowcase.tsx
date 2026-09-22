@@ -366,6 +366,20 @@ function Slide({
         column, so they stay registered to it at every width.
       */}
       <div className="relative mx-auto mt-[var(--space-7)] w-full max-w-[20rem] lg:mt-0 lg:self-center">
+        {/*
+          The index numeral, cropped at the panel edge.
+
+          The collection name was tried here at display size, so the plate would
+          crop into it the way a product crops the brand word on a retail hero.
+          It does not fit this layout: the word can only bleed left into the copy
+          column, where it sits under the description and costs contrast, or
+          right into the 63px of panel beyond the plate, where one letter shows.
+          That device needs the product centred with air around it, which is the
+          opposite of an index column that keeps every collection in view.
+
+          The numeral has neither problem, and says something the heading does
+          not already say — where you are in the range.
+        */}
         <span
           aria-hidden="true"
           className="pointer-events-none absolute -right-3 -top-12 select-none font-display text-[9rem] font-bold leading-none tracking-tighter text-white/[0.07] md:-right-6 md:-top-16 md:text-[12rem]"
@@ -378,6 +392,7 @@ function Slide({
         >
           <CropMarks />
           <Plate item={item} />
+          <MeasureRule index={index} />
         </div>
       </div>
 
@@ -575,6 +590,47 @@ function Tick() {
     >
       <path d="M4.5 10.5 8.5 14.5l7-9" />
     </svg>
+  );
+}
+
+/**
+ * §09 "measurement marks and restrained coordinate-like labels" — a dimension
+ * rule beneath the plate, the way a drawing dimensions the thing it describes.
+ *
+ * It is the piece that keeps this slider from reading as a borrowed retail
+ * carousel: the references it grew from sell a finished object with a price,
+ * and this one is presenting a sample for approval.
+ *
+ * The long tick marks the current collection, so the rule doubles as a second,
+ * quieter position indicator alongside the counter.
+ */
+function MeasureRule({ index }: { index: number }) {
+  const TICKS = 24;
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute -bottom-[var(--space-5)] left-0 right-0 flex items-end justify-between"
+    >
+      {Array.from({ length: TICKS }, (_, i) => {
+        // Every sixth tick is a major division; one is promoted to mark the
+        // slide, so the rule reads as measured rather than decorative.
+        const major = i % 6 === 0;
+        const marker = i === (index * 5) % TICKS;
+        return (
+          <span
+            key={i}
+            className={cn(
+              "w-px transition-[height,background-color] duration-[360ms] ease-[var(--ease-standard)]",
+              marker
+                ? "h-3 bg-[var(--color-action)]"
+                : major
+                  ? "h-2 bg-white/25"
+                  : "h-1 bg-white/12",
+            )}
+          />
+        );
+      })}
+    </div>
   );
 }
 
