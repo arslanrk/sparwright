@@ -5,6 +5,7 @@ import { CookieBanner } from "@/components/navigation/CookieBanner";
 import { Footer } from "@/components/navigation/Footer";
 import { Header } from "@/components/navigation/Header";
 import { MobileActionBar } from "@/components/navigation/MobileNavigation";
+import { WhatsAppLauncher } from "@/components/navigation/WhatsAppLauncher";
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -80,6 +81,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <Footer />
         <MobileActionBar />
+        <WhatsAppLauncher />
         <CookieBanner />
         <AnalyticsListener />
       </body>

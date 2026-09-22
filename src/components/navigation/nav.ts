@@ -41,6 +41,9 @@ export const PRODUCT_LINKS: NavLink[] = PRODUCTS.map((product) => ({
 }));
 
 export const PRIMARY_NAV: PrimaryNavItem[] = [
+  // `isActivePath` already matches "/" exactly rather than by prefix, so Home
+  // highlights only on the homepage instead of on every route beneath it.
+  { label: "Home", href: "/" },
   { label: "Products", href: "/products", children: PRODUCT_LINKS },
   { label: "For Clubs", href: "/for-clubs" },
   { label: "Private Label", href: "/private-label" },
@@ -59,7 +62,7 @@ export const PRIMARY_NAV: PrimaryNavItem[] = [
  * from?" (§14 lead source).
  */
 export const HEADER_CTA = {
-  label: CTA.mockup,
+  label: CTA.navQuote,
   href: "/quote?intent=mockup",
 } as const;
 

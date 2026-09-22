@@ -4,10 +4,25 @@
  * CTA copy is locked. Import from here rather than typing button labels so the
  * site keeps one set of actions across every page. §08 explicitly rules out
  * "Submit", "Click Here", "Discover More", "Let's Go" and "Shop Now".
+ *
+ * NOTE: the header and the homepage hero now use quote-led wording
+ * (`navQuote`, `customQuote`, `sampleOrder`) while every other surface still
+ * says "Request Your Mockup". That is a deliberate, scoped change and not yet
+ * the one locked set this file exists to keep — the interior heroes, the
+ * homepage's own closing CTA and the footer still carry the mockup language.
  */
 export const CTA = {
   /** Primary conversion — clubs and gyms. */
   mockup: "Request Your Mockup",
+  /**
+   * Quote-led wording for the header and the homepage hero. Separate entries
+   * rather than a rewrite of `mockup`, which still labels the same action on
+   * seven other surfaces — changing it there was not part of the brief. See
+   * the note below about the two sets now running side by side.
+   */
+  navQuote: "Custom Quote",
+  customQuote: "Get a Custom Quote",
+  sampleOrder: "Start Your Sample Order",
   /** Secondary conversion — buyers with defined requirements. */
   quote: "Get a Manufacturing Quote",
   sample: "Start a Sample Request",
@@ -24,7 +39,6 @@ export const CTA = {
    * for the private-label pathway: verb plus a specific destination, never a
    * vague "Learn more".
    */
-  exploreProduct: "Explore this product",
   exploreFightwear: "Explore Fightwear",
   exploreClubApparel: "Explore Club Apparel",
   privateLabel: "View Private Label Manufacturing",

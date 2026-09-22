@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { Container } from "@/components/foundation/Container";
-import { cn } from "@/lib/cn";
+import { ConstellationField } from "./ConstellationField";
 import banner from "../../../public/images/banner.jpg";
 
 /**
@@ -19,9 +19,10 @@ import banner from "../../../public/images/banner.jpg";
  * `lg`. It is one `<Image>` repositioned by CSS, not two — rendering both and
  * hiding one downloads the photograph twice.
  *
- * §07's Avoid list rules out "constant floating objects", which is what a
- * drifting node network is. So the constellation draws itself in once and then
- * holds still. Nothing here loops.
+ * The constellation overlay drifts continuously — a deliberate deviation from
+ * §07, which lists "constant floating objects" under Avoid. `ConstellationField`
+ * documents how the motion is kept to a backdrop and what it does under
+ * `prefers-reduced-motion`.
  */
 
 /** §12 alternative-text pattern: describe the work, not the file. */
@@ -76,7 +77,7 @@ export function HeroBanner({
         <div className="absolute inset-0 hidden bg-[var(--color-ink-950)]/20 lg:block" />
       </div>
 
-      <Constellation className="pointer-events-none absolute inset-0 hidden lg:block" />
+      <ConstellationField className="pointer-events-none absolute inset-0 hidden lg:block" />
 
       <Container
         width="shell"
@@ -152,112 +153,6 @@ function CheckMark() {
     >
       <circle cx="10" cy="10" r="8.25" />
       <path d="M6.25 10.25 8.9 12.9l4.85-5.3" />
-    </svg>
-  );
-}
-
-/* -------------------------------------------------------------------------
-   Constellation overlay
-
-   §09 lists "measurement marks and restrained coordinate-like labels" among the
-   approved graphic motifs, which is what this is: a survey net over the
-   workshop, not a particle effect.
-
-   The geometry is generated from a fixed seed, so the server and the client
-   produce identical markup and it renders as a plain server component — no
-   hydration boundary, no JavaScript shipped for a decoration.
-------------------------------------------------------------------------- */
-
-const VIEW_W = 1200;
-const VIEW_H = 620;
-
-/** Small deterministic PRNG, so "random" placement is the same every build. */
-function mulberry32(seed: number) {
-  return function next() {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-type Node = { x: number; y: number; r: number };
-
-function buildNet() {
-  const random = mulberry32(20260911);
-  const nodes: Node[] = [];
-  const COUNT = 30;
-
-  for (let i = 0; i < COUNT; i += 1) {
-    // Biased left: the right of the photograph is where the people and the
-    // gloves are, and a net drawn across their faces reads as clutter rather
-    // than as a motif. Squaring a 0–1 value pulls the distribution toward 0.
-    const bias = random() ** 1.7;
-    nodes.push({
-      x: bias * VIEW_W,
-      y: random() * VIEW_H,
-      r: 1.6 + random() * 2.2,
-    });
-  }
-
-  // Join near neighbours only, so the net reads as a structure rather than a mesh.
-  const THRESHOLD = 210;
-  const edges: Array<{ a: Node; b: Node; length: number }> = [];
-  for (let i = 0; i < nodes.length; i += 1) {
-    for (let j = i + 1; j < nodes.length; j += 1) {
-      const a = nodes[i];
-      const b = nodes[j];
-      const length = Math.hypot(a.x - b.x, a.y - b.y);
-      if (length < THRESHOLD) edges.push({ a, b, length });
-    }
-  }
-
-  return { nodes, edges };
-}
-
-const NET = buildNet();
-
-function Constellation({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-      preserveAspectRatio="xMidYMid slice"
-      className={cn("h-full w-full", className)}
-    >
-      {NET.edges.map(({ a, b, length }, index) => (
-        <line
-          key={`${a.x}-${a.y}-${b.x}-${b.y}`}
-          x1={a.x}
-          y1={a.y}
-          x2={b.x}
-          y2={b.y}
-          stroke="var(--color-action)"
-          strokeWidth="1"
-          className="constellation-line"
-          style={{
-            // Each line draws itself along its own length.
-            strokeDasharray: length,
-            strokeDashoffset: length,
-            animationDelay: `${300 + (index % 12) * 55}ms`,
-          }}
-        />
-      ))}
-      {NET.nodes.map((node, index) => (
-        <circle
-          key={`${node.x}-${node.y}`}
-          cx={node.x}
-          cy={node.y}
-          r={node.r}
-          fill="var(--color-action)"
-          className="constellation-node"
-          style={{
-            transformOrigin: `${node.x}px ${node.y}px`,
-            animationDelay: `${420 + (index % 10) * 70}ms`,
-          }}
-        />
-      ))}
     </svg>
   );
 }

@@ -20,8 +20,10 @@ import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
 import { TextLink } from "@/components/foundation/TextLink";
 import { CTA } from "@/components/foundation/cta";
+import Image from "next/image";
 import { SITE_FAQS } from "@/lib/faq";
-import { PRODUCT_RANGE } from "@/lib/product-range";
+import { COLLECTIONS } from "@/lib/collections";
+import factoryFloor from "../../public/images/boxing-glove-factory-floor.jpg";
 
 /**
  * Homepage — Design System §11 Homepage order, §A Starter copy library.
@@ -154,32 +156,110 @@ export default function Home() {
               data-analytics="hero_mockup_click"
               data-analytics-surface="hero"
             >
-              {CTA.mockup}
+              {CTA.customQuote}
             </Button>
             <Button href="/products" variant="secondary">
-              {CTA.products}
+              {CTA.sampleOrder}
             </Button>
           </>
         }
       />
 
+      {/*
+        The entity block. Everything else on this page describes the product or
+        the process; nothing says what Sparwright *is*, which leaves both a
+        buyer doing due diligence and a crawler building an entity with only
+        fragments to work from. Two paragraphs of sustained prose is also the
+        only body copy above the fold — the rest of the homepage is headings and
+        short supporting lines.
+
+        Deliberately not a process block. §11 already gives the process two
+        sections of its own ("From requirements to delivery" and "Manufacturing
+        you can inspect before bulk"), so this one stays on who we are, what we
+        make and who for. §10 preferred vocabulary throughout, and nothing here
+        claims a year, a certification, a client count or a capacity figure
+        (#5, #6).
+
+        The photograph is the facility, not the product: an about block's job is
+        proof that there is a real operation behind the claims (§09 — "real
+        products, real materials, real makers and a visible production process"),
+        and the collections slider immediately below already carries the product.
+
+        It must not restate the hero. `banner.jpg` is an eye-level view straight
+        down a single bench row with the left half of the frame empty floor, so
+        this one is shot from height and across the width of the hall. Same
+        building, different vantage — which is also what stops it reading as a
+        stock factory photograph.
+      */}
+      <Section theme="white" width="work">
+        <div className="grid items-center gap-[var(--space-7)] lg:grid-cols-2">
+          <div>
+            {/* §10 headline formula, service + buyer. */}
+            <SectionHeader
+              eyebrow="About Sparwright"
+              title="A custom fight gear manufacturer for clubs and fightwear brands."
+            />
+            {/* Spaced with an explicit margin on the second paragraph, which
+                is how every other stacked block on the site does it. `space-y`
+                is not used anywhere in this codebase and generated no rule at
+                all here — the paragraphs rendered flush against each other. */}
+            <p className="mt-[var(--space-5)] max-w-copy text-body-large text-[var(--color-text-secondary)]">
+              Sparwright manufactures custom boxing gloves, fightwear, lifting
+              gear and club apparel for gyms, clubs and fightwear brands. Every
+              product is made to a specification you set — materials and
+              construction, colours, closure, logo placement and packaging —
+              rather than picked from a catalogue and relabelled.
+            </p>
+            <p className="mt-[var(--space-4)] max-w-copy text-body-large text-[var(--color-text-secondary)]">
+              Working with one manufacturer across all four keeps a single
+              identity on everything a club or brand puts its name to: the same
+              colour references, the same logo treatment, and your artwork and
+              specifications kept on file so a reorder matches the first run.
+              Clubs order across member sizes; brands develop their own products
+              under their own label.
+            </p>
+            <div className="mt-[var(--space-6)]">
+              <Button href="/manufacturing" variant="secondary">
+                {CTA.process}
+              </Button>
+            </div>
+          </div>
+          {/*
+            §09 "Workshop wide view". Source is 2528x1696 (1.4906) against the
+            slot's 3:2, so `object-cover` trims well under a percent.
+
+            §12 alt text describes the work, not the file.
+          */}
+          <div className="relative aspect-[3/2] overflow-hidden rounded-lg">
+            <Image
+              src={factoryFloor}
+              alt="Machinists at sewing benches assembling custom boxing gloves on the Sparwright production floor."
+              fill
+              placeholder="blur"
+              // Half the work-width grid, so it never renders wider than this.
+              sizes="(min-width: 1024px) 600px, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
+      </Section>
+
       <Section theme="light" width="work">
         {/*
           The range, not the routing. A cold buyer's first question is whether
           we make their product at all, and two catalogue cards do not answer
-          it — the seven §08 product choices do. Each entry still routes to
-          whichever of the two pages covers it.
+          it — five collections that each name their products do.
 
           The section keeps its own heading outside the panel, so the panel is
-          the product and nothing else.
+          the range and nothing else.
         */}
         <SectionHeader
           eyebrow="Custom product range"
-          title="Custom gloves, fightwear and club apparel."
-          description="Every product is made to a specification you approve. Step through the range to see what gets decided before anything is cut."
+          title="Gloves, fightwear, lifting gear and club apparel."
+          description="We manufacture custom fight gear, strength equipment and team apparel to your specification — your shell, your construction, your branding, approved on a sample before bulk production."
         />
         <div className="mt-[var(--space-6)]">
-          <ProductShowcase items={PRODUCT_RANGE} action={CTA.exploreProduct} />
+          <ProductShowcase items={COLLECTIONS} />
         </div>
         <div className="mt-[var(--space-5)]">
           <TextLink href="/products">{CTA.products}</TextLink>

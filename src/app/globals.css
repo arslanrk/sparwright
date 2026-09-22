@@ -167,6 +167,10 @@
      never overlap the sticky mobile action bar. */
   --header-height: 4rem; /* 64px — mobile header */
   --action-bar-height: 4.25rem; /* 68px — sticky mobile action bar */
+
+  /* WhatsApp's own green. Outside the §04 palette on purpose: the launcher is
+     a third-party affordance that people recognise by this colour. */
+  --color-whatsapp: #25d366;
 }
 
 @media (width >= 64rem) {
@@ -348,36 +352,64 @@
   }
 }
 
-/* Each line draws along its own length; the dash values are set per element. */
-.constellation-line {
-  opacity: 0.22;
-  animation: constellation-line 900ms var(--ease-standard) both;
+/* WhatsApp launcher.
+
+   The button eases up once on load so it arrives rather than appearing. The
+   rings then expand out of it on a slow loop — §07 puts "constant floating
+   objects" on the Avoid list, and this is the deliberate exception: a contact
+   affordance has to stay findable after the reader has stopped moving. It is
+   kept quiet — 2.4s, low opacity, no colour shift — and the reduced-motion
+   block below stops it dead. */
+.whatsapp-launcher {
+  animation: whatsapp-arrive var(--motion-emphasis) var(--ease-standard) both;
+  animation-delay: 600ms;
 }
 
-@keyframes constellation-line {
-  from {
-    stroke-dashoffset: var(--line-length, 240);
-    opacity: 0;
-  }
-  to {
-    stroke-dashoffset: 0;
-    opacity: 0.22;
-  }
-}
-
-.constellation-node {
-  opacity: 0.5;
-  animation: constellation-node var(--motion-emphasis) var(--ease-standard) both;
-}
-
-@keyframes constellation-node {
+@keyframes whatsapp-arrive {
   from {
     opacity: 0;
-    transform: scale(0.3);
+    transform: scale(0.6) translateY(8px);
   }
   to {
-    opacity: 0.5;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.whatsapp-pulse {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 9999px;
+  background-color: var(--color-whatsapp);
+  animation: whatsapp-pulse 2.4s var(--ease-standard) infinite;
+}
+
+@keyframes whatsapp-pulse {
+  from {
+    opacity: 0.45;
     transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+/* The hero's drifting node network. The canvas paints nothing until it has
+   measured itself on the client, so the overlay fades in rather than popping
+   on at hydration. Per-node and per-link opacity live in the canvas itself. */
+.constellation-field {
+  animation: constellation-field 600ms var(--ease-standard) both;
+  animation-delay: 300ms;
+}
+
+@keyframes constellation-field {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -395,8 +427,16 @@
     scroll-behavior: auto !important;
   }
 
-  /* A line that never animates must not keep its draw-in offset. */
-  .constellation-line {
-    stroke-dashoffset: 0 !important;
+  /* The canvas paints one static frame under reduce and never starts its
+     loop, so the overlay only has to be visible — not faded in. */
+  .constellation-field {
+    opacity: 1 !important;
+  }
+
+  /* The rings are the whole of the launcher's motion. Collapsing their
+     duration would leave a ring parked at its resting size behind the button,
+     so they come off entirely and the button is simply present. */
+  .whatsapp-pulse {
+    display: none !important;
   }
 }
