@@ -33,6 +33,7 @@ import sublimationPrinter from "../../public/images/printing-and-decoration.jpg"
 import bindingMachine from "../../public/images/stitching-and-assembly.jpg";
 import inspectionBench from "../../public/images/quality-testing.jpg";
 import dispatchWarehouse from "../../public/images/packing-and-export.jpg";
+import gymAthletes from "../../public/images/gyms-and-academies.png";
 import factoryFloor from "../../public/images/boxing-glove-factory-floor.jpg";
 
 /**
@@ -87,23 +88,49 @@ const HERO_PROOF = [
   "Your artwork and specs kept for reorders",
 ];
 
-/** Headings and body copy taken verbatim from the §A audience-page heroes. */
+/**
+ * Two buyer types, named the way this market names them.
+ *
+ * The cards were headed "For clubs and gyms" and "Private label" under a
+ * section titled "Who we manufacture for" — but the heading above them read
+ * "Two ways buyers work with us", which is a different question. One framing
+ * asks who the buyer is, the other how the work is structured. Both cards now
+ * answer "who", and the section label is all that sits above them: a heading
+ * and a standfirst as well was the same answer given three times before the
+ * reader reached the cards that give it properly.
+ *
+ * The private-label card said "your fightwear brand". The catalogue runs to 89
+ * products across eleven categories — lifting belts, gym wear, yoga straps,
+ * bags — so a lifting brand reading that card concluded we were not for them.
+ * It now names the breadth it actually covers.
+ *
+ * "Practical ordering requirements" was the one abstraction in an otherwise
+ * concrete section (§10 Specific). What it meant was ordering across member
+ * sizes and matching a reorder to the first run, so it says that instead.
+ *
+ * NOT SEGMENTED FOR RETAILERS OR DISTRIBUTORS, deliberately. Comparable makers
+ * in this segment list both alongside gyms and private label, and they place
+ * the largest orders. Confirmed as out of scope for now; revisit here first if
+ * that changes, because the section is the page's whole answer to who buys.
+ */
 const AUDIENCES: AudienceCardItem[] = [
   {
-    eyebrow: "For clubs and gyms",
-    title: "Put your club identity across the entire kit.",
-    description:
-      "Custom gloves, fightwear and apparel created around your club colours, logo and practical ordering requirements.",
+    eyebrow: "Gyms & Academies",
+    title: "Custom kit in your club colours.",
     href: "/for-clubs",
-    action: CTA.clubKit,
+    action: CTA.gymManufacturing,
+    photo: {
+      src: gymAthletes,
+      alt: "A boxer and a club member in matching custom kit, both carrying the same club emblem.",
+    },
   },
   {
-    eyebrow: "Private label",
-    title: "Your fightwear brand, supported by a clear manufacturing process.",
-    description:
-      "Develop products, labels and packaging through an approved sample before bulk production begins.",
+    eyebrow: "Private Label",
+    title: "Your own products, your own label.",
     href: "/private-label",
     action: CTA.privateLabel,
+    actionVariant: "secondary",
+    shot: "Two models in a brand's own apparel range, cut out",
   },
 ];
 
@@ -189,7 +216,7 @@ const EXPERTISE: ExpertiseItem[] = [
     shot: "Pattern cutting",
     photo: {
       src: cuttingTable,
-      alt: "A cutter guiding a straight-knife machine through a stack of navy fabric plies on a cutting table, following a pinned paper marker.",
+      alt: "An operator lifting a cut glove panel clear of the waste skeleton on a laser cutting bed, the honeycomb support showing through.",
     },
   },
   {
@@ -405,12 +432,21 @@ export default function Home() {
       />
 
       <Section theme="light" width="work">
-        <SectionHeader
-          eyebrow="Who we manufacture for"
-          title="Two ways buyers work with us."
-          description="Clubs ordering a coordinated kit, and brands developing their own products against an approved specification."
-        />
-        <div className="mt-[var(--space-7)] grid gap-[var(--space-5)] lg:grid-cols-2">
+        {/*
+          Label only — the cards carry the message, so a heading and a standfirst
+          above them restated in prose what the two cards say in full directly
+          below. This is the one section on the page without a SectionHeader.
+
+          It is an h2 styled as an eyebrow, not a paragraph. The two cards are
+          h3s, and with no h2 here they would attach to the previous section's
+          heading and the document outline would read as though gyms and private
+          label were part of the process stepper. It stays a real heading for
+          that reason; only its appearance is the eyebrow's.
+        */}
+        <h2 className="text-eyebrow uppercase text-[var(--color-text-muted)]">
+          Who we manufacture for
+        </h2>
+        <div className="mt-[var(--space-6)] grid gap-[var(--space-5)] lg:grid-cols-2">
           {AUDIENCES.map((audience) => (
             <AudienceCard key={audience.href} item={audience} />
           ))}

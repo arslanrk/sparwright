@@ -35,18 +35,34 @@ export const CTA = {
   exploreGloves: "Explore Custom Gloves",
   /**
    * §08 specifies the product-card action as "Explore Custom Gloves → or
-   * equivalent". These are the equivalents for the other two categories and
-   * for the private-label pathway: verb plus a specific destination, never a
-   * vague "Learn more".
+   * equivalent". These are the equivalents for the other two categories:
+   * verb plus a specific destination, never a vague "Learn more".
    */
   exploreFightwear: "Explore Fightwear",
   exploreClubApparel: "Explore Club Apparel",
-  privateLabel: "View Private Label Manufacturing",
+  /**
+   * The two audience-banner labels below drop the verb and name the
+   * destination alone. §08 bans the ambiguous label, not the verbless one —
+   * "Learn more" fails because it could lead anywhere, where these say exactly
+   * which page opens. The banners are narrow and a leading "See" wrapped them
+   * onto two lines for no added meaning.
+   */
+  privateLabel: "Private Label Manufacturing",
   process: "See How Production Works",
   howItWorks: "How It Works",
   manufacturing: "View Manufacturing Process",
-  /** Audience landing pages only, where the destination is unambiguous (§10). */
+  /**
+   * Audience landing pages only, where the destination is unambiguous (§10).
+   *
+   * Two labels for the club pathway because they lead to different places.
+   * "Build Your Club Kit" promises an action and is only used where the link
+   * actually starts one — on /for-clubs, pointing at /quote. The homepage
+   * audience card points at /for-clubs itself, which is a page to read, so it
+   * uses the naming label instead; a "Build" invitation there promised a
+   * configurator and delivered an article.
+   */
   clubKit: "Build Your Club Kit",
+  gymManufacturing: "Club Manufacturing",
 } as const;
 
 export type CtaLabel = (typeof CTA)[keyof typeof CTA];
