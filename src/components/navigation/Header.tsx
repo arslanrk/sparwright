@@ -45,7 +45,7 @@ export function Header() {
       className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)]"
     >
       <Container width="shell">
-        <div className="flex h-[var(--header-height)] items-center justify-between gap-3 xl:gap-6">
+        <div className="flex h-[var(--header-height)] items-center justify-between gap-6">
           <Link
             href="/"
             aria-label="Sparwright — home"
@@ -60,8 +60,13 @@ export function Header() {
             />
           </Link>
 
-          <nav aria-label="Primary" className="hidden lg:block">
-            <ul className="flex items-center xl:gap-1">
+          {/*
+            The full row appears from `xl`. Six items, the logo and the CTA
+            need about 1100px; at 1024 they ran 64px past the edge, so the
+            drawer serves everything below 1280.
+          */}
+          <nav aria-label="Primary" className="hidden xl:block">
+            <ul className="flex items-center gap-1">
               {PRIMARY_NAV.map((item) =>
                 item.children ? (
                   <li key={item.href}>
@@ -76,11 +81,11 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="hidden shrink-0 lg:block">
+          <div className="hidden shrink-0 xl:block">
             <Button
               href={HEADER_CTA.href}
               variant="primary"
-              className="whitespace-nowrap px-5! xl:px-6!"
+              className="whitespace-nowrap"
               data-analytics="hero_mockup_click"
               data-analytics-surface="header"
             >
@@ -94,7 +99,7 @@ export function Header() {
             aria-expanded={drawerOpen}
             aria-controls={drawerId}
             onClick={() => setDrawerOpen((open) => !open)}
-            className="-mr-2 inline-flex size-11 items-center justify-center rounded-md text-[var(--color-text)] lg:hidden"
+            className="-mr-2 inline-flex size-11 items-center justify-center rounded-md text-[var(--color-text)] xl:hidden"
           >
             <MenuIcon open={drawerOpen} />
             <span className="sr-only">
@@ -114,10 +119,8 @@ export function Header() {
   );
 }
 
-// Never wraps: at `lg` six items, the logo and the CTA only just share the
-// row, so the type and padding tighten there and return to size from `xl`.
 const NAV_ITEM =
-  "inline-flex items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-2 font-body text-[0.875rem] font-medium xl:gap-1.5 xl:px-3 xl:text-[0.9375rem] " +
+  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 font-body text-[0.9375rem] font-medium " +
   "text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)] " +
   "data-[active=true]:font-semibold data-[active=true]:text-[var(--color-text)]";
 

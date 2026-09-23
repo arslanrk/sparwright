@@ -85,7 +85,7 @@ export function MobileNavigation({
   }
 
   return (
-    <div id={id} hidden={!open} className="lg:hidden">
+    <div id={id} hidden={!open} className="xl:hidden">
       {/* Scrim. Tapping outside the panel closes the drawer. */}
       <div
         aria-hidden="true"
@@ -261,7 +261,7 @@ export function MobileActionBar() {
   return (
     <div
       data-theme="white"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--color-border)] bg-[var(--color-bg)] px-5 py-3 lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--color-border)] bg-[var(--color-bg)] px-5 py-3 xl:hidden"
     >
       <Button
         href={HEADER_CTA.href}

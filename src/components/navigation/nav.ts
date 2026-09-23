@@ -123,9 +123,12 @@ export const PRIMARY_NAV: PrimaryNavItem[] = [
   // highlights only on the homepage instead of on every route beneath it.
   { label: "Home", href: "/" },
   { label: "Products", href: "/products", children: PRODUCT_LINKS },
-  { label: "For Clubs", href: "/for-clubs" },
+  // Named as the homepage audience card names this buyer.
+  { label: "Gyms & Academies", href: "/for-clubs" },
   { label: "Private Label", href: "/private-label" },
-  { label: "Manufacturing", href: "/manufacturing" },
+  // Manufacturing left the header for Portfolio; the page is still linked from
+  // the footer's Work With Us column.
+  { label: "Portfolio", href: "/portfolio" },
   // The process stepper lives on the homepage (PR 4, §11), so this is an
   // anchor rather than a route of its own.
   { label: CTA.howItWorks, href: "/#how-it-works" },

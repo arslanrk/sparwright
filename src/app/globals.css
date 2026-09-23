@@ -176,6 +176,13 @@
 @media (width >= 64rem) {
   :root {
     --header-height: 4.75rem; /* 76px — desktop header */
+  }
+}
+
+/* The sticky action bar gives way where the header's own CTA appears (xl),
+   not at lg: between the two the header shows the drawer button, not the CTA. */
+@media (width >= 80rem) {
+  :root {
     --action-bar-height: 0rem; /* the desktop header carries the action */
   }
 }
