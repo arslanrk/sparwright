@@ -1,7 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { Button } from "@/components/foundation/Button";
 import { cn } from "@/lib/cn";
 import type { Collection } from "@/lib/collections";
@@ -11,122 +17,137 @@ import { ImagePlaceholder } from "./ImagePlaceholder";
  * ProductShowcase — Design System §08 product choices, §09 graphic language,
  * §07 Motion, §12 Accessibility.
  *
- * A slider through the range, composed around this brand rather than borrowed
- * wholesale. Four things drive the layout:
+ * A drawing sheet, not a retail hero. §09 asks for "fine seam lines and
+ * glove-panel outlines", "measurement marks and restrained coordinate-like
+ * labels" and "product specification tags such as MODEL / USE / SHELL /
+ * BRANDING"; this takes that literally. The panel is a framed sheet with
+ * registration marks at its corners, the plate is dimensioned on two edges, and
+ * the collection's particulars sit in a ruled title block.
  *
- * The track. Every slide is in the document and the rail moves across them, so
- * the change is one continuous motion in the direction you asked for rather
- * than a panel blinking out and another blinking in. §07 rules out *automatic*
- * carousels, not carousels: nothing advances on its own, so there is no timer
- * and no need for a pause control. The 360ms travel is `--motion-emphasis`,
- * which §07 assigns to exactly this — a panel transition.
+ * Two things it does that a product-on-a-stage layout could not:
  *
- * Rendering every slide also keeps the range readable to a crawler. Only the
- * selected slide used to exist in the markup; the rest reached the page as
- * serialized props inside a script tag, which is not content.
+ * It says manufacturer rather than shop. Every reference this section grew from
+ * sells a finished object with a price; a drawing sheet presents something being
+ * specified, which is what Sparwright actually does.
  *
- * The plate. §09's motifs are "fine seam lines and glove-panel outlines" and
- * "restrained coordinate-like labels", so the product sits on a technical plate
- * with corner crop marks — the way a sample is presented for approval, which is
- * the thing we are actually selling.
+ * It survives missing photography. Most collections are still on placeholders,
+ * and a sheet whose STATUS cell reads "In development" is coherent — where a
+ * retail stage with no product on it just reads as broken. That cell is driven
+ * off whether the collection has a photograph, so it keeps itself honest as
+ * shots land.
  *
- * The numeral. An oversized ghosted index anchors the composition and cropped
- * at the panel edge it does the work a second photograph would otherwise do —
- * useful, given most of the photography is still outstanding.
+ * Navigation is a stepper under the copy — prev, the current collection, next —
+ * with the position stated at the top of the field. It replaced an index strip
+ * that listed all five collections at once. That strip was there for a reason:
+ * under 1% of visitors ever advance past a carousel's first slide, so a buyer
+ * who cannot see the whole range may never learn we make lifting gear. Stepping
+ * is the brief; the risk it carries is recorded here rather than forgotten.
  *
- * The index. A carousel that hides most of the range behind two arrows
- * answers "do you make my thing" badly, and a tab strip under the panel is
- * just that carousel with the arrows spelled out. So the navigation is a
- * drawing's contents column instead: every collection stays readable. The arrows
- * sit under it as a second way through, not the only one.
+ * It advances on its own every 7s, which §07 puts on its Avoid list under
+ * "automatic carousels". Auto-rotation also triggers WCAG 2.2.2 (Pause, Stop,
+ * Hide), so it comes with the three things that obligation actually requires:
+ * a visible pause control, a stop on hover and on focus-within, and no rotation
+ * at all under `prefers-reduced-motion`. Rotation wraps; the arrows do not.
  *
- * The index is a real tablist, so arrow keys, Home and End work and each slide
- * is labelled by the product it belongs to (§12). Slides that are off-stage are
- * `inert`, so neither a screen reader nor the Tab key wanders into them.
+ * ARIA follows the APG carousel pattern rather than tabs. With the index strip
+ * gone there are no tabs to own the panels, so the sheet is a `region` with
+ * `aria-roledescription="carousel"` and each slide a labelled `group`. The live
+ * region is off while rotating and polite once stopped, which is what the
+ * pattern asks for: announcing a slide nobody asked for is noise.
+ *
+ * Every slide stays in the document — rendering only the selected one left the
+ * rest reaching the page as serialized props inside a script tag, which is not
+ * content. Off-stage slides are `inert`, so neither a screen reader nor the Tab
+ * key wanders into them. Relative moves count from a synchronously-written ref,
+ * so three rapid clicks advance three slides rather than one.
  */
 
-type ProductShowcaseProps = {
-  items: Collection[];
-};
+type Props = { items: Collection[] };
 
 /** Drag distance, in px, that commits to the next slide instead of springing back. */
 const SWIPE_THRESHOLD = 56;
 
-export function ProductShowcase({ items }: ProductShowcaseProps) {
+/** Dwell between automatic advances. Long enough to read the style profile. */
+const ROTATE_MS = 7000;
+
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+
+function subscribeToReducedMotion(onChange: () => void) {
+  const query = window.matchMedia(REDUCED_MOTION);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+function getReducedMotion() {
+  return window.matchMedia(REDUCED_MOTION).matches;
+}
+
+export function ProductShowcase({ items }: Props) {
   const [selected, setSelected] = useState(0);
-  /** Live finger/pointer offset in px while dragging; 0 when settled. */
   const [dragOffset, setDragOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
 
+  /** The pause control's own state — what the visitor last asked for. */
+  const [playing, setPlaying] = useState(true);
+  /** Transient holds: pointer over the sheet, or focus inside it. */
+  const [held, setHeld] = useState(false);
+
   const baseId = useId();
-  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const viewportRef = useRef<HTMLDivElement>(null);
   const dragStartX = useRef(0);
-  /** Set once a pointer has travelled far enough to be a drag, not a click. */
   const dragged = useRef(false);
-  /** The selection as last requested, ahead of the re-render that applies it. */
   const pending = useRef(0);
 
-  const current = items[selected];
-  if (!current) return null;
+  /**
+   * Subscribed rather than read into state in an effect, which is what
+   * `react-hooks/set-state-in-effect` objects to and what
+   * `useSyncExternalStore` exists for. The server snapshot is `false`: the
+   * preference is unknowable there, and rendering as if motion were reduced
+   * would flash a paused control at everyone on first paint.
+   */
+  const reduceMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    getReducedMotion,
+    () => false,
+  );
 
-  const tabId = (i: number) => `${baseId}-tab-${i}`;
+  const rotating = playing && !held && !reduceMotion && items.length > 1;
+
+  useEffect(() => {
+    if (!rotating) return;
+    const id = window.setInterval(() => {
+      // Read through the ref rather than `selected`, so the timer advances from
+      // whatever is actually on stage if a click landed mid-interval.
+      pending.current = (pending.current + 1) % items.length;
+      setSelected(pending.current);
+    }, ROTATE_MS);
+    return () => window.clearInterval(id);
+    // `selected` restarts the clock after a manual move, so a visitor who just
+    // clicked gets a full dwell rather than the tail of the previous one.
+  }, [rotating, selected, items.length]);
+
+  if (!items[selected]) return null;
+
   const slideId = (i: number) => `${baseId}-slide-${i}`;
 
-  /** Selection follows focus, as a tablist is expected to behave. */
-  function select(next: number, moveFocus = true) {
+  function select(next: number) {
     const i = ((next % items.length) + items.length) % items.length;
-    // Two clicks inside one tick both read `selected` from the same render, so
-    // a quick double-tap on Next would advance a single slide. The ref is
-    // written synchronously and is what relative moves count from.
+    // Written synchronously so two clicks inside one tick do not both read the
+    // same `selected` and collapse into a single move.
     pending.current = i;
     setSelected(i);
-    if (moveFocus) tabRefs.current[i]?.focus();
   }
 
   /**
-   * Relative move. The tablist wraps, because that is what arrow keys in a
-   * tablist do; the two arrow buttons clamp, because they are disabled at the
-   * ends and should not appear to do nothing.
+   * The arrows clamp rather than wrap: they are disabled at the ends, and a
+   * control that looks dead but jumps to the far end is worse than one that
+   * does nothing. Automatic rotation wraps, because it has to keep going.
    */
-  function move(delta: number, opts: { wrap: boolean; moveFocus: boolean }) {
+  function move(delta: number, opts: { wrap: boolean }) {
     const next = pending.current + delta;
-    select(
-      opts.wrap ? next : Math.min(Math.max(next, 0), items.length - 1),
-      opts.moveFocus,
-    );
+    select(opts.wrap ? next : Math.min(Math.max(next, 0), items.length - 1));
   }
-
-  function onRailKeyDown(event: React.KeyboardEvent) {
-    switch (event.key) {
-      case "ArrowRight":
-      case "ArrowDown":
-        event.preventDefault();
-        move(1, { wrap: true, moveFocus: true });
-        break;
-      case "ArrowLeft":
-      case "ArrowUp":
-        event.preventDefault();
-        move(-1, { wrap: true, moveFocus: true });
-        break;
-      case "Home":
-        event.preventDefault();
-        select(0);
-        break;
-      case "End":
-        event.preventDefault();
-        select(items.length - 1);
-        break;
-    }
-  }
-
-  /* ---- Drag to change slide -------------------------------------------
-     `touch-action: pan-y` on the viewport leaves vertical scrolling to the
-     page and gives us the horizontal axis, so a swipe down the homepage on a
-     phone never snags on the slider. ------------------------------------ */
 
   function onPointerDown(event: React.PointerEvent) {
-    // Let the buttons and the link inside a slide behave normally.
     if (event.button !== 0) return;
     dragStartX.current = event.clientX;
     dragged.current = false;
@@ -137,7 +158,6 @@ export function ProductShowcase({ items }: ProductShowcaseProps) {
     if (!dragging) return;
     const dx = event.clientX - dragStartX.current;
     if (Math.abs(dx) > 4) dragged.current = true;
-    // Resist at the two ends, so the range feels finite rather than broken.
     const atEnd =
       (selected === 0 && dx > 0) || (selected === items.length - 1 && dx < 0);
     setDragOffset(atEnd ? dx * 0.25 : dx);
@@ -146,12 +166,14 @@ export function ProductShowcase({ items }: ProductShowcaseProps) {
   function endDrag() {
     if (!dragging) return;
     setDragging(false);
-    if (dragOffset <= -SWIPE_THRESHOLD) move(1, { wrap: false, moveFocus: false });
-    else if (dragOffset >= SWIPE_THRESHOLD) move(-1, { wrap: false, moveFocus: false });
+    if (dragOffset <= -SWIPE_THRESHOLD) {
+      move(1, { wrap: false });
+    } else if (dragOffset >= SWIPE_THRESHOLD) {
+      move(-1, { wrap: false });
+    }
     setDragOffset(0);
   }
 
-  /** A drag that ends on a control must not also fire that control. */
   function onClickCapture(event: React.MouseEvent) {
     if (dragged.current) {
       event.preventDefault();
@@ -163,92 +185,43 @@ export function ProductShowcase({ items }: ProductShowcaseProps) {
   return (
     <div
       data-theme="dark"
-      className="relative overflow-hidden rounded-xl bg-[var(--color-bg)] text-[var(--color-text)]"
-      style={{
-        // §04 palette only. The Forge light travels across the panel as you
-        // move through the range, so each product is lit differently without a
-        // colour being invented.
-        backgroundImage: [
-          `radial-gradient(55rem 38rem at ${14 + (selected / Math.max(items.length - 1, 1)) * 72}% 12%, color-mix(in srgb, var(--color-forge-600) 16%, transparent), transparent 60%)`,
-          `linear-gradient(${130 + selected * 14}deg, var(--color-carbon-900), var(--color-ink-950) 70%)`,
-        ].join(", "),
-        transition: "background-image 360ms var(--ease-standard)",
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Custom product range"
+      className="relative rounded-xl bg-[var(--color-ink-950)] p-[var(--space-4)] text-[var(--color-text)] md:p-[var(--space-5)]"
+      // WCAG 2.2.2: rotation stops while a pointer is over the sheet or focus
+      // is anywhere inside it, so it cannot move out from under someone
+      // reading or tabbing through.
+      onMouseEnter={() => setHeld(true)}
+      onMouseLeave={() => setHeld(false)}
+      onFocusCapture={() => setHeld(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setHeld(false);
+        }
       }}
     >
-      <div className="p-[var(--space-6)] md:p-[var(--space-8)]">
-        <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-x-[var(--space-7)]">
-          {/*
-            The index. A drawing's contents column rather than a tab bar:
-            every product stays readable, and it fills the height the plate
-            creates instead of adding a strip under everything.
-          */}
-          <div className="lg:flex lg:flex-col">
-            <div
-              role="tablist"
-              aria-label="Product range"
-              aria-orientation="vertical"
-              onKeyDown={onRailKeyDown}
-              className={cn(
-                "-mx-1 flex gap-1 overflow-x-auto px-1 pb-2",
-                "lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0",
-              )}
-            >
-              <p className="hidden text-eyebrow uppercase text-[var(--color-text-muted)] lg:mb-4 lg:block">
-                Range
-              </p>
-              {items.map((item, i) => {
-                const isSelected = i === selected;
-                return (
-                  <button
-                    key={item.name}
-                    ref={(node) => {
-                      tabRefs.current[i] = node;
-                    }}
-                    id={tabId(i)}
-                    role="tab"
-                    type="button"
-                    aria-selected={isSelected}
-                    aria-controls={slideId(i)}
-                    tabIndex={isSelected ? 0 : -1}
-                    onClick={() => select(i, false)}
-                    className={cn(
-                      "flex shrink-0 items-baseline gap-2.5 whitespace-nowrap rounded-md px-2.5 py-2 text-left transition-colors",
-                      // Weight and a rule carry the state, not colour alone (§12).
-                      "lg:w-full lg:whitespace-normal lg:rounded-none lg:border-l-2 lg:px-3 lg:py-2.5",
-                      isSelected
-                        ? "bg-white/10 font-semibold text-[var(--color-text)] lg:border-[var(--color-action)] lg:bg-white/[0.06]"
-                        : "text-[var(--color-text-secondary)] hover:bg-white/5 hover:text-[var(--color-text)] lg:border-transparent lg:hover:border-[var(--color-border)]",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "font-display text-small tabular-nums",
-                        isSelected
-                          ? "text-[var(--color-action)]"
-                          : "text-[var(--color-text-muted)]",
-                      )}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="font-body text-small">{item.name}</span>
-                  </button>
-                );
-              })}
-            </div>
+      {/*
+        The sheet frame. A drawing is bordered inside its sheet rather than
+        printed to the edge, so the whole panel gets an inset rule and four
+        registration marks — the crop marks that used to sit on the plate,
+        promoted to the sheet itself.
+      */}
+      <div className="relative border border-[var(--color-border)]">
+        <SheetMarks />
 
-            <SliderControls
-              selected={selected}
-              total={items.length}
-              onPrev={() => move(-1, { wrap: false, moveFocus: false })}
-              onNext={() => move(1, { wrap: false, moveFocus: false })}
-            />
-          </div>
-
-          {/* The viewport. Slides live in a rail that moves across it. */}
+        <div
+          className="overflow-hidden"
+          aria-live={rotating ? "off" : "polite"}
+        >
           <div
-            ref={viewportRef}
-            className="relative mt-[var(--space-6)] overflow-hidden lg:mt-0"
-            style={{ touchAction: "pan-y" }}
+            className="flex"
+            style={{
+              transform: `translate3d(calc(${selected * -100}% + ${dragOffset}px), 0, 0)`,
+              transition: dragging
+                ? "none"
+                : "transform 360ms var(--ease-standard)",
+            }}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={endDrag}
@@ -256,48 +229,38 @@ export function ProductShowcase({ items }: ProductShowcaseProps) {
             onPointerLeave={endDrag}
             onClickCapture={onClickCapture}
           >
-            <div
-              className="flex"
-              style={{
-                transform: `translate3d(calc(${selected * -100}% + ${dragOffset}px), 0, 0)`,
-                // No transition while a finger is down: the rail has to track
-                // the pointer exactly, then ease once it is let go.
-                transition: dragging
-                  ? "none"
-                  : "transform 360ms var(--ease-standard)",
-              }}
-            >
-              {items.map((item, i) => {
-                const isActive = i === selected;
-                return (
-                  <div
-                    key={item.name}
-                    id={slideId(i)}
-                    role="tabpanel"
-                    aria-labelledby={tabId(i)}
-                    // Off-stage slides stay in the document — a crawler should
-                    // see the whole range — but are taken out of the tab order
-                    // and the accessibility tree.
-                    inert={!isActive}
-                    aria-hidden={!isActive}
-                    className={cn(
-                      "w-full shrink-0",
-                      // The slide arriving lifts to full strength as it lands,
-                      // so the change reads as arrival rather than as a
-                      // filmstrip sliding past.
-                      "transition-[opacity,transform] duration-[360ms] ease-[var(--ease-standard)]",
-                      // Off-stage slides are fully transparent, not merely
-                      // dimmed: the oversized numeral overhangs its own slide
-                      // by ~23px, so a visible neighbour bleeds a sliver of its
-                      // index into the slide on stage.
-                      isActive ? "opacity-100" : "scale-[0.98] opacity-0",
-                    )}
-                  >
-                    <Slide item={item} index={i} isActive={isActive} />
-                  </div>
-                );
-              })}
-            </div>
+            {items.map((item, i) => {
+              const isActive = i === selected;
+              return (
+                <div
+                  key={item.name}
+                  id={slideId(i)}
+                  role="group"
+                  aria-roledescription="slide"
+                  aria-label={`${i + 1} of ${items.length}: ${item.name}`}
+                  inert={!isActive}
+                  aria-hidden={!isActive}
+                  className={cn(
+                    "w-full shrink-0 transition-opacity duration-[360ms] ease-[var(--ease-standard)]",
+                    isActive ? "opacity-100" : "opacity-0",
+                  )}
+                  style={{ touchAction: "pan-y" }}
+                >
+                  <Sheet
+                    item={item}
+                    index={i}
+                    total={items.length}
+                    onPrev={() => move(-1, { wrap: false })}
+                    onNext={() => move(1, { wrap: false })}
+                    atStart={i === 0}
+                    atEnd={i === items.length - 1}
+                    canRotate={!reduceMotion && items.length > 1}
+                    playing={playing}
+                    onTogglePlay={() => setPlaying((v) => !v)}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -306,139 +269,188 @@ export function ProductShowcase({ items }: ProductShowcaseProps) {
 }
 
 /* -------------------------------------------------------------------------
-   One slide
+   One sheet
 ------------------------------------------------------------------------- */
 
-function Slide({
+function Sheet({
   item,
   index,
-  isActive,
+  total,
+  onPrev,
+  onNext,
+  atStart,
+  atEnd,
+  canRotate,
+  playing,
+  onTogglePlay,
 }: {
   item: Collection;
   index: number;
-  isActive: boolean;
+  total: number;
+  onPrev: () => void;
+  onNext: () => void;
+  atStart: boolean;
+  atEnd: boolean;
+  canRotate: boolean;
+  playing: boolean;
+  onTogglePlay: () => void;
 }) {
-  /**
-   * The parts settle in order rather than arriving as one block. The class is
-   * only on the active slide, so it starts when the slide becomes active and
-   * the off-stage slides sit at their resting state — which is also what they
-   * look like under `prefers-reduced-motion`, where the global rule collapses
-   * both the delay and the duration.
-   */
-  const part = (delay: number) =>
-    isActive
-      ? { className: "panel-in", style: { animationDelay: `${delay}ms` } }
-      : { className: undefined, style: undefined };
-
   return (
-    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,0.74fr)] lg:gap-x-[var(--space-7)] lg:gap-y-[var(--space-6)]">
-      {/* Identity and the pitch for this one product. */}
-      <div className="lg:self-center">
-        <p
-          className={cn(
-            "text-eyebrow uppercase text-[var(--color-text-muted)]",
-            part(80).className,
-          )}
-          style={part(80).style}
-        >
-          {item.audience}
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_22rem]">
+      {/* The dimensioned field. */}
+      <div className="relative flex flex-col border-b border-[var(--color-border)] p-[var(--space-6)] lg:border-b-0 lg:border-r">
+        {/*
+          Position, stated at the head of the sheet. A drawing numbers itself in
+          the corner before anything else on it means much.
+        */}
+        <p className="font-display text-small tabular-nums text-[var(--color-text-muted)]">
+          <span className="sr-only">Collection </span>
+          <span className="text-[var(--color-action)]">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span className="sr-only"> of </span>
+          <span aria-hidden="true"> / </span>
+          {String(total).padStart(2, "0")}
         </p>
-        <h3
-          className={cn("mt-3 text-heading-1", part(130).className)}
-          style={part(130).style}
-        >
-          {item.name}
-        </h3>
-        <p
-          className={cn(
-            "mt-[var(--space-5)] max-w-copy text-body-large text-[var(--color-text-secondary)]",
-            part(180).className,
-          )}
-          style={part(180).style}
-        >
+
+        <div className="relative mx-auto mt-[var(--space-5)] w-full max-w-[18rem]">
+          <div className="relative">
+            <Plate item={item} />
+            {/* Dimension rules on two sides, as a drawing carries them. */}
+            <DimensionRule axis="x" />
+            <DimensionRule axis="y" />
+          </div>
+        </div>
+
+        <p className="mt-[var(--space-6)] max-w-copy text-body text-[var(--color-text-secondary)]">
           {item.styleProfile}
         </p>
-      </div>
 
-      {/*
-        The plate: the product presented the way a sample is. The numeral and
-        the crop marks are both anchored to the plate itself, not to the
-        column, so they stay registered to it at every width.
-      */}
-      <div className="relative mx-auto mt-[var(--space-7)] w-full max-w-[20rem] lg:mt-0 lg:self-center">
         {/*
-          The index numeral, cropped at the panel edge.
-
-          The collection name was tried here at display size, so the plate would
-          crop into it the way a product crops the brand word on a retail hero.
-          It does not fit this layout: the word can only bleed left into the copy
-          column, where it sits under the description and costs contrast, or
-          right into the 63px of panel beyond the plate, where one letter shows.
-          That device needs the product centred with air around it, which is the
-          opposite of an index column that keeps every collection in view.
-
-          The numeral has neither problem, and says something the heading does
-          not already say — where you are in the range.
+          The stepper. `mt-auto` pins it to the foot of the field so it holds
+          the same line whatever length the style profile runs to — otherwise
+          it jumped between slides.
         */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-3 -top-12 select-none font-display text-[9rem] font-bold leading-none tracking-tighter text-white/[0.07] md:-right-6 md:-top-16 md:text-[12rem]"
-        >
-          {String(index + 1).padStart(2, "0")}
-        </span>
-        <div
-          className={cn("relative", part(150).className)}
-          style={part(150).style}
-        >
-          <CropMarks />
-          <Plate item={item} />
-          <MeasureRule index={index} />
+        <div className="mt-auto flex items-center justify-center gap-[var(--space-4)] pt-[var(--space-6)]">
+          <SheetArrow
+            label="Previous collection"
+            onClick={onPrev}
+            disabled={atStart}
+            direction="prev"
+          />
+
+          <p className="min-w-[12rem] text-center">
+            <span className="font-display text-small tabular-nums text-[var(--color-action)]">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span className="ml-2 font-body text-body font-semibold uppercase tracking-wide text-[var(--color-text)]">
+              {item.name}
+            </span>
+          </p>
+
+          <SheetArrow
+            label="Next collection"
+            onClick={onNext}
+            disabled={atEnd}
+            direction="next"
+          />
+
+          {/*
+            WCAG 2.2.2 requires a mechanism to stop content that moves on its
+            own. Hidden when rotation cannot happen at all — under reduced
+            motion there is nothing to pause.
+          */}
+          {canRotate && (
+            <button
+              type="button"
+              onClick={onTogglePlay}
+              aria-pressed={!playing}
+              aria-label={
+                playing
+                  ? "Pause automatic rotation"
+                  : "Resume automatic rotation"
+              }
+              className="ml-1 flex size-9 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-action)] hover:text-[var(--color-text)]"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                className="size-3.5"
+                fill="currentColor"
+              >
+                {playing ? (
+                  <>
+                    <rect x="5.5" y="4" width="3" height="12" rx="1" />
+                    <rect x="11.5" y="4" width="3" height="12" rx="1" />
+                  </>
+                ) : (
+                  <path d="M6 4.2v11.6a1 1 0 0 0 1.53.85l9.1-5.8a1 1 0 0 0 0-1.7l-9.1-5.8A1 1 0 0 0 6 4.2Z" />
+                )}
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* What is in the collection, and the action, under the copy column. */}
-      <div
-        // Spans the copy and plate columns: confined to the copy column the
-        // product names wrapped onto four lines each.
-        className={cn(
-          "mt-[var(--space-6)] lg:col-span-2 lg:mt-0 lg:self-start",
-          part(230).className,
-        )}
-        style={part(230).style}
-      >
-        {/*
-          The products, named. This replaces the old Shell / Construction /
-          Branding row, which described one product and cannot describe a
-          collection — belts, straps and lifting gloves have three different
-          shells between them. It is also the part that keeps a collection slide
-          from being a bare label: "Boxing" alone tells a buyer nothing about
-          whether we make focus mitts.
-        */}
-        {item.products && item.products.length > 0 && (
-          <div className="border-t border-[var(--color-border)] pt-[var(--space-4)]">
-            <p className="text-eyebrow uppercase text-[var(--color-text-muted)]">
-              In this collection
-            </p>
-            <ul className="mt-3 flex flex-wrap gap-x-[var(--space-5)] gap-y-2">
-              {item.products.map((product) => (
+      {/*
+        The title block. A real drawing puts its particulars in a ruled grid in
+        the corner of the sheet, each cell labelled. These are §09's own
+        specification tags adapted from a single product to a collection.
+      */}
+      <div className="flex flex-col">
+        <TitleCell label="Collection">
+          <h3 className="text-heading-2">{item.name}</h3>
+        </TitleCell>
+
+        <TitleCell label="Made for">
+          <p className="font-body text-body text-[var(--color-text)]">
+            {item.audience}
+          </p>
+        </TitleCell>
+
+        <TitleCell label="Parts" grow>
+          {item.products && item.products.length > 0 ? (
+            <ul className="grid gap-2">
+              {item.products.map((product, i) => (
                 <li
                   key={product}
-                  className="flex items-center gap-2.5 font-body text-body font-semibold text-[var(--color-text)]"
+                  className="flex items-baseline gap-3 font-body text-body text-[var(--color-text)]"
                 >
-                  <Tick />
+                  <span className="font-display text-eyebrow tabular-nums text-[var(--color-action)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                   {product}
                 </li>
               ))}
             </ul>
-          </div>
-        )}
+          ) : (
+            <p className="font-body text-small italic text-[var(--color-text-muted)]">
+              Not yet scheduled
+            </p>
+          )}
+        </TitleCell>
 
-        <div className="mt-[var(--space-6)]">
-          {/*
-            §08 text-link rule: "no ambiguous label". The destination is named,
-            and collections without a product page say "brief" rather than
-            "explore", because there is nothing yet to explore.
-          */}
+        <div className="grid grid-cols-2 border-b border-[var(--color-border)]">
+          <div className="border-r border-[var(--color-border)] px-[var(--space-5)] py-[var(--space-4)]">
+            <p className="text-eyebrow uppercase text-[var(--color-text-muted)]">
+              Sheet
+            </p>
+            <p className="mt-1 font-display text-body tabular-nums text-[var(--color-text)]">
+              {String(index + 1).padStart(2, "0")} of{" "}
+              {String(total).padStart(2, "0")}
+            </p>
+          </div>
+          <div className="px-[var(--space-5)] py-[var(--space-4)]">
+            <p className="text-eyebrow uppercase text-[var(--color-text-muted)]">
+              Status
+            </p>
+            <p className="mt-1 font-display text-body text-[var(--color-text)]">
+              {item.photo ? "Sampled" : "In development"}
+            </p>
+          </div>
+        </div>
+
+        <div className="p-[var(--space-5)]">
           <Button href={item.href} variant="inverse" arrow>
             {item.linkLabel}
           </Button>
@@ -448,93 +460,93 @@ function Slide({
   );
 }
 
-/**
- * The plate's contents: the photograph where one exists, otherwise the brief for
- * the photograph that is still missing. Both wear the same frame at the same
- * ratio, so the crop marks stay registered to the plate either way.
- */
-function Plate({ item }: { item: Collection }) {
-  if (!item.photo) {
-    return (
-      <ImagePlaceholder
-        shot={item.shot}
-        ratio="portrait"
-        className="border-[var(--color-border)] bg-white/[0.04]"
-      />
-    );
-  }
-
+function TitleCell({
+  label,
+  children,
+  grow,
+}: {
+  label: string;
+  children: React.ReactNode;
+  grow?: boolean;
+}) {
   return (
-    <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-[var(--color-border)] bg-white/[0.04]">
-      <Image
-        src={item.photo.src}
-        alt={item.photo.alt}
-        fill
-        placeholder="blur"
-        // The plate is capped at 20rem and never renders wider, so there is no
-        // point offering the browser a candidate sized to the viewport.
-        sizes="320px"
-        className="object-cover"
-      />
+    <div
+      className={cn(
+        "border-b border-[var(--color-border)] px-[var(--space-5)] py-[var(--space-4)]",
+        grow && "flex-1",
+      )}
+    >
+      <p className="text-eyebrow uppercase text-[var(--color-text-muted)]">
+        {label}
+      </p>
+      <div className="mt-2">{children}</div>
     </div>
   );
 }
 
 /* -------------------------------------------------------------------------
-   Controls
+   Drawing furniture
 ------------------------------------------------------------------------- */
 
-function SliderControls({
-  selected,
-  total,
-  onPrev,
-  onNext,
-}: {
-  selected: number;
-  total: number;
-  onPrev: () => void;
-  onNext: () => void;
-}) {
+/** Registration marks at the four corners of the sheet, set just inside it. */
+function SheetMarks() {
+  const corner =
+    "pointer-events-none absolute size-3 border-[var(--color-action)]";
   return (
-    <div className="mt-[var(--space-6)] lg:mt-auto lg:pt-[var(--space-7)]">
-      <div className="flex items-center gap-3">
-        <ArrowButton
-          label="Previous product"
-          onClick={onPrev}
-          disabled={selected === 0}
-          direction="prev"
-        />
-        <ArrowButton
-          label="Next product"
-          onClick={onNext}
-          disabled={selected === total - 1}
-          direction="next"
-        />
-        {/* Position in the range. The count is the accessible version of the bar. */}
-        <p className="ml-auto font-display text-small tabular-nums text-[var(--color-text-muted)]">
-          <span className="sr-only">Product </span>
-          {String(selected + 1).padStart(2, "0")}
-          <span className="sr-only"> of </span>
-          <span aria-hidden="true"> / </span>
-          {String(total).padStart(2, "0")}
-        </p>
-      </div>
-
-      {/* Full width under the controls — a stub of a bar reads as a mistake. */}
-      <div
-        aria-hidden="true"
-        className="mt-[var(--space-4)] h-px w-full bg-[var(--color-border)]"
-      >
-        <div
-          className="h-px bg-[var(--color-action)] transition-[width] duration-[360ms] ease-[var(--ease-standard)]"
-          style={{ width: `${((selected + 1) / total) * 100}%` }}
-        />
-      </div>
+    // `pointer-events-none` belongs on this wrapper, not only on the marks it
+    // holds. It spans the whole sheet at z-10, so while it was hit-testable it
+    // swallowed every click inside — the arrows, the pause control and the
+    // action link were all dead.
+    <div aria-hidden="true" className="pointer-events-none absolute inset-2 z-10">
+      <span className={cn(corner, "left-0 top-0 border-l border-t")} />
+      <span className={cn(corner, "right-0 top-0 border-r border-t")} />
+      <span className={cn(corner, "bottom-0 left-0 border-b border-l")} />
+      <span className={cn(corner, "bottom-0 right-0 border-b border-r")} />
     </div>
   );
 }
 
-function ArrowButton({
+/**
+ * A dimension rule along one edge of the plate: a witness line with ticks and
+ * arrow ends, the way a drawing states an extent. §09's "measurement marks".
+ */
+function DimensionRule({ axis }: { axis: "x" | "y" }) {
+  const TICKS = 16;
+  const horizontal = axis === "x";
+  return (
+    <div
+      aria-hidden="true"
+      className={cn(
+        "pointer-events-none absolute flex",
+        horizontal
+          ? "-bottom-[var(--space-4)] left-0 right-0 items-end justify-between"
+          : "-left-[var(--space-4)] bottom-0 top-0 flex-col items-start justify-between",
+      )}
+    >
+      {Array.from({ length: TICKS }, (_, i) => {
+        const end = i === 0 || i === TICKS - 1;
+        const major = i % 4 === 0;
+        return (
+          <span
+            key={i}
+            className={cn(
+              end
+                ? "bg-[var(--color-action)]"
+                : major
+                  ? "bg-white/30"
+                  : "bg-white/15",
+              horizontal
+                ? cn("w-px", end ? "h-3" : major ? "h-2" : "h-1")
+                : cn("h-px", end ? "w-3" : major ? "w-2" : "w-1"),
+            )}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+function SheetArrow({
   label,
   onClick,
   disabled,
@@ -552,13 +564,15 @@ function ArrowButton({
       disabled={disabled}
       aria-label={label}
       className={cn(
-        "flex size-10 items-center justify-center rounded-md border transition-colors",
+        "flex w-12 shrink-0 items-center justify-center transition-colors",
+        direction === "prev"
+          ? "border-r border-[var(--color-border)]"
+          : "border-l border-[var(--color-border)]",
         disabled
-          ? "cursor-not-allowed border-[var(--color-border)] text-[var(--color-text-muted)] opacity-40"
-          : "border-[var(--color-border)] text-[var(--color-text)] hover:border-[var(--color-action)] hover:bg-white/5",
+          ? "cursor-not-allowed text-[var(--color-text-muted)] opacity-40"
+          : "text-[var(--color-text)] hover:bg-white/5",
       )}
     >
-      {/* §09 iconography: one line family, ~1.75px stroke. */}
       <svg
         aria-hidden="true"
         viewBox="0 0 20 20"
@@ -575,76 +589,27 @@ function ArrowButton({
   );
 }
 
-/** §09 iconography: one line family, ~1.75px stroke, Forge for emphasis. */
-function Tick() {
+/** The photograph where one exists, otherwise the brief it is waiting on. */
+function Plate({ item }: { item: Collection }) {
+  if (!item.photo) {
+    return (
+      <ImagePlaceholder
+        shot={item.shot}
+        ratio="portrait"
+        className="rounded-none border-[var(--color-border)] bg-white/[0.03]"
+      />
+    );
+  }
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 20 20"
-      className="size-4 shrink-0 text-[var(--color-action)]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4.5 10.5 8.5 14.5l7-9" />
-    </svg>
-  );
-}
-
-/**
- * §09 "measurement marks and restrained coordinate-like labels" — a dimension
- * rule beneath the plate, the way a drawing dimensions the thing it describes.
- *
- * It is the piece that keeps this slider from reading as a borrowed retail
- * carousel: the references it grew from sell a finished object with a price,
- * and this one is presenting a sample for approval.
- *
- * The long tick marks the current collection, so the rule doubles as a second,
- * quieter position indicator alongside the counter.
- */
-function MeasureRule({ index }: { index: number }) {
-  const TICKS = 24;
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute -bottom-[var(--space-5)] left-0 right-0 flex items-end justify-between"
-    >
-      {Array.from({ length: TICKS }, (_, i) => {
-        // Every sixth tick is a major division; one is promoted to mark the
-        // slide, so the rule reads as measured rather than decorative.
-        const major = i % 6 === 0;
-        const marker = i === (index * 5) % TICKS;
-        return (
-          <span
-            key={i}
-            className={cn(
-              "w-px transition-[height,background-color] duration-[360ms] ease-[var(--ease-standard)]",
-              marker
-                ? "h-3 bg-[var(--color-action)]"
-                : major
-                  ? "h-2 bg-white/25"
-                  : "h-1 bg-white/12",
-            )}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
-/** §09 "restrained coordinate-like labels" — corner marks, as on a sample plate. */
-function CropMarks() {
-  const corner =
-    "pointer-events-none absolute size-4 border-[var(--color-action)]";
-  return (
-    // Set just outside the plate, the way registration marks actually sit.
-    <div aria-hidden="true" className="absolute -inset-2 z-10">
-      <span className={cn(corner, "left-0 top-0 border-l-2 border-t-2")} />
-      <span className={cn(corner, "right-0 top-0 border-r-2 border-t-2")} />
-      <span className={cn(corner, "bottom-0 left-0 border-b-2 border-l-2")} />
-      <span className={cn(corner, "bottom-0 right-0 border-b-2 border-r-2")} />
+    <div className="relative aspect-[3/4] overflow-hidden border border-[var(--color-border)]">
+      <Image
+        src={item.photo.src}
+        alt={item.photo.alt}
+        fill
+        placeholder="blur"
+        sizes="288px"
+        className="object-cover"
+      />
     </div>
   );
 }
