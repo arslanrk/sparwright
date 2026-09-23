@@ -4,6 +4,7 @@ import { SectionHeader } from "@/components/foundation/SectionHeader";
 import { QuoteForm } from "@/components/forms/QuoteForm";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { CONTACT } from "@/components/navigation/nav";
+import { quotePrefill } from "@/lib/quote";
 
 /**
  * Quote and mockup request — Design System §08 Quote and mockup form,
@@ -21,7 +22,8 @@ export const metadata: Metadata = {
     "Send your product, branding, quantity and destination. A person reviews every request before confirming the next practical step.",
 };
 
-export default function QuotePage() {
+export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
+  const { product } = await searchParams;
   return (
     <>
       <Section theme="light" width="form" density="compact">
@@ -38,7 +40,7 @@ export default function QuotePage() {
       </Section>
 
       <Section theme="white" width="form">
-        <QuoteForm />
+        <QuoteForm initialValues={quotePrefill(product)} />
       </Section>
 
       <Section theme="light" width="form" density="compact">

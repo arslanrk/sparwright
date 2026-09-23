@@ -44,8 +44,19 @@ import { SuccessPanel } from "./SuccessPanel";
 
 type Status = "editing" | "submitting" | "submitted";
 
-export function QuoteForm() {
-  const [values, setValues] = useState<QuoteRequest>(EMPTY_QUOTE);
+type QuoteFormProps = {
+  /**
+   * Answers already known from the link — see `quotePrefill`. Read on the
+   * server, so the form renders filled in rather than filling itself after.
+   */
+  initialValues?: Partial<QuoteRequest>;
+};
+
+export function QuoteForm({ initialValues }: QuoteFormProps = {}) {
+  const [values, setValues] = useState<QuoteRequest>(() => ({
+    ...EMPTY_QUOTE,
+    ...initialValues,
+  }));
   const [artwork, setArtwork] = useState<UploadState>({ status: "empty" });
   const [errors, setErrors] = useState<QuoteErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);

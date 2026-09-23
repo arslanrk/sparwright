@@ -109,6 +109,27 @@ export const EMPTY_QUOTE: QuoteRequest = {
   preferredContact: "Email",
 };
 
+/**
+ * Answers carried in from a link, so the buyer does not have to say twice what
+ * they clicked on. `?product=` comes from the Products mega menu: a name that
+ * is one of the §08 product types selects it; anything else is written into
+ * "Reference products" — whose own hint asks for a product name — under the
+ * "Something else" category. Trimmed and capped: it is URL input.
+ */
+export function quotePrefill(
+  product: string | string[] | undefined,
+): Partial<QuoteRequest> {
+  const name = (Array.isArray(product) ? product[0] : product)
+    ?.trim()
+    .slice(0, 120);
+  if (!name) return {};
+
+  if ((PRODUCT_CHOICES as readonly string[]).includes(name)) {
+    return { productType: name };
+  }
+  return { category: "Something else", references: name };
+}
+
 export type QuoteField = keyof QuoteRequest;
 
 /** Field-level errors, keyed by field name. */
