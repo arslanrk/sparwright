@@ -8,6 +8,10 @@ import {
   CustomizationCard,
   type CustomizationItem,
 } from "@/components/content/CustomizationCard";
+import {
+  ExpertiseGrid,
+  type ExpertiseItem,
+} from "@/components/content/ExpertiseGrid";
 import { HeroBanner } from "@/components/content/HeroBanner";
 import { ImagePlaceholder } from "@/components/content/ImagePlaceholder";
 import {
@@ -23,15 +27,35 @@ import { CTA } from "@/components/foundation/cta";
 import Image from "next/image";
 import { SITE_FAQS } from "@/lib/faq";
 import { COLLECTIONS } from "@/lib/collections";
+import techPackDesk from "../../public/images/design-and-tech-pack-development.jpg";
+import cuttingTable from "../../public/images/pattern-making-and-cutting.jpg";
+import sublimationPrinter from "../../public/images/printing-and-decoration.jpg";
+import bindingMachine from "../../public/images/stitching-and-assembly.jpg";
+import inspectionBench from "../../public/images/quality-testing.jpg";
+import dispatchWarehouse from "../../public/images/packing-and-export.jpg";
 import factoryFloor from "../../public/images/boxing-glove-factory-floor.jpg";
 
 /**
  * Homepage — Design System §11 Homepage order, §A Starter copy library.
  *
- * Section stack: hero, products, audiences, customization, process,
- * manufacturing, final CTA. §11 illustrates the recommended stack as a figure
- * rather than an ordered list, so this is the roadmap's stated assumption; the
- * roadmap flags it for confirmation before merge.
+ * Section stack: hero, about, products, process, audiences, customization,
+ * manufacturing, FAQ, final CTA. §11 illustrates the recommended stack as a
+ * figure rather than an ordered list, so this is the roadmap's stated
+ * assumption; the roadmap flags it for confirmation before merge.
+ *
+ * The process sits directly under the range rather than after the audiences:
+ * a buyer who has just seen what we make asks how it gets made before asking
+ * who else we make it for.
+ *
+ * Surfaces alternate down the page and the bands are what separate one section
+ * from the next:
+ *
+ *   hero dark · about white · range light · process white · audiences light ·
+ *   customization dark · manufacturing white · FAQ light · CTA action
+ *
+ * Two adjacent sections must never share a surface — they merge into one
+ * unbroken block. Moving a section means re-checking the run from that point
+ * down, not just the section that moved.
  *
  * §08 specifies the four proof points twice — once as the Hero's own "Proof"
  * field and again as the proof bar beneath it. Running both would state the
@@ -109,6 +133,111 @@ const CUSTOMIZATION: CustomizationItem[] = [
   },
 ];
 
+/**
+ * Capability, not procedure.
+ *
+ * These were the six operations that finish a boxing glove — cutting, padding,
+ * stitching, decoration, inspection, packing. That was too narrow twice over:
+ * it described one product out of the 89 in `product-list.ts`, and "padding and
+ * forming" means nothing for a yoga strap, a lifting belt or a rashguard.
+ *
+ * A buyer placing a bulk order is not asking how a thumb is attached. They are
+ * asking whether a tech pack can be turned into units — whether there is a team
+ * to develop the spec, equipment to cut and decorate at volume, and a way to
+ * hold quality across a run. So these six are the stages every product in the
+ * catalogue passes through, stated as what the business can do rather than what
+ * happens to a glove.
+ *
+ * Card copy is kept to roughly fifteen to twenty words. These ran to
+ * forty-six at the longest and seventeen at the shortest, which made the grid
+ * ragged and put the explaining in the card rather than in /manufacturing,
+ * which the section links to. What survived the trim is the specific nouns —
+ * laser, steel die, BOM, flatlock, overlock, sublimation — because those are
+ * what prove the capability; what went was the clauses explaining why each one
+ * matters.
+ *
+ * Tech pack development is confirmed: the business writes the specification
+ * where a buyer does not already have one, which is why the first card offers
+ * both routes in rather than assuming a brand arrives with paperwork. It is
+ * also the difference between a development partner and a job shop, so it
+ * leads.
+ *
+ * STILL NEEDS CONFIRMATION. Unlike the copy elsewhere on this site, the rest
+ * of these name equipment — digitised and graded patterns, laser and steel die
+ * cutting, sublimation, flatlock and overlock machines, per-batch recorded
+ * testing. Those are exactly the claims a buyer verifies in an audit, so each
+ * needs checking against what is actually on the floor before this ships
+ * (#5, #6).
+ */
+const EXPERTISE: ExpertiseItem[] = [
+  {
+    phase: "Development",
+    title: "Design and tech pack development",
+    description:
+      "Arrive with a tech pack and we build to it. Arrive with a sketch and we write one — measurements, materials, BOM, artwork placement.",
+    shot: "Design and tech pack development",
+    photo: {
+      src: techPackDesk,
+      alt: "A pattern maker holding a leather swatch against a printed glove pattern, with the panel layout open on screen beside them.",
+    },
+  },
+  {
+    phase: "Production",
+    title: "Pattern making and cutting",
+    description:
+      "Patterns digitised and graded across the full size run, then cut by laser or steel die.",
+    shot: "Pattern cutting",
+    photo: {
+      src: cuttingTable,
+      alt: "A cutter guiding a straight-knife machine through a stack of navy fabric plies on a cutting table, following a pinned paper marker.",
+    },
+  },
+  {
+    phase: "Production",
+    title: "Printing and decoration",
+    description:
+      "Sublimation onto flat panels before assembly, plus screen print, transfer, vinyl and embroidery.",
+    shot: "Printing or embroidery",
+    photo: {
+      src: sublimationPrinter,
+      alt: "An operator at the control panel of a wide-format sublimation printer, watching a printed transfer roll feed out.",
+    },
+  },
+  {
+    phase: "Production",
+    title: "Stitching and assembly",
+    description:
+      "Machines set per operation — flatlock and overlock on knits, heavy lockstitch on leather and webbing.",
+    shot: "Stitching process",
+    photo: {
+      src: bindingMachine,
+      alt: "A machinist feeding the curved cuff of a boxing glove through a binding attachment, red edge tape running off a roll into the guide.",
+    },
+  },
+  {
+    phase: "Quality",
+    title: "Quality testing",
+    description:
+      "Inline checks through the run, then measurements, colour and logo placement verified against your approved sample.",
+    shot: "Quality inspection",
+    photo: {
+      src: inspectionBench,
+      alt: "Two inspectors checking finished headguards and gloves into crates at the end of a stitching line.",
+    },
+  },
+  {
+    phase: "Dispatch",
+    title: "Packing and export",
+    description:
+      "Polybagging, carton assortment and markings to your instruction, with export documentation for the destination.",
+    shot: "Packaging",
+    photo: {
+      src: dispatchWarehouse,
+      alt: "A dispatch warehouse with bagged gloves and sealed cartons on pallet racking, and a worker at a terminal on the floor.",
+    },
+  },
+];
+
 /** §08 Process stepper, verbatim. */
 const STAGES: ProcessStage[] = [
   {
@@ -173,9 +302,9 @@ export default function Home() {
         only body copy above the fold — the rest of the homepage is headings and
         short supporting lines.
 
-        Deliberately not a process block. §11 already gives the process two
-        sections of its own ("From requirements to delivery" and "Manufacturing
-        you can inspect before bulk"), so this one stays on who we are, what we
+        Deliberately not a process block. The page already gives the process
+        two sections of its own — the stepper directly below and "Manufacturing
+        you can inspect before bulk" — so this one stays on who we are, what we
         make and who for. §10 preferred vocabulary throughout, and nothing here
         claims a year, a certification, a client count or a capacity figure
         (#5, #6).
@@ -266,7 +395,16 @@ export default function Home() {
         </div>
       </Section>
 
-      <Section theme="white" width="work">
+      <ProcessStepper
+        id="how-it-works"
+        theme="white"
+        eyebrow="How it works"
+        title="How custom gloves, fightwear and apparel are manufactured."
+        description="Custom boxing gloves, fightwear, lifting gear and club apparel move through the same five stages — your specification, an approved pre-production sample, bulk production with quality control recorded against that sample, then packing and export documentation. You sign off each stage before the next begins."
+        stages={STAGES}
+      />
+
+      <Section theme="light" width="work">
         <SectionHeader
           eyebrow="Who we manufacture for"
           title="Two ways buyers work with us."
@@ -308,12 +446,22 @@ export default function Home() {
         </div>
       </Section>
 
-      <ProcessStepper
-        id="how-it-works"
-        eyebrow="How it works"
-        title="From requirements to delivery."
-        description="Five stages, each with something specific for you to approve before the next one begins."
-        stages={STAGES}
+      {/*
+        Capability rather than sequence. The stepper above says what happens
+        when; this says what we can actually do to a product, which is the
+        question that decides whether a buyer's item is makeable here at all.
+
+        Light: it sits between the dark customization band and the white
+        manufacturing band, and no two adjacent sections may share a surface.
+      */}
+      <ExpertiseGrid
+        theme="light"
+        eyebrow="Our expertise"
+        title="From a sketch or tech pack to a shipped bulk order."
+        description="Six capabilities that take an idea into volume production — a tech pack written or worked to, patterns digitised and graded across the size run, laser and die cutting, sublimation and embroidery, industrial assembly, and testing against the sample you approved."
+        items={EXPERTISE}
+        href="/manufacturing"
+        linkLabel={CTA.manufacturing}
       />
 
       <Section theme="white" width="work">
