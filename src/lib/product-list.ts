@@ -127,8 +127,14 @@ export const PRODUCT_LIST: CatalogueProduct[] = [
   { name: "Vests", category: "Apparel" },
   { name: "Trousers", category: "Apparel" },
   { name: "Sweatshirts", category: "Apparel" },
+  // Hoodies, tracksuits and rashguards were not in the source range, but the
+  // §08 quote form and the homepage collections already offer all three. They
+  // are listed so the menu, the range and the form name the same products.
+  { name: "Hoodies", category: "Apparel" },
+  { name: "Tracksuits", category: "Apparel" },
   { name: "Boxing Trunks", category: "Apparel" },
   { name: "MMA Shorts", category: "Apparel" },
+  { name: "Rashguards", category: "Apparel" },
   { name: "Compression Tops", category: "Apparel" },
   { name: "Compression Shorts", category: "Apparel" },
   { name: "Compression Pants", category: "Apparel" },

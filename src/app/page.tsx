@@ -464,7 +464,7 @@ export default function Home() {
         <SectionHeader
           eyebrow="Custom product range"
           title="Gloves, fightwear, lifting gear and club apparel."
-          description="We manufacture custom fight gear, strength equipment and team apparel to your specification — your shell, your construction, your branding, approved on a sample before bulk production."
+          description="Custom fight gear, protective equipment, strength gear and team apparel — kids' sizes and martial arts uniforms included — made to your specification and approved on a sample before bulk production."
         />
         <div className="mt-[var(--space-6)]">
           <ProductShowcase items={COLLECTIONS} />
