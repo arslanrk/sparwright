@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import {
   Section,
   type SectionTheme,
@@ -13,16 +12,13 @@ import { cn } from "@/lib/cn";
  * internal workflow (§10 Direct, Specific). The stage number is one of the two
  * places §04 permits Forge outside an action.
  *
- * Composed as a route card — the traveller that follows a job through a shop,
- * stamped at each station. The badges are the stations and the dashed rule
- * between them is the route; on a phone that rule turns and runs down the left,
- * so the same idea reads as a timeline rather than collapsing into five
- * unrelated blocks.
+ * Composed as a route: numbered stations on a track, each with a card beneath
+ * it. On a phone the track turns and runs down the left, so the same idea reads
+ * as a timeline rather than collapsing into five unrelated blocks.
  *
- * The icons are a single colour, not Forge. §09 allows Forge "only for active
- * or emphasized states", and nothing here is active — these five describe a
- * process rather than track progress through one. Forge stays on the numerals,
- * where §04 already permits it.
+ * Each stage carries its own accent, stepping from Forge at the brief to
+ * Success at delivery, and the track is a gradient between them — so the route
+ * reads as moving from start to done, not as five identical stamps.
  *
  * `id` matters: the header's "How It Works" item links to this section.
  *
@@ -66,36 +62,71 @@ export function ProcessStepper({
         description={description}
       />
 
-      <ol className="mt-[var(--space-8)] grid gap-x-[var(--space-4)] gap-y-[var(--space-6)] sm:grid-cols-2 lg:grid-cols-5 lg:gap-y-0">
+      <ol className="relative mt-[var(--space-8)] grid gap-y-[var(--space-5)] lg:grid-cols-5 lg:gap-x-[var(--space-4)]">
+        {/*
+          The route. Vertical down the stations below `lg`, horizontal across
+          their centres from `lg` — the same line, turned. Inset so it starts
+          and ends under the first and last station rather than trailing off.
+        */}
+        <span
+          aria-hidden="true"
+          className={cn(
+            "absolute rounded-full from-forge-600 via-amber-500 to-success-600",
+            "left-[1.1875rem] top-5 bottom-5 w-0.5 bg-linear-to-b",
+            "lg:left-[10%] lg:right-[10%] lg:top-[1.1875rem] lg:bottom-auto lg:h-0.5 lg:w-auto lg:bg-linear-to-r",
+          )}
+        />
+
         {stages.map((stage, i) => {
-          const last = i === stages.length - 1;
+          const accent = ACCENTS[i % ACCENTS.length];
           return (
-            <li key={stage.number} className="relative flex gap-[var(--space-5)] lg:block">
-              {/*
-                The route. Horizontal between stations from `lg`, and a vertical
-                rule down the left below it — the same line, turned. It stops at
-                the last station rather than trailing into nothing.
-              */}
-              {!last && (
+            <li
+              key={stage.number}
+              className="relative flex gap-[var(--space-4)] lg:flex-col lg:items-center lg:gap-[var(--space-5)]"
+            >
+              {/* The station: the stage number, stamped in its accent. */}
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full font-display text-small font-bold tabular-nums text-white",
+                  "ring-4 ring-[var(--color-bg)] shadow-sm",
+                  accent.node,
+                )}
+              >
+                {stage.number}
+              </span>
+
+              <div
+                className={cn(
+                  "group relative min-w-0 flex-1 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-[var(--space-5)] lg:w-full",
+                  "transition-[transform,box-shadow] duration-200 ease-standard motion-safe:hover:-translate-y-1 hover:shadow-lg",
+                )}
+              >
+                {/* Accent rule along the top edge of the card. */}
+                <span
+                  aria-hidden="true"
+                  className={cn("absolute inset-x-0 top-0 h-1", accent.node)}
+                />
+
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "absolute border-dashed border-[var(--color-border-strong)]",
-                    // Vertical: from under the badge to the next item.
-                    "left-7 top-14 h-[calc(100%+var(--space-6)-3.5rem)] border-l",
-                    // Horizontal: from the badge's right edge across the gap.
-                    "lg:left-14 lg:top-7 lg:h-0 lg:w-[calc(100%-3.5rem)] lg:border-l-0 lg:border-t",
+                    "flex size-12 items-center justify-center rounded-lg transition-transform duration-200 motion-safe:group-hover:scale-110",
+                    accent.tile,
                   )}
-                />
-              )}
+                >
+                  {STATION_ICONS[i] ?? <IconSpec />}
+                </span>
 
-              <StationBadge>{STATION_ICONS[i] ?? <IconSpec />}</StationBadge>
-
-              <div className="min-w-0 flex-1 lg:mt-[var(--space-5)]">
-                <p className="font-display text-eyebrow tabular-nums tracking-[0.12em] text-[var(--color-action-text)]">
-                  {stage.number}
+                <p
+                  className={cn(
+                    "mt-[var(--space-4)] font-display text-eyebrow uppercase tracking-[0.12em]",
+                    accent.label,
+                  )}
+                >
+                  Stage {stage.number}
                 </p>
-                <h3 className="mt-1.5 font-body text-body-large font-semibold">
+                <h3 className="mt-1 font-body text-body-large leading-snug font-semibold">
                   {stage.title}
                 </h3>
                 <p className="mt-2 max-w-copy text-small text-[var(--color-text-secondary)]">
@@ -111,22 +142,21 @@ export function ProcessStepper({
 }
 
 /**
- * A station on the route. The ring is solid and the surface is the section's
- * own, so the badge reads as a stamp on the sheet rather than a button.
+ * One accent per stage, from Forge at the brief to Success at delivery. The
+ * middle three step through orange, amber and teal so neighbours never clash
+ * and the gradient track passes through each in turn.
  */
-function StationBadge({ children }: { children: ReactNode }) {
-  return (
-    <span
-      aria-hidden="true"
-      className="relative z-10 flex size-14 shrink-0 items-center justify-center rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg)] text-[var(--color-text)]"
-    >
-      {children}
-    </span>
-  );
-}
+const ACCENTS = [
+  { node: "bg-forge-600", tile: "bg-forge-100 text-forge-700", label: "text-forge-700" },
+  { node: "bg-orange-500", tile: "bg-orange-100 text-orange-700", label: "text-orange-700" },
+  { node: "bg-amber-500", tile: "bg-amber-100 text-amber-700", label: "text-amber-700" },
+  { node: "bg-teal-600", tile: "bg-teal-100 text-teal-700", label: "text-teal-700" },
+  { node: "bg-success-600", tile: "bg-emerald-100 text-success-600", label: "text-success-600" },
+];
 
 /* -------------------------------------------------------------------------
-   §09 iconography: one line family, ~1.75px stroke, single colour.
+   §09 iconography: one line family, ~1.75px stroke, drawn in currentColor so
+   each tile's accent colours its icon.
 
    Indexed to the §08 stages in order — specification, concept, sample,
    production and QC, packing. Held here rather than on `ProcessStage` so the
