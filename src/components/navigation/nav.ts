@@ -92,6 +92,14 @@ export function whatsappHref(): string | null {
 
 export type FooterColumn = { heading: string; links: NavLink[] };
 
+/**
+ * "For Clubs" and "Private Label" used to sit under Manufacturing, which is
+ * not what they are: they are the two buyer pathways, so they get a column of
+ * their own. Manufacturing keeps the pages about how the work is done.
+ *
+ * The mockup link carries `?intent=mockup` like every other mockup CTA; without
+ * it, footer mockup requests were recorded as plain quotes (§14 lead source).
+ */
 export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     heading: "Products",
@@ -104,22 +112,51 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     ],
   },
   {
-    heading: "Manufacturing",
+    heading: "Work With Us",
     links: [
+      { label: "For Clubs & Gyms", href: "/for-clubs" },
+      { label: "Private Label", href: "/private-label" },
       { label: "Manufacturing & Quality", href: "/manufacturing" },
       { label: CTA.howItWorks, href: "/#how-it-works" },
-      { label: "For Clubs", href: "/for-clubs" },
-      { label: "Private Label", href: "/private-label" },
     ],
   },
   {
     heading: "Contact",
     links: [
-      { label: CTA.mockup, href: "/quote" },
+      { label: CTA.mockup, href: "/quote?intent=mockup" },
       { label: CTA.quote, href: "/quote" },
       { label: CONTACT.email, href: `mailto:${CONTACT.email}` },
     ],
   },
+];
+
+export type SocialNetwork =
+  | "instagram"
+  | "facebook"
+  | "tiktok"
+  | "youtube"
+  | "linkedin";
+
+export type SocialLink = {
+  network: SocialNetwork;
+  label: string;
+  /** Empty until the account exists. */
+  href: string;
+};
+
+/**
+ * PLACEHOLDERS — none of these accounts exists yet. Each `href` is empty and
+ * the footer renders it as a dummy link; paste the profile URL in when the
+ * account is created. The PR 13 launch checklist should not pass with any left
+ * empty: a social icon that goes nowhere reads as an abandoned brand. Once real,
+ * these URLs also belong in the Organization `sameAs` structured data.
+ */
+export const SOCIAL_LINKS: SocialLink[] = [
+  { network: "instagram", label: "Instagram", href: "" },
+  { network: "facebook", label: "Facebook", href: "" },
+  { network: "tiktok", label: "TikTok", href: "" },
+  { network: "youtube", label: "YouTube", href: "" },
+  { network: "linkedin", label: "LinkedIn", href: "" },
 ];
 
 /** Legal row. The three pages ship in PR 10. */
