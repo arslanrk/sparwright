@@ -18,6 +18,7 @@ import {
   type ProcessStage,
 } from "@/components/content/ProcessStepper";
 import { ProductShowcase } from "@/components/content/ProductShowcase";
+import { WhyUs, type WhyUsReason } from "@/components/content/WhyUs";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
@@ -42,7 +43,7 @@ import mockupToGlove from "../../public/images/logo-mockup-to-finished-glove.jpg
  * Homepage — Design System §11 Homepage order, §A Starter copy library.
  *
  * Section stack: hero, about, products, process, audiences, customization,
- * expertise, FAQ, final CTA. §11 illustrates the recommended stack as a
+ * expertise, why Sparwright, FAQ, final CTA. §11 illustrates the recommended stack as a
  * figure rather than an ordered list, so this is the roadmap's stated
  * assumption; the roadmap flags it for confirmation before merge.
  *
@@ -54,7 +55,8 @@ import mockupToGlove from "../../public/images/logo-mockup-to-finished-glove.jpg
  * from the next:
  *
  *   hero dark · about white · range light · process white · audiences light ·
- *   customization dark · expertise light · FAQ white · CTA action
+ *   customization dark · expertise light · why us white · FAQ light ·
+ *   CTA action
  *
  * Two adjacent sections must never share a surface — they merge into one
  * unbroken block. Moving a section means re-checking the run from that point
@@ -329,6 +331,52 @@ const STAGES: ProcessStage[] = [
 ];
 
 /**
+ * Why Sparwright. Six reasons, each already a commitment made elsewhere on the
+ * site — Sialkot and ten years (/manufacturing), the sample, specification,
+ * reorder and reply commitments (FAQ) — so nothing here is a new claim. Titles
+ * carry the terms buyers search ("custom", "private label", "reorder") only
+ * where they read naturally.
+ */
+const WHY_US: WhyUsReason[] = [
+  {
+    icon: "location",
+    title: "Made in Sialkot, not relabelled",
+    description:
+      "Ten years of hands-on fight-gear manufacturing in Sialkot, Pakistan. Your order is made there — and its inspection record can be shared.",
+  },
+  {
+    icon: "sample",
+    title: "A sample before bulk production",
+    description:
+      "You approve a mockup, then a physical sample. Every finished piece is checked against the sample you signed off.",
+  },
+  {
+    icon: "spec",
+    title: "Built to your specification",
+    description:
+      "Materials, padding, closure, colours, logo placement and packaging are your decisions, confirmed before sampling.",
+  },
+  {
+    icon: "range",
+    title: "One maker for gloves, fightwear and kit",
+    description:
+      "Custom boxing gloves, fightwear, lifting gear and club apparel from one manufacturer, with one colour reference and logo treatment throughout.",
+  },
+  {
+    icon: "reorder",
+    title: "Reorders that match the first run",
+    description:
+      "Artwork, colour references and the sample record stay on file, so a repeat order is made to the original, not developed again.",
+  },
+  {
+    icon: "person",
+    title: "A person reads every request",
+    description:
+      "No automated quotes. The team reviews your brief and confirms sampling and production dates in writing with your quote.",
+  },
+];
+
+/**
  * schema.org FAQPage for the site-wide questions. Google no longer shows FAQ
  * rich results for commercial sites, but the markup still states each question
  * and answer unambiguously for search and AI answer engines.
@@ -424,7 +472,7 @@ export default function Home() {
             </p>
             <div className="mt-[var(--space-6)]">
               <Button
-                href="/manufacturing"
+                href="/#how-it-works"
                 variant="secondary"
                 className="border-ink-950! bg-ink-950! text-white! hover:bg-ink-950/85!"
               >
@@ -553,8 +601,8 @@ export default function Home() {
         when; this says what we can actually do to a product, which is the
         question that decides whether a buyer's item is makeable here at all.
 
-        Light: it sits between the dark customization band and the white FAQ,
-        and no two adjacent sections may share a surface.
+        Light: it sits between the dark customization band and the white Why
+        Sparwright band, and no two adjacent sections may share a surface.
       */}
       <ExpertiseGrid
         theme="light"
@@ -562,12 +610,26 @@ export default function Home() {
         title="From a sketch or tech pack to a shipped bulk order."
         description="Six capabilities that take an idea into volume production — a tech pack written or worked to, patterns digitised and graded across the size run, laser and die cutting, sublimation and embroidery, industrial assembly, and testing against the sample you approved."
         items={EXPERTISE}
-        href="/manufacturing"
-        linkLabel={CTA.manufacturing}
       />
 
       {/*
-        White: it follows the light expertise band. The heading names the
+        Why Sparwright, between capability and objections: by here the buyer
+        has seen what we make and how, and "why you rather than someone else"
+        is the question left before the FAQ and the brief. Placed earlier it
+        would be claims with nothing yet on the page to stand them up.
+
+        White: it sits between the light expertise band and the light FAQ.
+      */}
+      <WhyUs
+        theme="white"
+        eyebrow="Why Sparwright"
+        title="Why gyms and brands choose Sparwright."
+        description="A custom boxing gloves and fightwear manufacturer in Sialkot, Pakistan, working to your specification for clubs and private label brands across the UK and Europe."
+        reasons={WHY_US}
+      />
+
+      {/*
+        Light: it follows the white Why Sparwright band. The heading names the
         subject rather than counting the questions — a count goes stale the
         moment one is added, and says nothing a search engine can match. The
         FAQPage data is built from the same list, so the markup can never claim
@@ -580,7 +642,7 @@ export default function Home() {
         }}
       />
       <FAQSection
-        theme="white"
+        theme="light"
         eyebrow="Questions"
         title="Custom fight gear manufacturing, answered."
         description="Minimums, samples, branding, materials, lead times and shipping — grouped by where you are in the order."

@@ -58,9 +58,9 @@ type ExpertiseGridProps = {
   title: string;
   description?: string;
   items: ExpertiseItem[];
-  /** Where the full version of this lives. */
-  href: string;
-  linkLabel: string;
+  /** Where the full version of this lives. Omit both for no link. */
+  href?: string;
+  linkLabel?: string;
 };
 
 export function ExpertiseGrid({
@@ -215,9 +215,11 @@ export function ExpertiseGrid({
         ))}
       </ul>
 
-      <div className="mt-[var(--space-6)]">
-        <TextLink href={href}>{linkLabel}</TextLink>
-      </div>
+      {href && linkLabel ? (
+        <div className="mt-[var(--space-6)]">
+          <TextLink href={href}>{linkLabel}</TextLink>
+        </div>
+      ) : null}
     </Section>
   );
 }
