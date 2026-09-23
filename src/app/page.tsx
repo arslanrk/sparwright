@@ -34,6 +34,7 @@ import bindingMachine from "../../public/images/stitching-and-assembly.jpg";
 import inspectionBench from "../../public/images/quality-testing.jpg";
 import dispatchWarehouse from "../../public/images/packing-and-export.jpg";
 import gymAthletes from "../../public/images/gyms-and-academies.png";
+import labelModels from "../../public/images/private-label.png";
 import factoryFloor from "../../public/images/boxing-glove-factory-floor.jpg";
 
 /**
@@ -130,7 +131,10 @@ const AUDIENCES: AudienceCardItem[] = [
     href: "/private-label",
     action: CTA.privateLabel,
     actionVariant: "secondary",
-    shot: "Two models in a brand's own apparel range, cut out",
+    photo: {
+      src: labelModels,
+      alt: "A man and a woman in plain unbranded training apparel, carrying no logo of any kind.",
+    },
   },
 ];
 
