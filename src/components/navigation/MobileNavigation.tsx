@@ -7,6 +7,7 @@ import { Logo } from "@/components/foundation/Logo";
 import { cn } from "@/lib/cn";
 import {
   HEADER_CTA,
+  MEGA_MENU,
   PRIMARY_NAV,
   isActivePath,
   isCurrentPage,
@@ -115,18 +116,21 @@ export function MobileNavigation({
                   onNavigate={onClose}
                 />
                 {item.children ? (
-                  <ul className="mb-2 flex flex-col">
-                    {item.children.map((child) => (
-                      <li key={child.href}>
-                        <DrawerLink
-                          link={child}
-                          pathname={pathname}
-                          level="child"
-                          onNavigate={onClose}
-                        />
-                      </li>
-                    ))}
-                  </ul>
+                  <>
+                    <ul className="flex flex-col">
+                      {item.children.map((child) => (
+                        <li key={child.href}>
+                          <DrawerLink
+                            link={child}
+                            pathname={pathname}
+                            level="child"
+                            onNavigate={onClose}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                    <CatalogueSections onNavigate={onClose} />
+                  </>
                 ) : null}
               </li>
             ))}
@@ -149,6 +153,70 @@ export function MobileNavigation({
         <div className="mt-[var(--space-7)]">
           <Logo variant="horizontal" height={28} clearSpace={false} />
         </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The desktop mega menu's catalogue, for the drawer. Seventy-odd links in one
+ * list would bury everything under Products, so each category is a native
+ * `<details>` that opens on its own, one at a time (shared `name`). Same data
+ * as the mega menu, so the two cannot disagree about what is listed or where
+ * it goes.
+ */
+function CatalogueSections({ onNavigate }: { onNavigate: () => void }) {
+  const groups = MEGA_MENU.flat();
+
+  return (
+    <div className="mb-3 mt-2 pl-4">
+      <p className="pb-2 text-eyebrow uppercase text-[var(--color-text-muted)]">
+        Browse by category
+      </p>
+      <div className="flex flex-col border-t border-[var(--color-border)]">
+        {groups.map((group) => (
+          <details
+            key={group.heading}
+            name="drawer-catalogue"
+            className="group border-b border-[var(--color-border)]"
+          >
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 font-body text-body font-semibold text-[var(--color-text)] [&::-webkit-details-marker]:hidden">
+              <span>
+                {group.heading}
+                <span className="ml-2 text-small font-medium tabular-nums text-[var(--color-text-muted)]">
+                  {group.links.length}
+                </span>
+              </span>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 16 16"
+                className="size-4 shrink-0 transition-transform group-open:rotate-180"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 6l4 4 4-4" />
+              </svg>
+            </summary>
+            <ul className="grid grid-cols-1 pb-3 sm:grid-cols-2 sm:gap-x-6">
+              {group.links.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    onClick={onNavigate}
+                    // 44px targets: denser than the 48px primary rows, still
+                    // clear of WCAG 2.5.8's 24px minimum by a wide margin.
+                    className="flex min-h-11 items-center rounded-md text-small text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ))}
       </div>
     </div>
   );

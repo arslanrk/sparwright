@@ -1,4 +1,9 @@
 import { CTA } from "@/components/foundation/cta";
+import {
+  PRODUCT_LIST,
+  type CatalogueProduct,
+  type ProductCategory,
+} from "@/lib/product-list";
 import { PRODUCTS, productHref } from "@/lib/products";
 
 /**
@@ -39,6 +44,79 @@ export const PRODUCT_LINKS: NavLink[] = PRODUCTS.map((product) => ({
   href: productHref(product),
   description: PRODUCT_BLURBS[product.slug],
 }));
+
+/**
+ * The Products mega menu — the catalogue by category, in five columns.
+ *
+ * Built from `PRODUCT_LIST`, less every `moulded` entry: mats, kettlebells,
+ * blocks, balls, rollers and bands are a different manufacturing competency
+ * from the stitched and leather goods the rest of the site describes, and are
+ * still awaiting confirmation. Yoga keeps only its strap once those go, so it
+ * folds into Fitness rather than standing as a one-item column.
+ *
+ * Only two product pages exist (§11, non-negotiable #7), so each item goes to
+ * the closest real page: boxing gloves to the glove page, fightwear and club
+ * apparel to the apparel page. Everything else opens the brief with the
+ * product already named (`?product=`, read by QuoteForm) rather than a thin
+ * page invented to catch the click.
+ */
+export type MegaMenuGroup = { heading: string; links: NavLink[] };
+
+const PAGE_FOR = {
+  gloves: productHref({ slug: "custom-boxing-gloves" }),
+  apparel: productHref({ slug: "fightwear-club-apparel" }),
+};
+
+function catalogueHref(product: CatalogueProduct): string {
+  if (product.category === "Boxing" || product.name === "Kids Boxing Gloves") {
+    return PAGE_FOR.gloves;
+  }
+  // Sauna wear is apparel by category but not what the apparel page covers.
+  if (product.category === "Apparel" && !product.name.startsWith("Sauna")) {
+    return PAGE_FOR.apparel;
+  }
+  return `/quote?product=${encodeURIComponent(product.name)}`;
+}
+
+function menuGroup(
+  heading: string,
+  categories: ProductCategory[],
+): MegaMenuGroup {
+  return {
+    heading,
+    links: PRODUCT_LIST.filter(
+      (product) => categories.includes(product.category) && !product.moulded,
+    ).map((product) => ({ label: product.name, href: catalogueHref(product) })),
+  };
+}
+
+/**
+ * Five columns balanced to roughly the same length. "Training Equipment" is
+ * named for what is in it, and "Bags" becomes "Kit Bags" so it cannot be read
+ * as the punch bags one column over.
+ */
+export const MEGA_MENU: MegaMenuGroup[][] = [
+  [
+    menuGroup("Boxing", ["Boxing"]),
+    menuGroup("MMA", ["MMA"]),
+    menuGroup("Kids", ["Kids"]),
+  ],
+  [
+    menuGroup("Bags, Pads & Mitts", ["Training Equipment"]),
+    menuGroup("Kit Bags", ["Bags"]),
+  ],
+  [menuGroup("Protective Gear", ["Protective Gear"])],
+  [
+    menuGroup("Strength & Lifting", ["Strength and Lifting"]),
+    menuGroup("Fitness", ["Fitness Accessories", "Yoga"]),
+  ],
+  // Gis and uniforms are garments; they sit under Apparel to keep the first
+  // column from running twice the length of the rest.
+  [
+    menuGroup("Apparel", ["Apparel"]),
+    menuGroup("Martial Arts", ["Martial Arts"]),
+  ],
+];
 
 export const PRIMARY_NAV: PrimaryNavItem[] = [
   // `isActivePath` already matches "/" exactly rather than by prefix, so Home
