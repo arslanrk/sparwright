@@ -5,9 +5,9 @@ import {
 import { CallToAction } from "@/components/content/CallToAction";
 import { FAQAccordion } from "@/components/content/FAQAccordion";
 import {
-  CustomizationCard,
+  CustomizationShowcase,
   type CustomizationItem,
-} from "@/components/content/CustomizationCard";
+} from "@/components/content/CustomizationShowcase";
 import {
   ExpertiseGrid,
   type ExpertiseItem,
@@ -36,6 +36,8 @@ import dispatchWarehouse from "../../public/images/packing-and-export.jpg";
 import gymAthletes from "../../public/images/gyms-and-academies.png";
 import labelModels from "../../public/images/private-label.png";
 import factoryFloor from "../../public/images/boxing-glove-factory-floor.jpg";
+import explodedGlove from "../../public/images/exploded-boxing-glove.jpg";
+import mockupToGlove from "../../public/images/logo-mockup-to-finished-glove.jpg";
 
 /**
  * Homepage — Design System §11 Homepage order, §A Starter copy library.
@@ -138,29 +140,57 @@ const AUDIENCES: AudienceCardItem[] = [
   },
 ];
 
-/** §08 Customization panel, verbatim. */
+/**
+ * §08 Customization panel, rewritten. The verbatim copy restated each tag as
+ * its title ("Branding" / "Your brand") and gave noun lists that could describe
+ * any factory; each title now says what the buyer gets, and each line names
+ * how it is done. `side` places each card beside the part of the glove it
+ * describes, and `hotspot` is that part's position on `exploded-boxing-glove`:
+ * the cuff patch and the woven label on the left, the tan leather and the
+ * padding layers on the right.
+ */
 const CUSTOMIZATION: CustomizationItem[] = [
   {
     tag: "Branding",
-    title: "Your brand",
+    title: "Logo and decoration",
     description:
-      "Logo placement, print, patch, label or embroidery where suitable.",
+      "Embroidery, print, patches and woven labels, placed where they work on each product.",
+    side: "left",
+    hotspot: { x: 25, y: 21 },
+    detail: {
+      kind: "chips",
+      items: ["Embroidery", "Print", "Patch", "Woven label"],
+    },
   },
   {
     tag: "Colour",
-    title: "Your colours",
-    description: "Club or brand colour combinations with agreed references.",
+    title: "Matched to your references",
+    description:
+      "Send colour codes or a physical swatch. Colours are matched on the sample and kept on file for reorders.",
+    side: "right",
+    hotspot: { x: 76, y: 42 },
+    detail: { kind: "swatches" },
   },
   {
     tag: "Construction",
-    title: "Your construction",
+    title: "Built to your specification",
     description:
-      "Materials, padding, closure, stitching and performance requirement.",
+      "Materials, padding, closure, stitching and sizing — down to hook-and-loop or lace-up on a glove.",
+    side: "right",
+    hotspot: { x: 71, y: 70 },
+    detail: { kind: "chips", items: ["Hook-and-loop", "Lace-up"] },
   },
   {
     tag: "Packaging",
-    title: "Your packaging",
-    description: "Labels, bags, boxes, inserts and export cartons.",
+    title: "Packed under your name",
+    description:
+      "Branded labels, polybags, retail boxes, inserts and export cartons marked to your instruction.",
+    side: "left",
+    hotspot: { x: 18, y: 70 },
+    detail: {
+      kind: "chips",
+      items: ["Polybag", "Retail box", "Export carton"],
+    },
   },
 ];
 
@@ -379,7 +409,11 @@ export default function Home() {
               under their own label.
             </p>
             <div className="mt-[var(--space-6)]">
-              <Button href="/manufacturing" variant="secondary">
+              <Button
+                href="/manufacturing"
+                variant="secondary"
+                className="border-ink-950! bg-ink-950! text-white! hover:bg-ink-950/85!"
+              >
                 {CTA.process}
               </Button>
             </div>
@@ -458,31 +492,49 @@ export default function Home() {
       </Section>
 
       <Section theme="dark" width="work">
-        <SectionHeader
-          eyebrow="Customization"
-          title="See your club identity before production."
-          description={
-            <>
-              Upload your logo and send your product requirements. We&rsquo;ll
-              review the practical concept or sampling step before bulk
-              production.
-            </>
-          }
-        />
-        <div className="mt-[var(--space-7)] grid gap-[var(--space-6)] sm:grid-cols-2 lg:grid-cols-4">
-          {CUSTOMIZATION.map((item) => (
-            <CustomizationCard key={item.tag} item={item} />
-          ))}
+        {/*
+          Written for clubs and brands alike — the homepage serves both, and
+          the club-only headline also duplicated the For Clubs page word for
+          word. The visual pairs the mockup with the glove made from it — the
+          promise in the headline, shown.
+        */}
+        <div className="grid gap-[var(--space-6)] lg:grid-cols-[1.2fr_1fr] lg:items-center">
+          <SectionHeader
+            eyebrow="Customization"
+            title="See your design before anything is made."
+            description="Send your logo and what you need. We come back with a mockup of your product, then a physical sample for sign-off. Nothing goes to bulk until you approve it."
+          />
+          <Image
+            src={mockupToGlove}
+            alt="A flat design mockup of a black and tan boxing glove with a shield emblem on the cuff, beside the finished leather glove with the same shield embroidered in tan thread."
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            className="h-auto w-full rounded-lg border border-[var(--color-border)]"
+          />
         </div>
-        <div className="mt-[var(--space-7)]">
+        <div className="mt-[var(--space-8)]">
+          <CustomizationShowcase
+            items={CUSTOMIZATION}
+            image={{
+              src: explodedGlove,
+              alt: "A black and tan leather boxing glove shown exploded: the cuff with a blank logo patch, the lace-up closure, a woven label and four padding layers separated from the shell.",
+            }}
+            shot="Exploded boxing glove — strap patch, padding layers and lace visible"
+          />
+        </div>
+        <div className="mt-[var(--space-7)] flex flex-col items-start gap-[var(--space-4)] sm:flex-row sm:items-center sm:gap-[var(--space-5)]">
           <Button
             href="/quote?intent=mockup"
             variant="inverse"
             arrow
             data-analytics="hero_mockup_click"
+            data-analytics-surface="customization"
           >
             {CTA.mockup}
           </Button>
+          <p className="text-small text-[var(--color-text-secondary)]">
+            All we need to start: your logo file, colour references, the
+            products and a rough quantity.
+          </p>
         </div>
       </Section>
 
