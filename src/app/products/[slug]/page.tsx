@@ -25,7 +25,7 @@ import {
  * quality-control points, related products, product FAQ, quote CTA.
  *
  * The FAQ section renders the product's own narrower question set through
- * `FAQAccordion` (§08); the site-wide nine live on the homepage.
+ * `FAQAccordion` (§08); the site-wide set lives on the homepage.
  */
 
 export function generateStaticParams() {
@@ -225,7 +225,11 @@ export default async function ProductPage({
           eyebrow="Questions"
           title={`${product.name} — common questions`}
         />
-        <FAQAccordion items={product.faqs} className="mt-[var(--space-6)]" />
+        <FAQAccordion
+          items={product.faqs}
+          openFirst
+          className="mt-[var(--space-6)]"
+        />
       </Section>
 
       {/* 10 — Quote or mockup CTA. */}

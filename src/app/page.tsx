@@ -3,7 +3,7 @@ import {
   type AudienceCardItem,
 } from "@/components/content/AudienceCard";
 import { CallToAction } from "@/components/content/CallToAction";
-import { FAQAccordion } from "@/components/content/FAQAccordion";
+import { FAQSection } from "@/components/content/FAQSection";
 import {
   CustomizationShowcase,
   type CustomizationItem,
@@ -13,7 +13,6 @@ import {
   type ExpertiseItem,
 } from "@/components/content/ExpertiseGrid";
 import { HeroBanner } from "@/components/content/HeroBanner";
-import { ImagePlaceholder } from "@/components/content/ImagePlaceholder";
 import {
   ProcessStepper,
   type ProcessStage,
@@ -25,7 +24,7 @@ import { SectionHeader } from "@/components/foundation/SectionHeader";
 import { TextLink } from "@/components/foundation/TextLink";
 import { CTA } from "@/components/foundation/cta";
 import Image from "next/image";
-import { SITE_FAQS } from "@/lib/faq";
+import { FAQ_GROUPS, SITE_FAQS } from "@/lib/faq";
 import { COLLECTIONS } from "@/lib/collections";
 import techPackDesk from "../../public/images/design-and-tech-pack-development.jpg";
 import cuttingTable from "../../public/images/pattern-making-and-cutting.jpg";
@@ -43,7 +42,7 @@ import mockupToGlove from "../../public/images/logo-mockup-to-finished-glove.jpg
  * Homepage — Design System §11 Homepage order, §A Starter copy library.
  *
  * Section stack: hero, about, products, process, audiences, customization,
- * manufacturing, FAQ, final CTA. §11 illustrates the recommended stack as a
+ * expertise, FAQ, final CTA. §11 illustrates the recommended stack as a
  * figure rather than an ordered list, so this is the roadmap's stated
  * assumption; the roadmap flags it for confirmation before merge.
  *
@@ -55,7 +54,7 @@ import mockupToGlove from "../../public/images/logo-mockup-to-finished-glove.jpg
  * from the next:
  *
  *   hero dark · about white · range light · process white · audiences light ·
- *   customization dark · manufacturing white · FAQ light · CTA action
+ *   customization dark · expertise light · FAQ white · CTA action
  *
  * Two adjacent sections must never share a surface — they merge into one
  * unbroken block. Moving a section means re-checking the run from that point
@@ -329,6 +328,21 @@ const STAGES: ProcessStage[] = [
   },
 ];
 
+/**
+ * schema.org FAQPage for the site-wide questions. Google no longer shows FAQ
+ * rich results for commercial sites, but the markup still states each question
+ * and answer unambiguously for search and AI answer engines.
+ */
+const FAQ_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: SITE_FAQS.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+};
+
 export default function Home() {
   return (
     <>
@@ -521,7 +535,7 @@ export default function Home() {
             shot="Exploded boxing glove — strap patch, padding layers and lace visible"
           />
         </div>
-        <div className="mt-[var(--space-7)] flex flex-col items-start gap-[var(--space-4)] sm:flex-row sm:items-center sm:gap-[var(--space-5)]">
+        <div className="mt-[var(--space-7)]">
           <Button
             href="/quote?intent=mockup"
             variant="inverse"
@@ -531,10 +545,6 @@ export default function Home() {
           >
             {CTA.mockup}
           </Button>
-          <p className="text-small text-[var(--color-text-secondary)]">
-            All we need to start: your logo file, colour references, the
-            products and a rough quantity.
-          </p>
         </div>
       </Section>
 
@@ -543,8 +553,8 @@ export default function Home() {
         when; this says what we can actually do to a product, which is the
         question that decides whether a buyer's item is makeable here at all.
 
-        Light: it sits between the dark customization band and the white
-        manufacturing band, and no two adjacent sections may share a surface.
+        Light: it sits between the dark customization band and the white FAQ,
+        and no two adjacent sections may share a surface.
       */}
       <ExpertiseGrid
         theme="light"
@@ -556,48 +566,51 @@ export default function Home() {
         linkLabel={CTA.manufacturing}
       />
 
-      <Section theme="white" width="work">
-        <div className="grid items-center gap-[var(--space-7)] lg:grid-cols-2">
-          <div>
-            {/*
-              §10 headline formula, proof + stage. The §A manufacturing intro
-              leads on years traded and location; both are supplier credentials,
-              and they still open /manufacturing, where a buyer checking us out
-              goes looking for them.
-            */}
-            <SectionHeader
-              eyebrow="Manufacturing"
-              title="Manufacturing you can inspect before bulk."
-              description="Clear product requirements, a sample you sign off, and checks recorded against that sample before anything is packed. Nothing about the process is a black box."
-            />
-            <div className="mt-[var(--space-6)]">
-              <Button href="/manufacturing" variant="secondary">
-                {CTA.manufacturing}
-              </Button>
-            </div>
-          </div>
-          <ImagePlaceholder shot="Stitching process" ratio="process" />
-        </div>
-      </Section>
-
-      <Section theme="light" width="copy">
-        <SectionHeader
-          eyebrow="Questions"
-          title="The nine things buyers ask first."
-          description="If your question is not here, send it with your requirements — a person reads every request."
-        />
-        <FAQAccordion items={SITE_FAQS} className="mt-[var(--space-6)]" />
-      </Section>
+      {/*
+        White: it follows the light expertise band. The heading names the
+        subject rather than counting the questions — a count goes stale the
+        moment one is added, and says nothing a search engine can match. The
+        FAQPage data is built from the same list, so the markup can never claim
+        an answer the page does not show.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(FAQ_JSON_LD).replace(/</g, "\\u003c"),
+        }}
+      />
+      <FAQSection
+        theme="white"
+        eyebrow="Questions"
+        title="Custom fight gear manufacturing, answered."
+        description="Minimums, samples, branding, materials, lead times and shipping — grouped by where you are in the order."
+        groups={FAQ_GROUPS}
+        action={{ label: CTA.brief, href: "/quote" }}
+      />
 
       {/* §A gives this action as "REQUEST A QUOTE"; the §08 CTA library is
           normative for labels, so it renders as "Get a Manufacturing Quote". */}
+      {/*
+        "Ready to develop your custom fight gear?" was a stock question shared
+        word for word with four other pages, and its line listed what to send
+        without saying what happens once you have. The heading now asks for the
+        brief directly, the line says who answers it, and the ticket beside it
+        carries the next steps. The mockup is offered as the lighter first step.
+      */}
       <CallToAction
-        title="Ready to develop your custom fight gear?"
-        description="Send your product, branding, quantity and destination."
+        title="Tell us what you want made."
+        description="Send the product, your logo, a rough quantity and where it ships. A person replies — with any questions left, not an automated quote."
         action={{
           label: CTA.quote,
           href: "/quote",
           analytics: "hero_quote_click",
+          surface: "final_cta",
+        }}
+        secondaryAction={{
+          label: CTA.mockup,
+          href: "/quote?intent=mockup",
+          analytics: "hero_mockup_click",
+          surface: "final_cta",
         }}
       />
     </>

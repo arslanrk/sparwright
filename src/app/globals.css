@@ -413,7 +413,32 @@
   }
 }
 
+/* FAQ answers ease open where the browser can animate to `height: auto`.
+   Elsewhere `<details>` keeps its native instant toggle, which is fine. */
+@supports (interpolate-size: allow-keywords) {
+  .faq-item {
+    interpolate-size: allow-keywords;
+  }
+
+  .faq-item::details-content {
+    height: 0;
+    overflow: clip;
+    transition:
+      height 260ms var(--ease-standard),
+      content-visibility 260ms allow-discrete;
+  }
+
+  .faq-item[open]::details-content {
+    height: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  /* `*` does not reach this pseudo-element, so it needs its own opt-out. */
+  .faq-item::details-content {
+    transition: none;
+  }
+
   *,
   *::before,
   *::after {
