@@ -159,7 +159,6 @@ function ProductsMenu({
   const groupRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
-  const links = item.children ?? [];
   const active = isActivePath(pathname, item.href);
 
   useEffect(() => {
@@ -224,9 +223,33 @@ function ProductsMenu({
               <div key={i} className="flex flex-col gap-[var(--space-4)]">
                 {column.map((group) => (
                   <div key={group.heading}>
-                    <p className="border-b-2 border-forge-600 pb-2 font-body text-eyebrow uppercase text-forge-700">
-                      {group.heading}
-                    </p>
+                    {/* A category with its own page links from its heading,
+                        with an arrow so it reads as a link. */}
+                    {group.href ? (
+                      <Link
+                        href={group.href}
+                        onClick={() => setOpen(false)}
+                        className="group/heading flex items-center justify-between gap-2 border-b-2 border-forge-600 pb-2 font-body text-eyebrow uppercase text-forge-700 transition-colors hover:text-ink-950"
+                      >
+                        {group.heading}
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 16 16"
+                          className="size-3.5 shrink-0 transition-transform motion-safe:group-hover/heading:translate-x-0.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
+                        </svg>
+                      </Link>
+                    ) : (
+                      <p className="border-b-2 border-forge-600 pb-2 font-body text-eyebrow uppercase text-forge-700">
+                        {group.heading}
+                      </p>
+                    )}
                     <ul className="mt-2">
                       {group.links.map((link) => (
                         <li key={link.label}>
@@ -246,19 +269,10 @@ function ProductsMenu({
             ))}
           </div>
 
-          {/* The pages that exist, the full range, and a way out for anything
-              not listed. */}
+          {/* The full range, and a way out for anything not listed. The
+              product pages themselves are the category headings above. */}
           <div className="mt-[var(--space-5)] flex items-center gap-[var(--space-4)] border-t border-[var(--color-border)] pt-[var(--space-4)]">
             <ul className="flex flex-1 flex-wrap gap-2">
-              {links.map((link) => (
-                <li key={link.href}>
-                  <DropdownLink
-                    link={link}
-                    pathname={pathname}
-                    onNavigate={() => setOpen(false)}
-                  />
-                </li>
-              ))}
               <li>
                 <DropdownLink
                   link={{

@@ -37,6 +37,10 @@ export type PrimaryNavItem = NavLink & {
 const PRODUCT_BLURBS: Record<string, string> = {
   "custom-boxing-gloves": "Your logo, colours and specification.",
   "fightwear-club-apparel": "Shorts, rashguards and coordinated club kit.",
+  "custom-mma-gloves": "Fight, sparring and grappling gloves.",
+  "custom-lifting-belts": "Belts, straps, grips and lifting gloves.",
+  "custom-protective-gear": "Head guards, protectors and wraps.",
+  "custom-pads-bags-mitts": "Punch bags, focus mitts and Thai pads.",
 };
 
 export const PRODUCT_LINKS: NavLink[] = PRODUCTS.map((product) => ({
@@ -60,30 +64,53 @@ export const PRODUCT_LINKS: NavLink[] = PRODUCTS.map((product) => ({
  * product already named (`?product=`, read by QuoteForm) rather than a thin
  * page invented to catch the click.
  */
-export type MegaMenuGroup = { heading: string; links: NavLink[] };
+export type MegaMenuGroup = {
+  heading: string;
+  /** The category's own page, when it has one — the heading links to it. */
+  href?: string;
+  links: NavLink[];
+};
 
 const PAGE_FOR = {
   gloves: productHref({ slug: "custom-boxing-gloves" }),
   apparel: productHref({ slug: "fightwear-club-apparel" }),
+  mma: productHref({ slug: "custom-mma-gloves" }),
+  lifting: productHref({ slug: "custom-lifting-belts" }),
+  protective: productHref({ slug: "custom-protective-gear" }),
+  pads: productHref({ slug: "custom-pads-bags-mitts" }),
 };
 
+/**
+ * The page each catalogue line lands on. Kids' items follow the adult page
+ * for the same product; anything without a page of its own — martial arts
+ * uniforms, fitness accessories, kit bags, sauna wear — opens the brief.
+ */
 function catalogueHref(product: CatalogueProduct): string {
-  if (product.category === "Boxing" || product.name === "Kids Boxing Gloves") {
-    return PAGE_FOR.gloves;
+  const { category, name } = product;
+  if (category === "Boxing" || name === "Kids Boxing Gloves") return PAGE_FOR.gloves;
+  if (category === "MMA" || name === "Kids MMA Gloves" || name === "Kids Grappling Gloves") {
+    return PAGE_FOR.mma;
+  }
+  if (category === "Strength and Lifting") return PAGE_FOR.lifting;
+  if (category === "Protective Gear" || name === "Kids Head Guards" || name === "Kids Protective Gear") {
+    return PAGE_FOR.protective;
+  }
+  if (category === "Training Equipment" || name === "Kids Punch Bags" || name === "Kids Boxing Sets") {
+    return PAGE_FOR.pads;
   }
   // Sauna wear is apparel by category but not what the apparel page covers.
-  if (product.category === "Apparel" && !product.name.startsWith("Sauna")) {
-    return PAGE_FOR.apparel;
-  }
-  return `/quote?product=${encodeURIComponent(product.name)}`;
+  if (category === "Apparel" && !name.startsWith("Sauna")) return PAGE_FOR.apparel;
+  return `/quote?product=${encodeURIComponent(name)}`;
 }
 
 function menuGroup(
   heading: string,
   categories: ProductCategory[],
+  href?: string,
 ): MegaMenuGroup {
   return {
     heading,
+    href,
     links: PRODUCT_LIST.filter(
       (product) => categories.includes(product.category) && !product.moulded,
     ).map((product) => ({ label: product.name, href: catalogueHref(product) })),
@@ -97,23 +124,23 @@ function menuGroup(
  */
 export const MEGA_MENU: MegaMenuGroup[][] = [
   [
-    menuGroup("Boxing", ["Boxing"]),
-    menuGroup("MMA", ["MMA"]),
+    menuGroup("Boxing", ["Boxing"], PAGE_FOR.gloves),
+    menuGroup("MMA", ["MMA"], PAGE_FOR.mma),
     menuGroup("Kids", ["Kids"]),
   ],
   [
-    menuGroup("Bags, Pads & Mitts", ["Training Equipment"]),
+    menuGroup("Bags, Pads & Mitts", ["Training Equipment"], PAGE_FOR.pads),
     menuGroup("Kit Bags", ["Bags"]),
   ],
-  [menuGroup("Protective Gear", ["Protective Gear"])],
+  [menuGroup("Protective Gear", ["Protective Gear"], PAGE_FOR.protective)],
   [
-    menuGroup("Strength & Lifting", ["Strength and Lifting"]),
+    menuGroup("Strength & Lifting", ["Strength and Lifting"], PAGE_FOR.lifting),
     menuGroup("Fitness", ["Fitness Accessories", "Yoga"]),
   ],
   // Gis and uniforms are garments; they sit under Apparel to keep the first
   // column from running twice the length of the rest.
   [
-    menuGroup("Apparel", ["Apparel"]),
+    menuGroup("Apparel", ["Apparel"], PAGE_FOR.apparel),
     menuGroup("Martial Arts", ["Martial Arts"]),
   ],
 ];

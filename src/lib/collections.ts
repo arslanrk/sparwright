@@ -78,14 +78,9 @@ export type Collection = {
 
 const GLOVES = "/products/custom-boxing-gloves";
 const APPAREL = "/products/fightwear-club-apparel";
-/**
- * Strength has no product page yet — §11 launched two, and neither covers it.
- * Pointing it at a page about boxing gloves would be a worse answer than
- * admitting the page does not exist, so it goes to the brief instead, with the
- * line already named (`quotePrefill`), and the label says so. Gym wear is
- * apparel, and goes where the mega menu sends apparel.
- */
-const LIFTING_BRIEF = `/quote?product=${encodeURIComponent("Strength and Lifting")}`;
+/** Every collection now has a page; gym wear is apparel, as the menu has it. */
+const MMA = "/products/custom-mma-gloves";
+const LIFTING = "/products/custom-lifting-belts";
 
 /**
  * Product lists follow the mega menu's catalogue (`product-list.ts`) and use
@@ -125,7 +120,7 @@ export const COLLECTIONS: Collection[] = [
       "MMA Shorts",
       "Rashguards",
     ],
-    href: APPAREL,
+    href: MMA,
     linkLabel: "Explore Custom MMA Gear",
     shot: "MMA gloves, front and palm",
     photo: {
@@ -145,8 +140,8 @@ export const COLLECTIONS: Collection[] = [
       "Lifting Grips",
       "Dipping Belts",
     ],
-    href: LIFTING_BRIEF,
-    linkLabel: "Start a Lifting Gear Brief",
+    href: LIFTING,
+    linkLabel: "Explore Custom Lifting Gear",
     shot: "Lifting belt and straps",
     photo: {
       src: strengthLifting,

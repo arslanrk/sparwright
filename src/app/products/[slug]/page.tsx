@@ -148,7 +148,13 @@ export default async function ProductPage({
             title={types.title}
             description={types.description}
           />
-          <ul className="mt-[var(--space-7)] grid gap-[var(--space-4)] sm:grid-cols-2 lg:grid-cols-5">
+          <ul
+            className={cn(
+              "mt-[var(--space-7)] grid gap-[var(--space-4)] sm:grid-cols-2",
+              // Six fill two rows of three; five sit in one row.
+              types.items.length % 3 === 0 ? "lg:grid-cols-3" : "lg:grid-cols-5",
+            )}
+          >
             {types.items.map((type, i) => (
               <li
                 key={type.title}
