@@ -38,6 +38,18 @@ type PageMetadataInput = {
   extra?: Metadata;
 };
 
+/**
+ * A starter page: the full metadata, plus noindex until it is marked ready.
+ * The page stays reachable from the menu; search engines skip it.
+ */
+export function starterMetadata(input: PageMetadataInput & { ready: boolean }): Metadata {
+  const { ready, ...rest } = input;
+  return pageMetadata({
+    ...rest,
+    extra: ready ? rest.extra : { ...rest.extra, robots: { index: false, follow: true } },
+  });
+}
+
 export function pageMetadata({
   path,
   title,

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { hasPortfolio } from "@/lib/portfolio";
 import { HOW_IT_WORKS_READY } from "@/lib/process";
+import { readySectionPaths } from "@/lib/site-sections";
 import { PRODUCTS, productHref } from "@/lib/products";
 import { siteUrl } from "@/lib/site";
 
@@ -38,6 +39,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...(HOW_IT_WORKS_READY
       ? [{ path: "/how-it-works", priority: 0.7, changeFrequency: "monthly" as const }]
       : []),
+    // About, Resources and Contact starter pages, each once marked ready.
+    ...readySectionPaths().map((path) => ({
+      path,
+      priority: 0.6,
+      changeFrequency: "monthly" as const,
+    })),
     // Listed only once it has real work in it; until then it is noindex.
     ...(hasPortfolio
       ? [{ path: "/portfolio", priority: 0.7, changeFrequency: "monthly" as const }]

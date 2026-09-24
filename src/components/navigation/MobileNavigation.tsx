@@ -129,7 +129,10 @@ export function MobileNavigation({
                         </li>
                       ))}
                     </ul>
-                    <CatalogueSections onNavigate={onClose} />
+                    {/* The catalogue belongs to Products only. */}
+                    {item.menu === "mega" ? (
+                      <CatalogueSections onNavigate={onClose} />
+                    ) : null}
                   </>
                 ) : null}
               </li>

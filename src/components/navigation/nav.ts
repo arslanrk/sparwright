@@ -5,6 +5,12 @@ import {
   type ProductCategory,
 } from "@/lib/product-list";
 import { PRODUCTS, productHref } from "@/lib/products";
+import {
+  ABOUT,
+  CONTACT_PAGE,
+  RESOURCES,
+  type SiteSection,
+} from "@/lib/site-sections";
 
 /**
  * Navigation model — Design System §08 Header and navigation, §08 Footer.
@@ -24,7 +30,18 @@ export type NavLink = {
 export type PrimaryNavItem = NavLink & {
   /** Renders as a dropdown trigger in the desktop header (§08). */
   children?: NavLink[];
+  /** "mega" for the Products catalogue; "list" for a plain dropdown. */
+  menu?: "mega" | "list";
 };
+
+const sectionLinks = (section: SiteSection): NavLink[] => [
+  ...section.pages.map(({ label, href, description }) => ({
+    label,
+    href,
+    description,
+  })),
+  { label: section.hub.label, href: section.hub.href },
+];
 
 /**
  * The Products dropdown (§08), built from the catalogue so the menu can only
@@ -145,19 +162,26 @@ export const MEGA_MENU: MegaMenuGroup[][] = [
   ],
 ];
 
+/**
+ * No Home item: the logo links home, and the row needed the room. How It
+ * Works left the row for the same reason — it is "Our Process" under About
+ * Us, so it is one click deeper, not gone. Manufacturing is linked from the
+ * footer's Work With Us column.
+ */
 export const PRIMARY_NAV: PrimaryNavItem[] = [
-  // `isActivePath` already matches "/" exactly rather than by prefix, so Home
-  // highlights only on the homepage instead of on every route beneath it.
-  { label: "Home", href: "/" },
-  { label: "Products", href: "/products", children: PRODUCT_LINKS },
+  { label: "Products", href: "/products", children: PRODUCT_LINKS, menu: "mega" },
   // Named as the homepage audience card names this buyer.
   { label: "Gyms & Academies", href: "/for-clubs" },
   { label: "Private Label", href: "/private-label" },
-  // Manufacturing left the header for Portfolio; the page is still linked from
-  // the footer's Work With Us column.
   { label: "Portfolio", href: "/portfolio" },
-  // Its own page now, rather than the homepage anchor it used to be.
-  { label: CTA.howItWorks, href: "/how-it-works" },
+  { label: "About Us", href: ABOUT.hub.href, children: sectionLinks(ABOUT), menu: "list" },
+  {
+    label: "Resources",
+    href: RESOURCES.hub.href,
+    children: sectionLinks(RESOURCES),
+    menu: "list",
+  },
+  { label: CONTACT_PAGE.label, href: CONTACT_PAGE.href },
 ];
 
 /**

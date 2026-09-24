@@ -45,7 +45,7 @@ export function Header() {
       className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)]"
     >
       <Container width="shell">
-        <div className="flex h-[var(--header-height)] items-center justify-between gap-6">
+        <div className="flex h-[var(--header-height)] items-center justify-between gap-4">
           <Link
             href="/"
             aria-label="Sparwright — home"
@@ -66,11 +66,11 @@ export function Header() {
             drawer serves everything below 1280.
           */}
           <nav aria-label="Primary" className="hidden xl:block">
-            <ul className="flex items-center gap-1">
+            <ul className="flex items-center">
               {PRIMARY_NAV.map((item) =>
                 item.children ? (
                   <li key={item.href}>
-                    <ProductsMenu item={item} pathname={pathname} />
+                    <NavMenu item={item} pathname={pathname} />
                   </li>
                 ) : (
                   <li key={item.href}>
@@ -119,8 +119,11 @@ export function Header() {
   );
 }
 
+// Seven items, the logo and the CTA share one row. The header container is
+// capped at 1280px, so the row is the same width at every desktop size — the
+// type and padding are set to fit it once, rather than growing at 2xl.
 const NAV_ITEM =
-  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 font-body text-[0.9375rem] font-medium " +
+  "inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-2 font-body text-[0.875rem] font-medium " +
   "text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)] " +
   "data-[active=true]:font-semibold data-[active=true]:text-[var(--color-text)]";
 
@@ -145,16 +148,21 @@ function NavItemLink({ item, pathname }: { item: NavLink; pathname: string }) {
  * The panel spans the header rather than hanging off the trigger: it is
  * positioned against the sticky header, which is the nearest positioned
  * ancestor because this group deliberately is not one. The catalogue sits in
- * five columns (`MEGA_MENU`); the two product pages that exist, the full range
- * and the brief sit in a bar underneath.
+ * five columns (`MEGA_MENU`); the full range and the brief sit in a bar
+ * underneath.
+ *
+ * The same component draws a plain list dropdown for a `menu: "list"` item
+ * (About Us): same open, close and keyboard behaviour, but a narrow panel that
+ * hangs from its trigger, so here the group is positioned.
  */
-function ProductsMenu({
+function NavMenu({
   item,
   pathname,
 }: {
   item: PrimaryNavItem;
   pathname: string;
 }) {
+  const list = item.menu === "list";
   const [open, setOpen] = useState(false);
   const groupRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -173,6 +181,7 @@ function ProductsMenu({
   return (
     <div
       ref={groupRef}
+      className={list ? "relative" : undefined}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       onKeyDown={(event) => {
@@ -209,6 +218,25 @@ function ProductsMenu({
         ) : null}
       </span>
 
+      {list ? (
+        <div
+          id={panelId}
+          hidden={!open}
+          className="absolute left-0 top-full w-[22rem] pt-2"
+        >
+          <ul className="rounded-lg border border-[var(--color-border)] bg-[var(--color-white)] p-2 shadow-[var(--shadow-overlay)]">
+            {(item.children ?? []).map((child) => (
+              <li key={child.href}>
+                <DropdownLink
+                  link={child}
+                  pathname={pathname}
+                  onNavigate={() => setOpen(false)}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
       <div
         id={panelId}
         hidden={!open}
@@ -312,6 +340,7 @@ function ProductsMenu({
           </div>
         </Container>
       </div>
+      )}
     </div>
   );
 }
