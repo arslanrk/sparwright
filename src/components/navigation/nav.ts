@@ -245,7 +245,11 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     heading: "Products",
     links: [
-      ...PRODUCT_LINKS.map(({ label, href }) => ({ label, href })),
+      // The short category names: the full page names wrapped in a column.
+      ...PRODUCTS.map((product) => ({
+        label: product.category,
+        href: productHref(product),
+      })),
       {
         label: "All Products",
         href: "/products",
@@ -257,15 +261,29 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     links: [
       { label: "Gyms & Academies", href: "/for-clubs" },
       { label: "Private Label", href: "/private-label" },
+      { label: "Portfolio", href: "/portfolio" },
       { label: "Manufacturing & Quality", href: "/manufacturing" },
-      { label: CTA.howItWorks, href: "/how-it-works" },
     ],
+  },
+  // About Us and Resources come from the same lists as the header dropdowns,
+  // so the footer can never offer a page the menu does not (or the reverse).
+  {
+    heading: "About Us",
+    links: [
+      ...ABOUT.pages.map(({ label, href }) => ({ label, href })),
+      { label: ABOUT.hub.label, href: ABOUT.hub.href },
+    ],
+  },
+  {
+    heading: "Resources",
+    links: RESOURCES.pages.map(({ label, href }) => ({ label, href })),
   },
   {
     heading: "Contact",
     links: [
       { label: CTA.mockup, href: "/quote?intent=mockup" },
       { label: CTA.quote, href: "/quote" },
+      { label: "Contact Us", href: CONTACT_PAGE.href },
       { label: CONTACT.email, href: `mailto:${CONTACT.email}` },
     ],
   },

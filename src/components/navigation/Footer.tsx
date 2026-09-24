@@ -29,8 +29,13 @@ export function Footer() {
       className="bg-[var(--color-bg)] text-[var(--color-text)]"
     >
       <Container width="shell" className="py-[var(--space-9)]">
-        <div className="grid gap-[var(--space-7)] md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div>
+        {/*
+          Brand block, then five link columns. The brand spans the full row up
+          to `xl` and sits beside the columns from there — five columns and a
+          brand block do not fit side by side any narrower.
+        */}
+        <div className="grid grid-cols-2 gap-x-[var(--space-6)] gap-y-[var(--space-7)] md:grid-cols-3 xl:grid-cols-[minmax(0,1.7fr)_repeat(5,minmax(0,1fr))]">
+          <div className="col-span-full xl:col-span-1 xl:pr-[var(--space-5)]">
             <Logo
               variant="primary"
               tone="inverse"
@@ -50,10 +55,11 @@ export function Footer() {
 
           {FOOTER_COLUMNS.map((column) => (
             <nav key={column.heading} aria-label={column.heading}>
-              <h2 className="font-body text-eyebrow uppercase text-[var(--color-text-muted)]">
+              <h2 className="flex items-center gap-2 font-body text-eyebrow uppercase text-[var(--color-text-muted)]">
+                <span aria-hidden="true" className="h-0.5 w-4 rounded-full bg-forge-600" />
                 {column.heading}
               </h2>
-              <ul className="mt-[var(--space-4)] flex flex-col gap-3">
+              <ul className="mt-[var(--space-4)] flex flex-col gap-2.5">
                 {column.links.map((link) => (
                   <li key={`${column.heading}-${link.href}-${link.label}`}>
                     <FooterLink href={link.href}>{link.label}</FooterLink>
