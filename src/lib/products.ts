@@ -78,9 +78,17 @@ export type Product = {
   /** The §08 quote-form product type this page pre-selects. */
   quoteProduct?: string;
   /** The types within the line, and what each is built for. */
-  types?: { title: string; description: string; items: ProductType[] };
+  types?: {
+    /** Section eyebrow, e.g. "Glove types". */
+    eyebrow: string;
+    title: string;
+    description: string;
+    items: ProductType[];
+  };
   /** A side-by-side of the materials a buyer chooses between. */
   materialOptions?: {
+    /** Section eyebrow, e.g. "Materials". */
+    eyebrow: string;
     title: string;
     description: string;
     options: MaterialOption[];
@@ -116,44 +124,6 @@ export type Product = {
   /** Slugs of the §11 section 8 related products. */
   related: string[];
 };
-
-/**
- * Answers shared across products. §08 lists nine standard buyer questions; the
- * MOQ and lead-time answers deliberately commit to no number, because
- * non-negotiable #6 forbids publishing either until they are confirmed.
- */
-const SHARED_FAQS = {
-  moq: {
-    question: "What is your minimum order quantity?",
-    answer:
-      "It depends on the product, materials and branding method. Send your product and an approximate quantity and we will confirm the minimum for that specification before you commit to anything.",
-  },
-  logo: {
-    question: "Can you add our club logo?",
-    answer:
-      "Yes. Upload your artwork with your requirements and the production team will confirm whether the file is suitable for the branding method you want, and propose an alternative if it is not.",
-  },
-  sample: {
-    question: "Do you create a sample before bulk production?",
-    answer:
-      "Yes. Bulk production starts only against a sample you have approved, and that approved specification is what production is checked against.",
-  },
-  reference: {
-    question: "Can you work from a reference product?",
-    answer:
-      "Yes. Send photographs, measurements or the product itself and we will confirm which parts of the construction we can match and which need a decision from you.",
-  },
-  leadTime: {
-    question: "How long does production take?",
-    answer:
-      "Sampling and production times depend on the product, quantity and branding. We confirm dates for your specific order in writing with your quote rather than publishing a general figure.",
-  },
-  reorder: {
-    question: "Can we reorder the same approved design?",
-    answer:
-      "Yes. Approved artwork and specifications are retained so a reorder is produced against the same reference rather than being developed again.",
-  },
-} as const;
 
 export const PRODUCTS: Product[] = [
   {
@@ -222,6 +192,7 @@ export const PRODUCTS: Product[] = [
      * which non-negotiable #5 rules out asserting.
      */
     types: {
+      eyebrow: "Glove types",
       title: "Boxing gloves for every kind of session",
       description:
         "The glove type decides the padding, the weight and the closure, so it is the first thing we confirm with you.",
@@ -259,6 +230,7 @@ export const PRODUCTS: Product[] = [
       ],
     },
     materialOptions: {
+      eyebrow: "Materials",
       title: "Genuine leather or synthetic shell",
       description:
         "Both are made to the same construction and checked against the same sample. The choice is about feel, lifespan and budget.",
@@ -431,11 +403,18 @@ export const PRODUCTS: Product[] = [
   {
     slug: "fightwear-club-apparel",
     name: "Fightwear and Club Apparel",
+    noun: "custom fightwear and club apparel",
+    heading: "Custom fightwear and club apparel, made to your specification.",
+    seo: {
+      title: "Custom Fightwear and Club Apparel Manufacturer",
+      description:
+        "Custom fight shorts, rashguards, compression wear, club T-shirts, hoodies and tracksuits made in Sialkot, Pakistan — in your colours, sizing and branding.",
+    },
     category: "Fightwear and apparel",
     summary:
-      "Fight shorts, rashguards and club apparel manufactured with your fabrics, colours, sizing and branding.",
+      "Fight shorts, rashguards, compression wear, club T-shirts, hoodies and tracksuits, made with your fabrics, colours, sizing and branding.",
     cardDescription:
-      "Shorts, rashguards, tees, hoodies and tracksuits for clubs and growing brands. Specify fabric, panel layout, colours, sizing and branding method.",
+      "Fight shorts, rashguards, compression wear, tees, hoodies and tracksuits for clubs and brands. Specify fabric, panels, colours, sizing and branding.",
     cardShot: "Coordinated product collection",
     cardPhoto: {
       src: clubTeamKit,
@@ -468,7 +447,79 @@ export const PRODUCTS: Product[] = [
       },
     ],
     overview:
-      "One page covers the apparel side of a club kit: shorts, rashguards, tees, hoodies and tracksuits, specified together so colours, logo placement and sizing stay consistent across everything you order.",
+      "Everything a club or brand wears, specified together: fight shorts and rashguards for the mat and ring, compression and training wear for the gym, and T-shirts, hoodies and tracksuits for members. One colour reference and one logo treatment carry across every garment, and the size spread is confirmed before bulk.",
+    /*
+     * The garments the Products menu sends here, grouped as a buyer orders
+     * them. The spec line names the usual branding method rather than a fabric:
+     * fabrics are confirmed per garment, and a published fabric would be a
+     * commitment the catalogue has not made.
+     */
+    types: {
+      eyebrow: "Garment types",
+      title: "Fightwear and apparel for the whole kit",
+      description:
+        "Each garment is specified on its own — fabric, fit, panels and branding — then matched to the rest of the order.",
+      items: [
+        {
+          title: "Fight shorts and boxing trunks",
+          description:
+            "MMA shorts and boxing trunks with split legs, side panels and a secure waistband, in club or brand colours.",
+          spec: "Usually sublimated",
+        },
+        {
+          title: "Rashguards",
+          description:
+            "Long or short sleeve, cut close for grappling, with flatlock seams and all-over designs.",
+          spec: "Usually sublimated",
+        },
+        {
+          title: "Compression wear",
+          description:
+            "Compression tops, shorts and pants for training and fight camps, matched to the rest of the kit.",
+          spec: "Sublimated or printed",
+        },
+        {
+          title: "Club T-shirts and vests",
+          description:
+            "Training and member tees and vests, ordered across sizes with the club logo on each.",
+          spec: "Printed or embroidered",
+        },
+        {
+          title: "Hoodies, sweatshirts and tracksuits",
+          description:
+            "Warm-up and travel wear for members and teams — hoodies, sweatshirts, trousers and full tracksuits.",
+          spec: "Embroidered or printed",
+        },
+      ],
+    },
+    materialOptions: {
+      eyebrow: "Branding methods",
+      title: "Sublimation, or print and embroidery",
+      description:
+        "The branding method follows the garment and the design. We confirm which suits each piece before sampling.",
+      options: [
+        {
+          name: "Sublimation",
+          bestFor: "Rashguards, fight shorts and all-over or full-colour designs.",
+          points: [
+            "Dye goes into the fabric, so there is nothing to crack or peel",
+            "Unlimited colours and edge-to-edge designs",
+            "Keeps the fabric's stretch and feel",
+            "Works on polyester-based fabrics",
+          ],
+        },
+        {
+          name: "Print and embroidery",
+          bestFor: "Cotton tees, hoodies, tracksuits and a crisp chest logo.",
+          points: [
+            "Works on cotton and blended fabrics",
+            "Embroidery gives a raised, premium logo",
+            "Print suits bold one- or two-colour artwork",
+            "Easy to repeat the same logo across every garment",
+          ],
+        },
+      ],
+    },
     useCases: [
       {
         title: "Coordinated club kit",
@@ -481,7 +532,7 @@ export const PRODUCTS: Product[] = [
           "Shorts and rashguards specified for a squad, competition or camp.",
       },
       {
-        title: "Private-label ranges",
+        title: "Private label ranges",
         description:
           "Brand-owned apparel with your labels, care information and packaging.",
       },
@@ -509,7 +560,7 @@ export const PRODUCTS: Product[] = [
       {
         label: "Branding method",
         value:
-          "Print, sublimation, embroidery or applied badge, chosen per garment.",
+          "Sublimation, print, embroidery or an applied badge, chosen per garment.",
       },
       {
         label: "Labels",
@@ -554,19 +605,62 @@ export const PRODUCTS: Product[] = [
       "Count, size assortment, inner packing and carton details recorded.",
       "Inspection record retained before dispatch.",
     ],
+    /*
+     * Apparel-specific, not the site-wide set, for the same reason as the glove
+     * page. MOQ and lead time still commit to no number (#6).
+     */
     faqs: [
-      SHARED_FAQS.moq,
-      SHARED_FAQS.logo,
-      SHARED_FAQS.sample,
-      SHARED_FAQS.reference,
       {
-        question: "What materials are available?",
+        question: "What fightwear and apparel do you make?",
         answer:
-          "Fabric weight and composition are chosen per garment against the intended use, then fixed by the sample you approve.",
+          "Fight shorts and boxing trunks, rashguards, compression tops, shorts and pants, club T-shirts and vests, and hoodies, sweatshirts, trousers and tracksuits — each made to your specification.",
       },
-      SHARED_FAQS.leadTime,
-      SHARED_FAQS.reorder,
+      {
+        question: "Sublimation, print or embroidery — which should we use?",
+        answer:
+          "Sublimation suits rashguards, fight shorts and full-colour designs, because the dye goes into the fabric and cannot crack. Print and embroidery suit cotton tees, hoodies and tracksuits, and embroidery gives a raised logo. We confirm the method for each garment before sampling.",
+      },
+      {
+        question: "Can you match our club colours across different garments?",
+        answer:
+          "Yes. One colour reference is used across the whole order and checked on the sample, so a sublimated rashguard and an embroidered hoodie read as the same kit.",
+      },
+      {
+        question: "How do sizes work for a club order?",
+        answer:
+          "We confirm a size chart for each garment and the quantity per size before production, so a club can order across its members in one run.",
+      },
+      {
+        question: "Can we add our own labels and packaging?",
+        answer:
+          "Yes. Neck, size and care labels carry your brand details, and garments can be polybagged and packed in cartons marked to your instruction.",
+      },
+      {
+        question: "What is the minimum order for custom fightwear?",
+        answer:
+          "It depends on the garment, the fabric and the branding method. Send the garments and an approximate quantity and we confirm the minimum for your specification before you commit to anything.",
+      },
+      {
+        question: "Do you make a sample before bulk production?",
+        answer:
+          "Yes — a mockup first, then a physical sample of each garment. Bulk production starts only once you have approved it, and the finished order is checked against it.",
+      },
+      {
+        question: "How long does a custom apparel order take?",
+        answer:
+          "It depends on the garments, the quantity and the branding. Dates for sampling and bulk production are confirmed in writing with your quote.",
+      },
+      {
+        question: "Can we reorder the same kit later?",
+        answer:
+          "Yes. The approved specification, artwork, colour references and size chart stay on file, so a reorder matches the first run.",
+      },
     ],
+    closing: {
+      title: "Tell us about your kit.",
+      description:
+        "Send the garments, colours, logo, size spread and a rough quantity. A person replies with anything left to confirm.",
+    },
     related: ["custom-boxing-gloves"],
   },
 ];

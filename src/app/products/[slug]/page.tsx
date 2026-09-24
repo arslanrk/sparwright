@@ -143,7 +143,7 @@ export default async function ProductPage({
       render: (theme, index) => (
         <Section theme={theme} width="work">
           <SectionHeader
-            eyebrow="Glove types"
+            eyebrow={types.eyebrow}
             index={index}
             title={types.title}
             description={types.description}
@@ -172,7 +172,9 @@ export default async function ProductPage({
                 </p>
                 {type.spec ? (
                   <p className="mt-auto pt-[var(--space-5)]">
-                    <span className="inline-flex rounded-full bg-forge-100 px-3 py-1 text-small font-semibold text-forge-700">
+                    {/* Rounded rather than a pill: in a narrow card a long
+                        spec wraps, and a wrapped pill reads as a mistake. */}
+                    <span className="inline-flex rounded-md bg-forge-100 px-2.5 py-1 text-small font-semibold leading-snug text-forge-700">
                       {type.spec}
                     </span>
                   </p>
@@ -219,7 +221,7 @@ export default async function ProductPage({
       render: (theme, index) => (
         <Section theme={theme} width="work">
           <SectionHeader
-            eyebrow="Materials"
+            eyebrow={options.eyebrow}
             index={index}
             title={options.title}
             description={options.description}
@@ -333,7 +335,10 @@ export default async function ProductPage({
               />
             </div>
             <div>
+              {/* An eyebrow, unnumbered, so this heading lines up with the
+                  numbered one beside it — it is the same section. */}
               <SectionHeader
+                eyebrow="Customization"
                 title="Customization options"
                 description="The four things you control on every order."
               />
