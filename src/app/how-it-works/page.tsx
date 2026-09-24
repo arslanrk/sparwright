@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { CallToAction } from "@/components/content/CallToAction";
 import { ProcessStepper } from "@/components/content/ProcessStepper";
 import { Section } from "@/components/foundation/Container";
@@ -21,12 +22,13 @@ import { HOW_IT_WORKS_READY, PROCESS_STAGES } from "@/lib/process";
  * search for "how custom boxing gloves are made" is asking for.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/how-it-works",
   title: "How It Works",
   description:
     "How a custom boxing glove, fightwear or club apparel order runs — from your brief and an approved sample to bulk production, quality checks and export.",
-  ...(HOW_IT_WORKS_READY ? {} : { robots: { index: false, follow: true } }),
-};
+  extra: HOW_IT_WORKS_READY ? {} : { robots: { index: false, follow: true } },
+});
 
 export default function HowItWorksPage() {
   return (

@@ -25,6 +25,34 @@ import Image from "next/image";
 import { FAQ_GROUPS, SITE_FAQS } from "@/lib/faq";
 import { COLLECTIONS } from "@/lib/collections";
 import { PROCESS_STAGES } from "@/lib/process";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
+import type { Metadata } from "next";
+
+/**
+ * The homepage states its own canonical rather than inheriting one: set in
+ * the layout, "/" was inherited by every route. Its title is the brand line,
+ * not the "| Sparwright" template other pages use.
+ */
+const HOME_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
+
+export const metadata: Metadata = {
+  title: { absolute: HOME_TITLE },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "en_GB",
+    url: "/",
+    title: HOME_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOME_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+};
 import techPackDesk from "../../public/images/design-and-tech-pack-development.jpg";
 import cuttingTable from "../../public/images/pattern-making-and-cutting.jpg";
 import sublimationPrinter from "../../public/images/printing-and-decoration.jpg";

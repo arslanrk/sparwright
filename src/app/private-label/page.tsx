@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { CallToAction } from "@/components/content/CallToAction";
 import { Hero } from "@/components/content/Hero";
 import { ImagePlaceholder } from "@/components/content/ImagePlaceholder";
@@ -23,11 +24,12 @@ import type { SpecRow } from "@/lib/products";
  * itself ships in PR 9; this page is its entry point.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/private-label",
   title: "Private Label",
   description:
     "Develop fightwear products, labels and packaging through an approved sample before bulk production begins.",
-};
+});
 
 /** §11 "Product development from reference, sketch or defined brief." */
 const DEVELOPMENT = [

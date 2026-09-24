@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
 import { QuoteForm } from "@/components/forms/QuoteForm";
@@ -16,11 +17,12 @@ import { quotePrefill } from "@/lib/quote";
  * non-negotiable #6 rules out publishing lead times.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/quote",
   title: "Request a Quote or Mockup",
   description:
     "Send your product, branding, quantity and destination. A person reviews every request before confirming the next practical step.",
-};
+});
 
 export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
   const { product } = await searchParams;

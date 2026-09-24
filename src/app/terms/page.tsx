@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import {
   LegalPage,
   PendingLegalDetail,
@@ -17,11 +18,12 @@ import { CONTACT } from "@/components/navigation/nav";
  * someone qualified before launch.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/terms",
   title: "Terms",
   description:
     "Terms for using this website, and how a quote request becomes a confirmed order.",
-};
+});
 
 const SECTIONS: LegalSection[] = [
   {

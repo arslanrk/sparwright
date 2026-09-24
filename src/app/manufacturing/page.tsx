@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { CallToAction } from "@/components/content/CallToAction";
 import { Hero } from "@/components/content/Hero";
 import { ImagePlaceholder } from "@/components/content/ImagePlaceholder";
@@ -24,11 +25,12 @@ import { Breadcrumb } from "@/components/navigation/Breadcrumb";
  * PR 13 blockers.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/manufacturing",
   title: "Manufacturing and Quality",
   description:
     "Ten years of hands-on fight-gear manufacturing in Sialkot, built around clear product requirements, approved samples and checks before dispatch.",
-};
+});
 
 /**
  * §11 "Name who owns product development, manufacturing, quality, buyer

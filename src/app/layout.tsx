@@ -45,20 +45,23 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
+  // No canonical and no Open Graph URL here. Set at the root, both were
+  // inherited by every route, so every page declared itself a copy of the
+  // homepage. Each page sets its own through `pageMetadata`; these are only
+  // the fallbacks for a route that forgets, and a missing canonical is far
+  // less harmful than a wrong one.
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
     title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION,
     locale: "en_GB",
-    url: "/",
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION,
   },
-  alternates: { canonical: "/" },
   // Belt and braces with robots.ts: nothing is indexed until launch is called.
   robots: isProductionSite()
     ? { index: true, follow: true }

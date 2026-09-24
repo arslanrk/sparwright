@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import {
   LegalPage,
   PendingLegalDetail,
@@ -17,11 +18,12 @@ import { CONTACT } from "@/components/navigation/nav";
  * the PR 13 checklist blocks on it.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/privacy",
   title: "Privacy",
   description:
     "What we collect when you send a quote or mockup request, why we hold it, and how to ask us to delete it.",
-};
+});
 
 const SECTIONS: LegalSection[] = [
   {

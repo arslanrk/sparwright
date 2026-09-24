@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { CallToAction } from "@/components/content/CallToAction";
 import { ProductCard } from "@/components/content/ProductCard";
 import { Section } from "@/components/foundation/Container";
@@ -26,11 +27,12 @@ const PRODUCT_ACTIONS: Record<string, string> = {
   "fightwear-club-apparel": CTA.exploreFightwear,
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/products",
   title: "Custom Products",
   description:
     "Custom boxing gloves, fightwear and club apparel manufactured in Sialkot against your branding, colours and product specifications.",
-};
+});
 
 export default function ProductsPage() {
   return (

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { CallToAction } from "@/components/content/CallToAction";
 import { Hero } from "@/components/content/Hero";
 import { ImagePlaceholder } from "@/components/content/ImagePlaceholder";
@@ -23,11 +24,12 @@ import { PRODUCTS, productCardItem } from "@/lib/products";
  * non-negotiables #5 and #6.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/for-clubs",
   title: "For Clubs and Gyms",
   description:
     "Custom gloves, fightwear and apparel created around your club colours, logo and practical ordering requirements.",
-};
+});
 
 /** §11 "Explain typical club equipment and apparel needs." */
 const REQUIREMENTS = [

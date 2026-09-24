@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import Image from "next/image";
 import { CallToAction } from "@/components/content/CallToAction";
 import { Section } from "@/components/foundation/Container";
@@ -24,12 +25,13 @@ import {
  * to switch the grid on.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/portfolio",
   title: "Portfolio",
   description:
     "Custom boxing gloves, fightwear, lifting gear and club kit made for gyms, clubs and brands — finished orders, photographed.",
-  ...(hasPortfolio ? {} : { robots: { index: false, follow: true } }),
-};
+  extra: hasPortfolio ? {} : { robots: { index: false, follow: true } },
+});
 
 export default function PortfolioPage() {
   return (

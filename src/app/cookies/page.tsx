@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { LegalPage, type LegalSection } from "@/components/content/LegalPage";
 import { CookieSettings } from "@/components/navigation/CookieSettings";
 
@@ -14,11 +15,12 @@ import { CookieSettings } from "@/components/navigation/CookieSettings";
  * have to be revisited together.
  */
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/cookies",
   title: "Cookies",
   description:
     "What this site stores in your browser, what it does not, and how to change your choice.",
-};
+});
 
 const SECTIONS: LegalSection[] = [
   {

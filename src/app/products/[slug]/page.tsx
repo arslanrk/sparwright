@@ -15,7 +15,9 @@ import {
   getProduct,
   getRelatedProducts,
   productCardItem,
+  productHref,
 } from "@/lib/products";
+import { pageMetadata } from "@/lib/metadata";
 
 /**
  * Product page — Design System §11 Product page template.
@@ -39,10 +41,11 @@ export async function generateMetadata({
   const product = getProduct(slug);
   if (!product) return {};
 
-  return {
+  return pageMetadata({
+    path: productHref(product),
     title: product.name,
     description: product.summary,
-  };
+  });
 }
 
 export default async function ProductPage({
