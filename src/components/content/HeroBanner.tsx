@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import type { ReactNode } from "react";
 import { Container } from "@/components/foundation/Container";
 import { ConstellationField } from "./ConstellationField";
@@ -35,7 +35,18 @@ type HeroBannerProps = {
   description: string;
   actions: ReactNode;
   /** §08 Hero "Proof" — four short, factual trust points. */
-  proof: string[];
+  proof?: string[];
+  /**
+   * The backdrop. Defaults to the homepage workshop banner; interior pages
+   * pass their own so no two heroes restate each other.
+   */
+  image?: { src: StaticImageData; alt: string; position?: string };
+  /** Above the eyebrow: an interior page's breadcrumb. */
+  top?: ReactNode;
+  /** Below the actions: the products page's jump links, for one. */
+  footer?: ReactNode;
+  /** A shorter band for interior pages. */
+  compact?: boolean;
 };
 
 export function HeroBanner({
@@ -44,6 +55,10 @@ export function HeroBanner({
   description,
   actions,
   proof,
+  image,
+  top,
+  footer,
+  compact = false,
 }: HeroBannerProps) {
   return (
     <section
@@ -56,8 +71,8 @@ export function HeroBanner({
       */}
       <div className="relative order-2 aspect-[16/10] w-full sm:aspect-[2/1] lg:absolute lg:inset-0 lg:order-none lg:aspect-auto lg:h-full">
         <Image
-          src={banner}
-          alt={BANNER_ALT}
+          src={image?.src ?? banner}
+          alt={image?.alt ?? BANNER_ALT}
           fill
           // The LCP image. Next 16 deprecated `priority`, which no longer
           // emitted a fetch priority at all; this is its documented
@@ -70,6 +85,7 @@ export function HeroBanner({
           // Weighted right so the desktop scrim falls over the emptier half of
           // the floor rather than over the people working.
           className="object-cover object-[62%_center]"
+          style={image?.position ? { objectPosition: image.position } : undefined}
         />
         {/*
           Scrim. Only on desktop, where type sits over the photograph — on
@@ -85,8 +101,13 @@ export function HeroBanner({
 
       <Container
         width="shell"
-        className="relative z-10 order-1 py-[var(--space-9)] lg:order-none lg:py-[var(--space-11)]"
+        className={
+          compact
+            ? "relative z-10 order-1 py-[var(--space-7)] lg:order-none lg:py-[var(--space-9)]"
+            : "relative z-10 order-1 py-[var(--space-9)] lg:order-none lg:py-[var(--space-11)]"
+        }
       >
+        {top ? <div className="mb-[var(--space-7)]">{top}</div> : null}
         <div className="lg:max-w-[46rem]">
           {/*
             Badge. Forge carries the border and the tint; the label itself is
@@ -123,6 +144,7 @@ export function HeroBanner({
           </div>
 
           {/* §08 Hero proof. Four short points, no invented numbers. */}
+          {proof && proof.length > 0 ? (
           <ul
             className="hero-rise mt-[var(--space-7)] grid gap-x-[var(--space-6)] gap-y-3 sm:grid-cols-2"
             style={{ animationDelay: "300ms" }}
@@ -136,6 +158,16 @@ export function HeroBanner({
               </li>
             ))}
           </ul>
+          ) : null}
+
+          {footer ? (
+            <div
+              className="hero-rise mt-[var(--space-7)]"
+              style={{ animationDelay: "300ms" }}
+            >
+              {footer}
+            </div>
+          ) : null}
         </div>
       </Container>
     </section>
