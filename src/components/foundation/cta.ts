@@ -40,6 +40,10 @@ export const CTA = {
    */
   exploreFightwear: "Explore Fightwear",
   exploreClubApparel: "Explore Club Apparel",
+  exploreMMA: "Explore Custom MMA Gear",
+  exploreLifting: "Explore Custom Lifting Gear",
+  exploreProtective: "Explore Protective Gear",
+  explorePads: "Explore Pads and Bags",
   /**
    * The two audience-banner labels below drop the verb and name the
    * destination alone. §08 bans the ambiguous label, not the verbless one —

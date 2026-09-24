@@ -1,4 +1,5 @@
 import type { StaticImageData } from "next/image";
+import { CTA } from "@/components/foundation/cta";
 import boxingAthlete from "../../public/images/boxing-athlete.jpg";
 import boxingGloves from "../../public/images/boxing-gloves.jpg";
 import clubTeamKit from "../../public/images/club-team-kit.jpg";
@@ -110,6 +111,12 @@ export type Product = {
   /** The card's photograph, once it exists. */
   cardPhoto?: ProductPhoto;
   /**
+   * The card's action label, from the §08 CTA library. Kept on the product so
+   * a new page cannot ship with a blank card link — the /products grid used
+   * a separate lookup that only ever covered the first two.
+   */
+  cardAction: string;
+  /**
    * Show the exploded-glove customization block in place of the plain
    * customization table. Only for gloves: the photograph is of a glove.
    */
@@ -147,6 +154,7 @@ export const PRODUCTS: Product[] = [
     cardDescription:
       "Training, sparring, bag, competition and kids' gloves, 8–16 oz, in leather or synthetic. Choose the padding, colours, closure and logo placement.",
     cardShot: "Full glove front",
+    cardAction: CTA.exploreGloves,
     cardPhoto: {
       src: boxingGloves,
       alt: "A pair of matte black custom boxing gloves with a red crackle pattern across the shell and cuff.",
@@ -425,6 +433,7 @@ export const PRODUCTS: Product[] = [
     cardDescription:
       "Fight shorts, rashguards, compression wear, tees, hoodies and tracksuits for clubs and brands. Specify fabric, panels, colours, sizing and branding.",
     cardShot: "Coordinated product collection",
+    cardAction: CTA.exploreFightwear,
     cardPhoto: {
       src: clubTeamKit,
       alt: "Three members of one club in matching black hoodies and T-shirts, each with the same red shield on the chest.",
@@ -689,6 +698,7 @@ export const PRODUCTS: Product[] = [
     cardDescription:
       "MMA fight, sparring and grappling gloves and shin guards for MMA gyms and fightwear brands. Choose the padding, shell, colours and logo.",
     cardShot: "MMA gloves, front and palm",
+    cardAction: CTA.exploreMMA,
     cardPhoto: {
       src: mmaFighter,
       alt: "An MMA fighter throwing a jab in black open-palm MMA gloves with red wrist straps.",
@@ -888,6 +898,7 @@ export const PRODUCTS: Product[] = [
     cardDescription:
       "Lifting belts, dipping belts, straps, grips and weightlifting gloves for strength gyms and lifting brands. Choose the material, width, buckle and logo.",
     cardShot: "Lifting belt and straps",
+    cardAction: CTA.exploreLifting,
     cardPhoto: {
       src: strengthLifting,
       alt: "A lifter chalking his hands, wearing a black leather lifting belt with red stitching and black wrist wraps.",
@@ -1106,6 +1117,7 @@ export const PRODUCTS: Product[] = [
     cardDescription:
       "Head guards, body and groin protectors, shin guards, hand wraps and supports for clubs and brands. Choose the padding, colours and logo.",
     cardShot: "Head guard",
+    cardAction: CTA.exploreProtective,
     cardPhoto: {
       src: inspectionBench,
       alt: "Two inspectors checking finished head guards and gloves on a workbench.",
@@ -1307,6 +1319,7 @@ export const PRODUCTS: Product[] = [
     cardDescription:
       "Punch bags, focus mitts, Thai pads, kicking shields and training sticks for gyms and brands. Choose the shell, padding, colours and logo.",
     cardShot: "Focus mitts",
+    cardAction: CTA.explorePads,
     cardPhoto: {
       src: factoryFloor,
       alt: "Machinists at sewing benches in the Sialkot workshop, with finished gloves and pads along the walls.",
@@ -1526,7 +1539,8 @@ export type ProductCardItem = {
 /** Project a catalogue entry onto the §08 product card. */
 export function productCardItem(
   product: Product,
-  action: string,
+  /** Defaults to the product's own label — specific beats a repeated "View". */
+  action: string = product.cardAction,
 ): ProductCardItem {
   return {
     category: product.category,

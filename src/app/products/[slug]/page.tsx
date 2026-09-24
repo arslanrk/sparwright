@@ -464,7 +464,7 @@ export default async function ProductPage({
             {related.map((item) => (
               <ProductCard
                 key={item.slug}
-                item={productCardItem(item, CTA.products)}
+                item={productCardItem(item)}
               />
             ))}
           </div>

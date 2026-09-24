@@ -173,7 +173,7 @@ export default function ForClubsPage() {
           {PRODUCTS.map((product) => (
             <ProductCard
               key={product.slug}
-              item={productCardItem(product, CTA.products)}
+              item={productCardItem(product)}
             />
           ))}
         </div>
