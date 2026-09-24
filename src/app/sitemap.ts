@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { hasPortfolio } from "@/lib/portfolio";
+import { HOW_IT_WORKS_READY } from "@/lib/process";
 import { PRODUCTS, productHref } from "@/lib/products";
 import { siteUrl } from "@/lib/site";
 
@@ -33,6 +34,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/for-clubs", priority: 0.8, changeFrequency: "monthly" },
     { path: "/private-label", priority: 0.7, changeFrequency: "monthly" },
     { path: "/manufacturing", priority: 0.7, changeFrequency: "monthly" },
+    // Listed once it has its own content; until then it is noindex.
+    ...(HOW_IT_WORKS_READY
+      ? [{ path: "/how-it-works", priority: 0.7, changeFrequency: "monthly" as const }]
+      : []),
     // Listed only once it has real work in it; until then it is noindex.
     ...(hasPortfolio
       ? [{ path: "/portfolio", priority: 0.7, changeFrequency: "monthly" as const }]

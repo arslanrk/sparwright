@@ -129,9 +129,8 @@ export const PRIMARY_NAV: PrimaryNavItem[] = [
   // Manufacturing left the header for Portfolio; the page is still linked from
   // the footer's Work With Us column.
   { label: "Portfolio", href: "/portfolio" },
-  // The process stepper lives on the homepage (PR 4, §11), so this is an
-  // anchor rather than a route of its own.
-  { label: CTA.howItWorks, href: "/#how-it-works" },
+  // Its own page now, rather than the homepage anchor it used to be.
+  { label: CTA.howItWorks, href: "/how-it-works" },
 ];
 
 /**
@@ -198,7 +197,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "For Clubs & Gyms", href: "/for-clubs" },
       { label: "Private Label", href: "/private-label" },
       { label: "Manufacturing & Quality", href: "/manufacturing" },
-      { label: CTA.howItWorks, href: "/#how-it-works" },
+      { label: CTA.howItWorks, href: "/how-it-works" },
     ],
   },
   {
