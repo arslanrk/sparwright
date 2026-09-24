@@ -255,7 +255,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     heading: "Work With Us",
     links: [
-      { label: "For Clubs & Gyms", href: "/for-clubs" },
+      { label: "Gyms & Academies", href: "/for-clubs" },
       { label: "Private Label", href: "/private-label" },
       { label: "Manufacturing & Quality", href: "/manufacturing" },
       { label: CTA.howItWorks, href: "/how-it-works" },

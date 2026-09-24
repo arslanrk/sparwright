@@ -51,6 +51,34 @@ export function websiteJsonLd() {
   };
 }
 
+/** BreadcrumbList from Home through the given trail. */
+export function breadcrumbJsonLd(trail: { name: string; path: string }[]) {
+  const base = siteUrl();
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [{ name: "Home", path: "/" }, ...trail].map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      item: `${base}${item.path}`,
+    })),
+  };
+}
+
+/** FAQPage from a page's own questions — the ones it shows, never others. */
+export function faqJsonLd(faqs: { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  };
+}
+
 /** Serialised for a `<script type="application/ld+json">`, with `<` escaped. */
 export function jsonLdScript(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");

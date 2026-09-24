@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Section, type SectionTheme } from "@/components/foundation/Container";
+import { Eyebrow } from "@/components/foundation/SectionHeader";
 
 /**
  * Hero — Design System §08 Hero component, §05 Typography, §09 Image ratios.
@@ -31,11 +32,8 @@ export function Hero({
     <Section theme={theme} width="shell" as="section">
       <div className="grid items-center gap-[var(--space-7)] lg:grid-cols-[1.1fr_1fr] lg:gap-[var(--space-8)]">
         <div>
-          {eyebrow ? (
-            <p className="text-eyebrow uppercase text-[var(--color-text-muted)]">
-              {eyebrow}
-            </p>
-          ) : null}
+          {/* The same eyebrow as every section header, Forge rule and all. */}
+          {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
           <h1 className="mt-4 text-display-lg">{title}</h1>
           <p className="mt-[var(--space-5)] max-w-copy text-body-large text-[var(--color-text-secondary)]">
             {description}
