@@ -13,6 +13,11 @@ import {
   isProductionSite,
   siteUrl,
 } from "@/lib/site";
+import {
+  jsonLdScript,
+  organizationJsonLd,
+  websiteJsonLd,
+} from "@/lib/structured-data";
 import "./globals.css";
 
 // §05 — Archivo (600/700) for display, Inter (400/500/600) for body and UI.
@@ -62,11 +67,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // en-GB, matching the Open Graph locale: the site is written in British
+    // English for UK and European buyers.
     <html
-      lang="en"
+      lang="en-GB"
       className={`${archivo.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        {/* Who is behind the site, for search and AI answer engines. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: jsonLdScript([organizationJsonLd(), websiteJsonLd()]),
+          }}
+        />
         {/* §08 navigation shell — the same header, footer and sticky mobile
             action bar on every route. */}
         {/* §12 — the first stop for a keyboard user on every page. */}

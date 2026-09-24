@@ -59,7 +59,11 @@ export function HeroBanner({
           src={banner}
           alt={BANNER_ALT}
           fill
-          priority
+          // The LCP image. Next 16 deprecated `priority`, which no longer
+          // emitted a fetch priority at all; this is its documented
+          // replacement for an above-the-fold image.
+          loading="eager"
+          fetchPriority="high"
           placeholder="blur"
           quality={80}
           sizes="100vw"

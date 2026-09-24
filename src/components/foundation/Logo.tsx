@@ -141,7 +141,8 @@ export function Logo({
         alt={decorative ? "" : label}
         width={renderedWidth}
         height={renderedHeight}
-        priority={priority}
+        // `priority` is deprecated in Next 16; above the fold, load eagerly.
+        loading={priority ? "eager" : undefined}
         // No `sizes`: this is a fixed-size image, so Next emits a tight 1x/2x
         // srcSet from the width. With `sizes` it emits every device width up to
         // 3840 and points the no-JS fallback `src` at the largest — an upscale
