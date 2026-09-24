@@ -21,6 +21,8 @@ import type { FaqGroup } from "@/lib/faq";
 type FAQSectionProps = {
   groups: FaqGroup[];
   eyebrow: string;
+  /** Section number on its page, shown in the eyebrow. */
+  index?: string;
   title: string;
   description: string;
   theme?: SectionTheme;
@@ -31,6 +33,7 @@ type FAQSectionProps = {
 export function FAQSection({
   groups,
   eyebrow,
+  index,
   title,
   description,
   theme = "white",
@@ -59,7 +62,7 @@ export function FAQSection({
           )}
         >
           <div className="order-1">
-            <SectionHeader eyebrow={eyebrow} title={title} description={description} />
+            <SectionHeader eyebrow={eyebrow} index={index} title={title} description={description} />
           </div>
           <AskCard action={action} className="order-3 lg:mt-[var(--space-7)]" />
         </div>

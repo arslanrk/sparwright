@@ -55,6 +55,8 @@ export type ExpertiseItem = {
 type ExpertiseGridProps = {
   theme?: SectionTheme;
   eyebrow?: string;
+  /** Section number on its page, shown in the eyebrow. */
+  index?: string;
   title: string;
   description?: string;
   items: ExpertiseItem[];
@@ -66,6 +68,7 @@ type ExpertiseGridProps = {
 export function ExpertiseGrid({
   theme = "light",
   eyebrow,
+  index,
   title,
   description,
   items,
@@ -76,6 +79,7 @@ export function ExpertiseGrid({
     <Section theme={theme} width="work">
       <SectionHeader
         eyebrow={eyebrow}
+        index={index}
         title={title}
         description={description}
       />

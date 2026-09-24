@@ -32,6 +32,8 @@ export type WhyUsReason = {
 type WhyUsProps = {
   theme?: SectionTheme;
   eyebrow: string;
+  /** Section number on its page, shown in the eyebrow. */
+  index?: string;
   title: string;
   description: string;
   reasons: WhyUsReason[];
@@ -40,6 +42,7 @@ type WhyUsProps = {
 export function WhyUs({
   theme = "white",
   eyebrow,
+  index,
   title,
   description,
   reasons,
@@ -47,7 +50,7 @@ export function WhyUs({
   return (
     <Section theme={theme} width="work">
       <div className="mx-auto max-w-[48rem] text-center [&_p]:mx-auto">
-        <SectionHeader eyebrow={eyebrow} title={title} description={description} />
+        <SectionHeader eyebrow={eyebrow} index={index} title={title} description={description} />
       </div>
 
       <ul className="mx-auto mt-[var(--space-8)] grid max-w-[64rem] gap-x-[var(--space-8)] gap-y-[var(--space-7)] md:grid-cols-2">

@@ -18,7 +18,7 @@ import { ProductShowcase } from "@/components/content/ProductShowcase";
 import { WhyUs, type WhyUsReason } from "@/components/content/WhyUs";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
-import { SectionHeader } from "@/components/foundation/SectionHeader";
+import { Eyebrow, SectionHeader } from "@/components/foundation/SectionHeader";
 import { TextLink } from "@/components/foundation/TextLink";
 import { CTA } from "@/components/foundation/cta";
 import Image from "next/image";
@@ -397,6 +397,7 @@ export default function Home() {
         */}
         <SectionHeader
           eyebrow="Custom product range"
+          index="01"
           title="Gloves, fightwear, lifting gear and club apparel."
           description="Custom fight gear, protective equipment, strength gear and team apparel — kids' sizes and martial arts uniforms included — from custom MMA gloves to team kit, made to your specification."
         />
@@ -424,8 +425,10 @@ export default function Home() {
           band. Straight after the range, because "is this for me?" follows
           "do you make my thing?".
         */}
-        <h2 className="text-eyebrow uppercase text-[var(--color-text-muted)]">
-          Custom manufacturing for gyms, clubs and private label brands
+        <h2>
+          <Eyebrow as="span" index="02">
+            Custom manufacturing for gyms, clubs and private label brands
+          </Eyebrow>
         </h2>
         <div className="mt-[var(--space-6)] grid gap-[var(--space-5)] lg:grid-cols-2">
           {AUDIENCES.map((audience) => (
@@ -447,6 +450,7 @@ export default function Home() {
       <WhyUs
         theme="light"
         eyebrow="Why Sparwright"
+        index="03"
         title="Why gyms and brands choose Sparwright."
         description="A custom boxing gloves and fightwear manufacturer in Sialkot, Pakistan, working to your specification for clubs and private label brands across the UK and Europe."
         reasons={WHY_US}
@@ -462,6 +466,7 @@ export default function Home() {
         <div className="grid gap-[var(--space-6)] lg:grid-cols-[1.2fr_1fr] lg:items-center">
           <SectionHeader
             eyebrow="Customization"
+            index="04"
             title="Custom logos, colours and construction — see it before it's made."
             description="Send your logo and what you need. We come back with a mockup of your product, then a physical sample for you to sign off."
           />
@@ -499,6 +504,7 @@ export default function Home() {
         id="how-it-works"
         theme="white"
         eyebrow="How it works"
+        index="05"
         title="How custom gloves, fightwear and apparel are manufactured."
         description="Custom boxing gloves, fightwear, lifting gear and club apparel move through the same five stages — your specification, an approved pre-production sample, bulk production with quality control recorded against that sample, then packing and export documentation. You sign off each stage before the next begins."
         stages={PROCESS_STAGES}
@@ -515,6 +521,7 @@ export default function Home() {
       <ExpertiseGrid
         theme="light"
         eyebrow="Our expertise"
+        index="06"
         title="Fight gear manufacturing, from tech pack to bulk order."
         description="Six capabilities that take an idea into volume production — a tech pack written or worked to, patterns digitised and graded across the size run, laser and die cutting, sublimation and embroidery, industrial assembly, and testing against the sample you approved."
         items={EXPERTISE}
@@ -556,6 +563,7 @@ export default function Home() {
             {/* §10 headline formula, service + buyer. */}
             <SectionHeader
               eyebrow="About Sparwright"
+              index="07"
               title="A custom fight gear manufacturer for clubs and fightwear brands."
             />
             {/* Spaced with an explicit margin on the second paragraph, which
@@ -624,6 +632,7 @@ export default function Home() {
       <FAQSection
         theme="light"
         eyebrow="Questions"
+        index="08"
         title="Custom fight gear manufacturing, answered."
         description="Minimums, samples, branding, materials, lead times and shipping — grouped by where you are in the order."
         groups={FAQ_GROUPS}

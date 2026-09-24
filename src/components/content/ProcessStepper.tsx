@@ -41,6 +41,8 @@ type ProcessStepperProps = {
   /** Defaults to the light surface; pass "white" where the run calls for it. */
   theme?: SectionTheme;
   eyebrow?: string;
+  /** Section number on its page, shown in the eyebrow. */
+  index?: string;
   title: string;
   description?: string;
   stages: ProcessStage[];
@@ -50,6 +52,7 @@ export function ProcessStepper({
   id,
   theme = "light",
   eyebrow,
+  index,
   title,
   description,
   stages,
@@ -58,6 +61,7 @@ export function ProcessStepper({
     <Section id={id} theme={theme} width="work">
       <SectionHeader
         eyebrow={eyebrow}
+        index={index}
         title={title}
         description={description}
       />
