@@ -187,6 +187,11 @@
   }
 }
 
+/* No bar rendered (the quote page hides it), so nothing reserves its space. */
+:root:not(:has([data-action-bar])) {
+  --action-bar-height: 0rem;
+}
+
 @layer base {
   html {
     /* Anchor targets must clear the sticky header. */

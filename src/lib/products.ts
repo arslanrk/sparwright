@@ -891,7 +891,7 @@ export const PRODUCTS: Product[] = [
       description:
         "Custom leather and nylon lifting belts, dipping belts, lifting straps, grips and weightlifting gloves made in Sialkot, Pakistan — with your logo.",
     },
-    quoteProduct: "Lifting belts and gear",
+    quoteProduct: "Lifting Belts and Gear",
     category: "Strength and lifting",
     summary:
       "Leather and nylon lifting belts, dipping belts, lifting straps, grips and weightlifting gloves, made with your branding, colours and fit.",
@@ -1110,7 +1110,7 @@ export const PRODUCTS: Product[] = [
       description:
         "Custom head guards, body and groin protectors, shin guards, hand wraps and supports made in Sialkot, Pakistan — in your colours, with your logo.",
     },
-    quoteProduct: "Head guards and protective gear",
+    quoteProduct: "Protective Gear",
     category: "Protective gear",
     summary:
       "Head guards, chest and body protectors, groin and shin guards, hand wraps, inner gloves and supports, made in your colours with your logo.",

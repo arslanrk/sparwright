@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/foundation/Button";
 import { Logo } from "@/components/foundation/Logo";
@@ -299,10 +300,17 @@ function DrawerLink({
 /**
  * Sticky bottom action bar (§08). Mobile only — the desktop header already
  * carries the same action.
+ *
+ * Not on the quote page: there it pointed at the page the buyer was already
+ * on, and covered the form's own buttons. `data-action-bar` is what
+ * globals.css checks to release the space the bar reserves.
  */
 export function MobileActionBar() {
+  const pathname = usePathname();
+  if (pathname === "/quote") return null;
   return (
     <div
+      data-action-bar
       data-theme="white"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--color-border)] bg-[var(--color-bg)] px-5 py-3 xl:hidden"
     >

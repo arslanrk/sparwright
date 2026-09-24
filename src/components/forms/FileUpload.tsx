@@ -157,6 +157,36 @@ export function FileUpload({
             : "border-[var(--color-border-strong)] bg-[var(--color-white)]",
         )}
       >
+        {/* The drop prompt, so the dashed box says what it is for. Hidden once
+            a file is attached, when the success row says what is there. */}
+        {value.status !== "success" ? (
+          <div className="mb-[var(--space-4)] flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-forge-100 text-forge-700"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="size-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 15V4M7.5 8.5 12 4l4.5 4.5" />
+                <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+              </svg>
+            </span>
+            <p className="text-small text-[var(--color-text-secondary)]">
+              <span className="font-semibold text-[var(--color-text)]">
+                Drop your logo here
+              </span>{" "}
+              or choose a file — up to {formatBytes(MAX_ARTWORK_BYTES)}.
+            </p>
+          </div>
+        ) : null}
+
         {/* Always present, whatever the state — §12 requires the upload to work
             without drag-and-drop, and a keyboard user reaches this input. */}
         <input

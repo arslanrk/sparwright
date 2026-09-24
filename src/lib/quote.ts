@@ -7,16 +7,25 @@
  * two-stage workflow rather than a generic name/email/message contact form.
  */
 
-/** §08 product choices, verbatim. */
+/**
+ * §08 product choices, extended to every product line. The §08 eight covered
+ * gloves, pads and apparel only; the lifting, protective gear and punch bag
+ * pages sent buyers here with nothing they could select. Each product page's
+ * `quoteProduct` must be one of these, so its link pre-selects it.
+ */
 export const PRODUCT_CHOICES = [
   "Boxing Gloves",
   "MMA Gloves",
   "Focus Mitts and Pads",
+  "Punch Bags",
+  "Protective Gear",
+  "Lifting Belts and Gear",
   "Fight Shorts",
   "Rashguards",
   "Club T-Shirts",
   "Hoodies and Tracksuits",
   "Multiple Products",
+  "Something Else",
 ] as const;
 
 /** §08 quantity choices, verbatim. "Not sure" is first: it is a real answer. */
@@ -27,16 +36,6 @@ export const QUANTITY_CHOICES = [
   "50–99",
   "100–249",
   "250+",
-] as const;
-
-/**
- * §08 step 1 opens with "Category". These are the catalogue pages plus an
- * escape hatch, so an enquiry that does not fit is still answerable.
- */
-export const CATEGORY_CHOICES = [
-  "Custom Boxing Gloves",
-  "Fightwear and Club Apparel",
-  "Something else",
 ] as const;
 
 export const INTENDED_USES = [
@@ -111,10 +110,14 @@ export const EMPTY_QUOTE: QuoteRequest = {
 
 /**
  * Answers carried in from a link, so the buyer does not have to say twice what
- * they clicked on. `?product=` comes from the Products mega menu: a name that
- * is one of the §08 product types selects it; anything else is written into
- * "Reference products" — whose own hint asks for a product name — under the
- * "Something else" category. Trimmed and capped: it is URL input.
+ * they clicked on. `?product=` comes from the product pages and the mega menu:
+ * a name that is one of the product types selects it (ignoring case); anything
+ * else selects "Something Else" and is written into "Reference products",
+ * whose own hint asks for a product name. Trimmed and capped: it is URL input.
+ *
+ * `category` stays in the request for the lead record, but the form no longer
+ * asks for it: once the product types covered every line, a category
+ * dropdown above them asked the same question twice.
  */
 export function quotePrefill(
   product: string | string[] | undefined,
@@ -124,10 +127,20 @@ export function quotePrefill(
     .slice(0, 120);
   if (!name) return {};
 
-  if ((PRODUCT_CHOICES as readonly string[]).includes(name)) {
-    return { productType: name };
-  }
-  return { category: "Something else", references: name };
+  const match = PRODUCT_CHOICES.find(
+    (choice) => choice.toLowerCase() === name.toLowerCase(),
+  );
+  if (match) return { productType: match };
+  return { productType: "Something Else", references: name };
+}
+
+/** Which entry point the buyer came through — `?intent=mockup` or a quote. */
+export type QuoteIntent = "mockup" | "quote";
+
+export function quoteIntent(intent: string | string[] | undefined): QuoteIntent {
+  return (Array.isArray(intent) ? intent[0] : intent) === "mockup"
+    ? "mockup"
+    : "quote";
 }
 
 export type QuoteField = keyof QuoteRequest;

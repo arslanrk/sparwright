@@ -33,6 +33,12 @@ type RadioCardGroupProps = {
   onChange: (value: string) => void;
   /** Cards per row at the largest breakpoint. */
   columns?: 2 | 3 | 4;
+  /**
+   * Tighter cards, two to a row even on a phone — for a long list of short
+   * labels (product types, quantity ranges) that would otherwise run a
+   * screen and a half at one per row.
+   */
+  compact?: boolean;
   className?: string;
 };
 
@@ -40,6 +46,12 @@ const COLUMNS = {
   2: "sm:grid-cols-2",
   3: "sm:grid-cols-2 lg:grid-cols-3",
   4: "sm:grid-cols-2 lg:grid-cols-4",
+} as const;
+
+const COMPACT_COLUMNS = {
+  2: "grid-cols-2",
+  3: "grid-cols-2 sm:grid-cols-3",
+  4: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
 } as const;
 
 export function RadioCardGroup({
@@ -51,6 +63,7 @@ export function RadioCardGroup({
   options,
   onChange,
   columns = 3,
+  compact = false,
   className,
 }: RadioCardGroupProps) {
   const id = useId();
@@ -83,16 +96,26 @@ export function RadioCardGroup({
         </p>
       ) : null}
 
-      <div className={cn("mt-3 grid gap-3", COLUMNS[columns])}>
+      <div
+        className={cn(
+          "mt-3 grid",
+          compact ? "gap-2" : "gap-3",
+          compact ? COMPACT_COLUMNS[columns] : COLUMNS[columns],
+        )}
+      >
         {items.map((item) => {
           const selected = value === item.value;
           return (
             <label
               key={item.value}
               className={cn(
-                "group flex cursor-pointer items-start gap-3 rounded-md border bg-[var(--color-white)] p-4 transition-colors",
+                "group flex cursor-pointer rounded-md border bg-[var(--color-white)] transition-colors",
+                compact ? "items-center gap-2.5 px-3 py-3" : "items-start gap-3 p-4",
                 selected
-                  ? "border-2 border-[var(--color-action)] p-[calc(1rem-1px)]"
+                  ? cn(
+                      "border-2 border-[var(--color-action)] bg-forge-100/40",
+                      compact ? "px-[calc(0.75rem-1px)] py-[calc(0.75rem-1px)]" : "p-[calc(1rem-1px)]",
+                    )
                   : "border-[var(--color-border-strong)] hover:border-[var(--color-text)]",
                 // The visible focus ring belongs on the card, not the hidden input.
                 "has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-[3px] has-[:focus-visible]:outline-[var(--color-ink-950)]",
@@ -106,9 +129,14 @@ export function RadioCardGroup({
                 onChange={() => onChange(item.value)}
                 className="sr-only"
               />
-              <RadioDot selected={selected} />
-              <span>
-                <span className="block font-body text-body font-medium text-[var(--color-text)]">
+              <RadioDot selected={selected} className={compact ? undefined : "mt-0.5"} />
+              <span className="min-w-0">
+                <span
+                  className={cn(
+                    "block font-body font-medium text-[var(--color-text)]",
+                    compact ? "text-small leading-snug" : "text-body",
+                  )}
+                >
                   {item.value}
                 </span>
                 {item.description ? (
@@ -127,12 +155,13 @@ export function RadioCardGroup({
   );
 }
 
-function RadioDot({ selected }: { selected: boolean }) {
+function RadioDot({ selected, className }: { selected: boolean; className?: string }) {
   return (
     <span
       aria-hidden="true"
       className={cn(
-        "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border",
+        "flex size-5 shrink-0 items-center justify-center rounded-full border",
+        className,
         selected
           ? "border-[var(--color-action)]"
           : "border-[var(--color-text-muted)]",
