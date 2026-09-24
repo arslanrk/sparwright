@@ -23,10 +23,47 @@ export type UseCase = { title: string; description: string };
 
 export type ProductFaq = { question: string; answer: string };
 
+/** One type within a product line — a glove built for one job. */
+export type ProductType = {
+  title: string;
+  description: string;
+  /** A short spec line, e.g. "Typically 14–16 oz". */
+  spec?: string;
+};
+
+/** One side of a material comparison. */
+export type MaterialOption = {
+  name: string;
+  /** Who it suits, in a line. */
+  bestFor: string;
+  points: string[];
+};
+
 export type Product = {
   slug: string;
   /** Navigation and card label. */
   name: string;
+  /**
+   * The product in running text, lower case — "boxing gloves". Section
+   * headings are built from it so they carry the search term, not "these".
+   */
+  noun?: string;
+  /** The page's h1, when it should say more than the name. */
+  heading?: string;
+  /** Search result title and description, when they differ from the page. */
+  seo?: { title: string; description: string };
+  /** The §08 quote-form product type this page pre-selects. */
+  quoteProduct?: string;
+  /** The types within the line, and what each is built for. */
+  types?: { title: string; description: string; items: ProductType[] };
+  /** A side-by-side of the materials a buyer chooses between. */
+  materialOptions?: {
+    title: string;
+    description: string;
+    options: MaterialOption[];
+  };
+  /** The closing band's heading and line. */
+  closing?: { title: string; description: string };
   /** Short uppercase context label on the product card (§08). */
   category: string;
   /** §11 product hero: product category, then what is customizable. */
@@ -92,12 +129,19 @@ export const PRODUCTS: Product[] = [
   {
     slug: "custom-boxing-gloves",
     name: "Custom Boxing Gloves",
+    noun: "custom boxing gloves",
+    heading: "Custom boxing gloves, made to your specification.",
+    seo: {
+      title: "Custom Boxing Gloves Manufacturer in Pakistan",
+      description:
+        "Custom boxing gloves made in Sialkot, Pakistan — training, sparring, bag, competition and kids' gloves, 8–16 oz, leather or synthetic, with your logo.",
+    },
+    quoteProduct: "Boxing Gloves",
     category: "Boxing gloves",
-    // §11 product hero example, verbatim.
     summary:
-      "Training, sparring and bag gloves manufactured with your preferred materials, branding, colours and closure specifications.",
+      "Training, sparring, bag, competition and kids' gloves from 8 to 16 oz, in genuine leather or synthetic, with your logo, colours and closure.",
     cardDescription:
-      "Training, sparring and bag gloves for clubs and fightwear brands. Choose the shell material, padding profile, colours, closure and logo placement.",
+      "Training, sparring, bag, competition and kids' gloves, 8–16 oz, in leather or synthetic. Choose the padding, colours, closure and logo placement.",
     cardShot: "Full glove front",
     gallery: [
       {
@@ -126,7 +170,77 @@ export const PRODUCTS: Product[] = [
       },
     ],
     overview:
-      "Gloves are made to the specification you approve: shell material, padding profile, closure, colourway and branding are all decided before sampling, and bulk production is checked against the sample you signed off.",
+      "Every glove is made to a specification you approve. Shell, padding, weight, closure, colourway and branding are decided before sampling, and bulk production is checked against the sample you signed off. Clubs order across member sizes; brands develop their own line under their own label.",
+    /*
+     * Typical weights are stated as typical — they are the norms buyers search
+     * against, not a limit on what we make. Competition gloves carry a note
+     * rather than a claim: sanctioned bouts need a governing body's approval,
+     * which non-negotiable #5 rules out asserting.
+     */
+    types: {
+      title: "Boxing gloves for every kind of session",
+      description:
+        "The glove type decides the padding, the weight and the closure, so it is the first thing we confirm with you.",
+      items: [
+        {
+          title: "Training gloves",
+          description:
+            "All-round gloves for club members — bag, pads and light partner work in one pair.",
+          spec: "Typically 10–16 oz",
+        },
+        {
+          title: "Sparring gloves",
+          description:
+            "Softer, more even padding to protect a training partner in controlled sparring.",
+          spec: "Typically 14–16 oz",
+        },
+        {
+          title: "Bag gloves",
+          description:
+            "Denser padding and a firmer wrist for repeated heavy-bag and pad sessions.",
+          spec: "Typically 10–14 oz",
+        },
+        {
+          title: "Competition gloves",
+          description:
+            "Lighter, compact gloves for bouts, usually lace-up. Check your governing body's rules for sanctioned events.",
+          spec: "Typically 8–10 oz",
+        },
+        {
+          title: "Kids' boxing gloves",
+          description:
+            "Smaller sizes and lighter padding for junior members, in the same colours as the club's adult kit.",
+          spec: "Sized by age and hand",
+        },
+      ],
+    },
+    materialOptions: {
+      title: "Genuine leather or synthetic shell",
+      description:
+        "Both are made to the same construction and checked against the same sample. The choice is about feel, lifespan and budget.",
+      options: [
+        {
+          name: "Genuine leather",
+          bestFor: "Premium lines, heavy daily use and long-life club gloves.",
+          points: [
+            "Moulds to the hand and softens with use",
+            "The most durable choice for repeated heavy-bag work",
+            "Breathes better than most synthetics",
+            "Higher cost per pair",
+          ],
+        },
+        {
+          name: "Synthetic (PU) leather",
+          bestFor: "Member gloves, starter ranges and vivid colourways.",
+          points: [
+            "Lower cost per pair at the same construction",
+            "A consistent surface for print and bright colours",
+            "Wipes clean easily",
+            "No animal leather",
+          ],
+        },
+      ],
+    },
     useCases: [
       {
         title: "Club training",
@@ -144,7 +258,7 @@ export const PRODUCTS: Product[] = [
           "Gloves specified for repeated bag and pad sessions rather than sparring.",
       },
       {
-        title: "Private-label retail",
+        title: "Private label retail",
         description:
           "Brand-owned gloves with your labels, packaging and retained specification for reorders.",
       },
@@ -153,7 +267,11 @@ export const PRODUCTS: Product[] = [
       {
         label: "Shell",
         value:
-          "Synthetic or leather shell, confirmed against your specification before sampling.",
+          "Genuine leather or synthetic (PU) leather, confirmed against your specification before sampling.",
+      },
+      {
+        label: "Weight",
+        value: "8 to 16 oz, set by the glove type and confirmed on the sample.",
       },
       {
         label: "Padding",
@@ -166,23 +284,19 @@ export const PRODUCTS: Product[] = [
       },
       {
         label: "Closure",
-        value: "Hook-and-loop or lace closure, specified per order.",
-      },
-      {
-        label: "Stitching",
-        value:
-          "Panel stitching and reinforcement points verified against the approved sample.",
+        value: "Hook-and-loop or lace-up, specified per order.",
       },
       {
         label: "Sizes",
-        value: "Size range confirmed with your quantity split before bulk.",
+        value:
+          "Adult and kids' sizes, with the split confirmed against your quantity before bulk.",
       },
     ],
     customization: [
       {
         label: "Branding",
         value:
-          "Logo placement on the wrist, cuff or palm by print, patch or embroidery where suitable.",
+          "Logo on the cuff, back of the hand or palm, by print, patch or embroidery where suitable.",
       },
       {
         label: "Colour",
@@ -211,19 +325,63 @@ export const PRODUCTS: Product[] = [
       "Count, assortment, inner packing and carton details recorded.",
       "Inspection record retained before dispatch.",
     ],
+    /*
+     * Glove-specific, not the site-wide set: the homepage already answers the
+     * general questions, and repeating them here word for word is duplicate
+     * content. MOQ and lead time still commit to no number (#6).
+     */
     faqs: [
-      SHARED_FAQS.moq,
-      SHARED_FAQS.logo,
-      SHARED_FAQS.sample,
-      SHARED_FAQS.reference,
       {
-        question: "What materials are available?",
+        question: "What boxing glove weights do you make?",
         answer:
-          "Shell, padding and lining options are confirmed against your intended use and budget at specification stage, then fixed by the sample you approve.",
+          "From 8 to 16 oz. The weight follows the glove type — sparring gloves are usually 14–16 oz and competition gloves 8–10 oz — and is confirmed on the sample before bulk production.",
       },
-      SHARED_FAQS.leadTime,
-      SHARED_FAQS.reorder,
+      {
+        question: "Leather or synthetic — which should we choose?",
+        answer:
+          "Genuine leather moulds to the hand and lasts longest under heavy daily use. Synthetic (PU) leather costs less per pair and takes bright colours and print well. Both are built to the same construction and checked against the same approved sample.",
+      },
+      {
+        question: "Do you make kids' boxing gloves?",
+        answer:
+          "Yes. Kids' gloves are made to order like the adult range, in smaller sizes with lighter padding, and can match your club's adult kit.",
+      },
+      {
+        question: "Hook-and-loop or lace-up closure?",
+        answer:
+          "Hook-and-loop is quicker to put on and suits training and club use. Lace-up gives a tighter, more even fit at the wrist and is usually chosen for competition. Both are available and specified per order.",
+      },
+      {
+        question: "Where can our logo go on a boxing glove?",
+        answer:
+          "On the cuff, the back of the hand or the palm, by print, embroidery or patch depending on the shell and the design. Placement is confirmed on your mockup before sampling.",
+      },
+      {
+        question: "What is the minimum order for custom boxing gloves?",
+        answer:
+          "It depends on the shell, the branding method and how many colourways you want. Send an approximate quantity and we confirm the minimum for your specification before you commit to anything.",
+      },
+      {
+        question: "Do you make a sample glove before bulk production?",
+        answer:
+          "Yes — a mockup first, then a physical sample glove. Bulk production starts only once you have approved it, and the finished order is checked against it.",
+      },
+      {
+        question: "How long does a custom glove order take?",
+        answer:
+          "It depends on the quantity, the shell and the branding. Dates for sampling and bulk production are confirmed in writing with your quote.",
+      },
+      {
+        question: "Can we reorder the same gloves later?",
+        answer:
+          "Yes. The approved specification, artwork and sample record stay on file, so a reorder matches the first run rather than being developed again.",
+      },
     ],
+    closing: {
+      title: "Tell us about your gloves.",
+      description:
+        "Send the glove type, weight, shell, colours, logo and a rough quantity. A person replies with anything left to confirm.",
+    },
     related: ["fightwear-club-apparel"],
   },
   {
