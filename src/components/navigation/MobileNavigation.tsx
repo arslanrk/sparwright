@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/foundation/Button";
 import { Logo } from "@/components/foundation/Logo";
 import { cn } from "@/lib/cn";
@@ -38,6 +38,9 @@ export function MobileNavigation({
   onClose,
 }: MobileNavigationProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  // Which section's sub-pages are open — one at a time, none by default.
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const sectionIdBase = useId();
 
   // The page behind a modal drawer must not scroll.
   useEffect(() => {
@@ -104,19 +107,55 @@ export function MobileNavigation({
       >
         <nav aria-label="Primary">
           <ul className="flex flex-col">
-            {PRIMARY_NAV.map((item) => (
+            {PRIMARY_NAV.map((item, i) => {
+              const panel = `${sectionIdBase}-${i}`;
+              const isOpen = expanded === item.href;
+              return (
               <li
                 key={item.href}
                 className="border-b border-[var(--color-border)] py-1"
               >
-                <DrawerLink
-                  link={item}
-                  pathname={pathname}
-                  level="primary"
-                  onNavigate={onClose}
-                />
+                {/*
+                  A section's name still links to its own page; the chevron
+                  beside it opens its sub-pages. Collapsed by default, and one
+                  at a time, so every top-level item fits on the first screen.
+                */}
+                <div className="flex items-center justify-between gap-3">
+                  <DrawerLink
+                    link={item}
+                    pathname={pathname}
+                    level="primary"
+                    onNavigate={onClose}
+                  />
+                  {item.children ? (
+                    <button
+                      type="button"
+                      aria-expanded={isOpen}
+                      aria-controls={panel}
+                      aria-label={`${isOpen ? "Hide" : "Show"} ${item.label} pages`}
+                      onClick={() => setExpanded(isOpen ? null : item.href)}
+                      className="-mr-2 flex size-12 shrink-0 items-center justify-center rounded-md text-[var(--color-text)] transition-colors hover:bg-[var(--color-surface)]"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 16 16"
+                        className={cn(
+                          "size-4 transition-transform duration-200",
+                          isOpen && "rotate-180",
+                        )}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M4 6l4 4 4-4" />
+                      </svg>
+                    </button>
+                  ) : null}
+                </div>
                 {item.children ? (
-                  <>
+                  <div id={panel} hidden={!isOpen} className="pb-2">
                     <ul className="flex flex-col">
                       {item.children.map((child) => (
                         <li key={child.href}>
@@ -133,10 +172,11 @@ export function MobileNavigation({
                     {item.menu === "mega" ? (
                       <CatalogueSections onNavigate={onClose} />
                     ) : null}
-                  </>
+                  </div>
                 ) : null}
               </li>
-            ))}
+              );
+            })}
           </ul>
         </nav>
 

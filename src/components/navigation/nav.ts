@@ -30,18 +30,19 @@ export type NavLink = {
 export type PrimaryNavItem = NavLink & {
   /** Renders as a dropdown trigger in the desktop header (§08). */
   children?: NavLink[];
-  /** "mega" for the Products catalogue; "list" for a plain dropdown. */
+  /** "mega" for the Products catalogue; "list" for a section of pages. */
   menu?: "mega" | "list";
+  /** One line introducing a "list" section, shown beside its pages. */
+  intro?: string;
 };
 
-const sectionLinks = (section: SiteSection): NavLink[] => [
-  ...section.pages.map(({ label, href, description }) => ({
+/** A section's pages. The hub is the trigger's own href, not a child. */
+const sectionLinks = (section: SiteSection): NavLink[] =>
+  section.pages.map(({ label, href, description }) => ({
     label,
     href,
     description,
-  })),
-  { label: section.hub.label, href: section.hub.href },
-];
+  }));
 
 /**
  * The Products dropdown (§08), built from the catalogue so the menu can only
@@ -174,12 +175,21 @@ export const PRIMARY_NAV: PrimaryNavItem[] = [
   { label: "Gyms & Academies", href: "/for-clubs" },
   { label: "Private Label", href: "/private-label" },
   { label: "Portfolio", href: "/portfolio" },
-  { label: "About Us", href: ABOUT.hub.href, children: sectionLinks(ABOUT), menu: "list" },
+  {
+    label: "About Us",
+    href: ABOUT.hub.href,
+    children: sectionLinks(ABOUT),
+    menu: "list",
+    intro:
+      "An OEM and private label manufacturer in Sialkot, Pakistan — how we work, what the workshop can do, and how orders ship.",
+  },
   {
     label: "Resources",
     href: RESOURCES.hub.href,
     children: sectionLinks(RESOURCES),
     menu: "list",
+    intro:
+      "Guides for gyms, clubs and brands planning a custom order — sizing, minimums and why we make in Sialkot.",
   },
   { label: CONTACT_PAGE.label, href: CONTACT_PAGE.href },
 ];

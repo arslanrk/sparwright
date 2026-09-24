@@ -151,9 +151,10 @@ function NavItemLink({ item, pathname }: { item: NavLink; pathname: string }) {
  * five columns (`MEGA_MENU`); the full range and the brief sit in a bar
  * underneath.
  *
- * The same component draws a plain list dropdown for a `menu: "list"` item
- * (About Us): same open, close and keyboard behaviour, but a narrow panel that
- * hangs from its trigger, so here the group is positioned.
+ * The same component draws a `menu: "list"` section (About Us, Resources) in
+ * the same full-width panel, so every dropdown in the header looks alike: the
+ * section's heading and intro on the left, its pages in a grid, and the same
+ * footer bar with the brief.
  */
 function NavMenu({
   item,
@@ -181,7 +182,6 @@ function NavMenu({
   return (
     <div
       ref={groupRef}
-      className={list ? "relative" : undefined}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       onKeyDown={(event) => {
@@ -222,19 +222,51 @@ function NavMenu({
         <div
           id={panelId}
           hidden={!open}
-          className="absolute left-0 top-full w-[22rem] pt-2"
+          className="absolute inset-x-0 top-full border-y border-[var(--color-border)] bg-[var(--color-white)] shadow-[var(--shadow-overlay)]"
         >
-          <ul className="rounded-lg border border-[var(--color-border)] bg-[var(--color-white)] p-2 shadow-[var(--shadow-overlay)]">
-            {(item.children ?? []).map((child) => (
-              <li key={child.href}>
-                <DropdownLink
-                  link={child}
-                  pathname={pathname}
-                  onNavigate={() => setOpen(false)}
-                />
-              </li>
-            ))}
-          </ul>
+          <Container
+            width="shell"
+            className="max-h-[calc(100dvh-var(--header-height))] overflow-y-auto py-[var(--space-5)]"
+          >
+            <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,3fr)] gap-x-[var(--space-7)]">
+              {/* The section itself: what it is, and its hub page. */}
+              <div>
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="group/heading flex items-center justify-between gap-2 border-b-2 border-forge-600 pb-2 font-body text-eyebrow uppercase text-forge-700 transition-colors hover:text-ink-950"
+                >
+                  {item.label}
+                  <MenuArrow />
+                </Link>
+                {item.intro ? (
+                  <p className="mt-[var(--space-4)] text-small text-[var(--color-text-secondary)]">
+                    {item.intro}
+                  </p>
+                ) : null}
+              </div>
+
+              {/* Its pages, as the catalogue lists products. */}
+              <ul className="grid grid-cols-3 gap-x-[var(--space-6)] gap-y-[var(--space-2)]">
+                {(item.children ?? []).map((child) => (
+                  <li key={child.href}>
+                    <DropdownLink
+                      link={child}
+                      pathname={pathname}
+                      onNavigate={() => setOpen(false)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-[var(--space-5)] flex items-center gap-[var(--space-4)] border-t border-[var(--color-border)] pt-[var(--space-4)]">
+              <p className="flex-1 text-small text-[var(--color-text-muted)]">
+                Every order is made to a specification you approve.
+              </p>
+              <BriefLink onNavigate={() => setOpen(false)} />
+            </div>
+          </Container>
         </div>
       ) : (
       <div
@@ -260,18 +292,7 @@ function NavMenu({
                         className="group/heading flex items-center justify-between gap-2 border-b-2 border-forge-600 pb-2 font-body text-eyebrow uppercase text-forge-700 transition-colors hover:text-ink-950"
                       >
                         {group.heading}
-                        <svg
-                          aria-hidden="true"
-                          viewBox="0 0 16 16"
-                          className="size-3.5 shrink-0 transition-transform motion-safe:group-hover/heading:translate-x-0.5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
-                        </svg>
+                        <MenuArrow />
                       </Link>
                     ) : (
                       <p className="border-b-2 border-forge-600 pb-2 font-body text-eyebrow uppercase text-forge-700">
@@ -313,35 +334,60 @@ function NavMenu({
                 />
               </li>
             </ul>
-            <Link
-              href="/quote"
-              onClick={() => setOpen(false)}
-              className="group shrink-0 rounded-lg bg-ink-950 px-5 py-3.5 text-white transition-colors hover:bg-carbon-900"
-            >
-              <span className="block text-eyebrow uppercase text-mist-300">
-                Not listed?
-              </span>
-              <span className="mt-0.5 flex items-center gap-2 font-body text-[0.9375rem] font-semibold">
-                {CTA.brief}
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 16 16"
-                  className="size-4 transition-transform motion-safe:group-hover:translate-x-0.5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
-                </svg>
-              </span>
-            </Link>
+            <BriefLink onNavigate={() => setOpen(false)} />
           </div>
         </Container>
       </div>
       )}
     </div>
+  );
+}
+
+/** The arrow on a panel heading that links to its own page. */
+function MenuArrow() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 16 16"
+      className="size-3.5 shrink-0 transition-transform motion-safe:group-hover/heading:translate-x-0.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
+    </svg>
+  );
+}
+
+/** The way out of any panel for a product that is not listed. */
+function BriefLink({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <Link
+      href="/quote"
+      onClick={onNavigate}
+      className="group shrink-0 rounded-lg bg-ink-950 px-5 py-3.5 text-white transition-colors hover:bg-carbon-900"
+    >
+      <span className="block text-eyebrow uppercase text-mist-300">
+        Not listed?
+      </span>
+      <span className="mt-0.5 flex items-center gap-2 font-body text-[0.9375rem] font-semibold">
+        {CTA.brief}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 16 16"
+          className="size-4 transition-transform motion-safe:group-hover:translate-x-0.5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
+        </svg>
+      </span>
+    </Link>
   );
 }
 
