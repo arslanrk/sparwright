@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { TextLink } from "@/components/foundation/TextLink";
 import { cn } from "@/lib/cn";
@@ -38,7 +39,22 @@ export function ProductCard({
         className,
       )}
     >
-      <ImagePlaceholder shot={item.shot} ratio="product" />
+      {item.photo ? (
+        <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-ink-950">
+          <Image
+            src={item.photo.src}
+            alt={item.photo.alt}
+            fill
+            sizes="(min-width: 1280px) 280px, (min-width: 640px) 50vw, 100vw"
+            className={cn(
+              "transition-transform duration-500 ease-standard motion-safe:group-hover:scale-105",
+              item.photo.fit === "contain" ? "object-contain" : "object-cover",
+            )}
+          />
+        </div>
+      ) : (
+        <ImagePlaceholder shot={item.shot} ratio="product" />
+      )}
       <p className="mt-[var(--space-5)] text-eyebrow uppercase text-[var(--color-text-muted)]">
         {item.category}
       </p>

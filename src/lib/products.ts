@@ -1,3 +1,12 @@
+import type { StaticImageData } from "next/image";
+import boxingAthlete from "../../public/images/boxing-athlete.jpg";
+import boxingGloves from "../../public/images/boxing-gloves.jpg";
+import clubTeamKit from "../../public/images/club-team-kit.jpg";
+import explodedGlove from "../../public/images/exploded-boxing-glove.jpg";
+import gymWear from "../../public/images/gym-wear.jpg";
+import mockupToGlove from "../../public/images/logo-mockup-to-finished-glove.jpg";
+import mmaFighter from "../../public/images/mma-fighter.jpg";
+
 /**
  * Product catalogue — Design System §11 Information architecture and page
  * templates, §09 Imagery, §10 Content design.
@@ -16,8 +25,22 @@
 /** A row in a §11 specification table. */
 export type SpecRow = { label: string; value: string };
 
-/** A gallery slot naming the §09 minimum-launch shot it is waiting on. */
-export type GalleryShot = { shot: string; caption: string };
+/** A photograph, with the §12 description that travels with it. */
+export type ProductPhoto = {
+  src: StaticImageData;
+  alt: string;
+  /**
+   * "contain" for an image whose own framing matters — a side-by-side that a
+   * 4:5 crop would cut in half. Defaults to "cover".
+   */
+  fit?: "cover" | "contain";
+};
+
+/**
+ * A gallery slot: the §09 shot it stands for and, once it exists, the
+ * photograph. A slot without one still shows the shot it is waiting on.
+ */
+export type GalleryShot = { shot: string; caption: string; photo?: ProductPhoto };
 
 export type UseCase = { title: string; description: string };
 
@@ -72,6 +95,13 @@ export type Product = {
   cardDescription: string;
   /** §09 shot used on the product card, 4:5. */
   cardShot: string;
+  /** The card's photograph, once it exists. */
+  cardPhoto?: ProductPhoto;
+  /**
+   * Show the exploded-glove customization block in place of the plain
+   * customization table. Only for gloves: the photograph is of a glove.
+   */
+  customizationShowcase?: boolean;
   gallery: GalleryShot[];
   /** Short overview beside the gallery (§11 section 2). */
   overview: string;
@@ -143,30 +173,44 @@ export const PRODUCTS: Product[] = [
     cardDescription:
       "Training, sparring, bag, competition and kids' gloves, 8–16 oz, in leather or synthetic. Choose the padding, colours, closure and logo placement.",
     cardShot: "Full glove front",
+    cardPhoto: {
+      src: boxingGloves,
+      alt: "A pair of matte black custom boxing gloves with a red crackle pattern across the shell and cuff.",
+    },
+    customizationShowcase: true,
     gallery: [
       {
         shot: "Full glove front",
-        caption: "Front view of a finished custom glove.",
+        caption: "A custom shell print carried across the glove and cuff.",
+        photo: {
+          src: boxingGloves,
+          alt: "A pair of matte black custom boxing gloves with a red crackle pattern across the shell and cuff.",
+        },
       },
       {
-        shot: "Full glove side",
-        caption: "Side profile showing the padding and panel shape.",
-      },
-      {
-        shot: "Wrist closure close-up",
-        caption: "Wrist closure and strap detail.",
-      },
-      {
-        shot: "Stitching close-up",
-        caption: "Stitching along the shell panels.",
+        shot: "Glove in use",
+        caption: "The same glove in training.",
+        photo: {
+          src: boxingAthlete,
+          alt: "A boxer in a gym holding a guard in black custom boxing gloves with a red crackle pattern.",
+        },
       },
       {
         shot: "Padding or construction detail",
-        caption: "Padding profile shown in cross-section.",
+        caption: "What goes into a glove: cuff, closure, label and padding layers.",
+        photo: {
+          src: explodedGlove,
+          alt: "A black and tan leather boxing glove shown exploded into its cuff patch, lace closure, woven label and padding layers.",
+        },
       },
       {
         shot: "Logo application",
-        caption: "Club logo applied to the wrist panel.",
+        caption: "From your mockup to the finished glove.",
+        photo: {
+          src: mockupToGlove,
+          alt: "A flat mockup of a black and tan glove with a shield emblem beside the finished glove, the emblem embroidered on the cuff.",
+          fit: "contain",
+        },
       },
     ],
     overview:
@@ -393,22 +437,35 @@ export const PRODUCTS: Product[] = [
     cardDescription:
       "Shorts, rashguards, tees, hoodies and tracksuits for clubs and growing brands. Specify fabric, panel layout, colours, sizing and branding method.",
     cardShot: "Coordinated product collection",
+    cardPhoto: {
+      src: clubTeamKit,
+      alt: "Three members of one club in matching black hoodies and T-shirts, each with the same red shield on the chest.",
+    },
     gallery: [
-      { shot: "Fight shorts", caption: "Custom fight shorts in club colours." },
-      { shot: "Rashguard", caption: "Rashguard with sublimated panel design." },
+      {
+        shot: "Rashguard",
+        caption: "A rashguard and fight shorts in matching colours.",
+        photo: {
+          src: mmaFighter,
+          alt: "A fighter in a black long-sleeve rashguard with red seams and black and maroon fight shorts.",
+        },
+      },
       {
         shot: "Club apparel flat lay",
-        caption: "Club tees and hoodies laid out as a set.",
+        caption: "Club hoodies and T-shirts under one emblem.",
+        photo: {
+          src: clubTeamKit,
+          alt: "Three members of one club in matching black hoodies and T-shirts, each with the same red shield on the chest.",
+        },
       },
       {
-        shot: "Coordinated product collection",
-        caption: "Gloves, fightwear and apparel under one identity.",
+        shot: "Training wear",
+        caption: "Training wear: a compression top and tapered joggers.",
+        photo: {
+          src: gymWear,
+          alt: "An athlete in a fitted black compression T-shirt with red seam lines and black tapered joggers.",
+        },
       },
-      {
-        shot: "Printing or embroidery",
-        caption: "Branding applied in the workshop.",
-      },
-      { shot: "Logo application", caption: "Club logo placed on the chest." },
     ],
     overview:
       "One page covers the apparel side of a club kit: shorts, rashguards, tees, hoodies and tracksuits, specified together so colours, logo placement and sizing stay consistent across everything you order.",
@@ -521,6 +578,7 @@ export type ProductCardItem = {
   description: string;
   href: string;
   shot: string;
+  photo?: ProductPhoto;
   action: string;
 };
 
@@ -535,6 +593,7 @@ export function productCardItem(
     description: product.cardDescription,
     href: productHref(product),
     shot: product.cardShot,
+    photo: product.cardPhoto,
     action,
   };
 }

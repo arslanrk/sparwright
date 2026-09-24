@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Fragment, type ReactNode } from "react";
 import { CallToAction } from "@/components/content/CallToAction";
+import { CustomizationShowcase } from "@/components/content/CustomizationShowcase";
 import { FAQAccordion } from "@/components/content/FAQAccordion";
 import { ImageGallery } from "@/components/content/ImageGallery";
 import { ProductCard } from "@/components/content/ProductCard";
@@ -10,6 +12,12 @@ import { Section, type SectionTheme } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
 import { CTA } from "@/components/foundation/cta";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
+import {
+  CUSTOMIZATION,
+  CUSTOMIZATION_IMAGE,
+  CUSTOMIZATION_SHOT,
+} from "@/lib/customization";
+import { cn } from "@/lib/cn";
 import { pageMetadata } from "@/lib/metadata";
 import {
   PRODUCTS,
@@ -26,10 +34,17 @@ import { jsonLdScript } from "@/lib/structured-data";
  * Product page — Design System §11 Product page template.
  *
  * Sections in order: breadcrumb and hero with the gallery and overview, the
- * types within the line, use cases, a material comparison, materials and
- * customization, sample and approval, quality control, related products, the
- * product's own FAQ, and the quote band. Types and the material comparison are
- * optional — a product that has neither simply skips them.
+ * types within the line, use cases, a material comparison, the exploded-glove
+ * customization block, the specification, sample and approval, quality
+ * control, related products, the product's own FAQ, and the quote band.
+ * Several are optional — a product without types, a material comparison or a
+ * showcase simply skips them.
+ *
+ * Because sections come and go, the page does not hand out surfaces or
+ * numbers by hand. Each section after the hero is declared in `sections`;
+ * light ones alternate light and white so no two neighbours match, dark ones
+ * keep their own band, and every one takes the next number in its eyebrow —
+ * the homepage's numbered-sheet treatment.
  *
  * Section headings are built from `product.noun` so each carries the search
  * term ("custom boxing gloves") rather than "these". The FAQ is the product's
@@ -53,10 +68,6 @@ export async function generateMetadata({
     description: product.seo?.description ?? product.summary,
   });
 }
-
-/** The other light surface — the run alternates so neighbours never match. */
-const next = (theme: SectionTheme): SectionTheme =>
-  theme === "light" ? "white" : "light";
 
 /**
  * Breadcrumb and FAQ data for search engines. Product data is left out on
@@ -97,6 +108,13 @@ function productJsonLd(product: Product) {
   ];
 }
 
+/** One section after the hero. `dark` keeps the dark band; the rest alternate. */
+type PageSection = {
+  key: string;
+  dark?: boolean;
+  render: (theme: SectionTheme, index: string) => ReactNode;
+};
+
 export default async function ProductPage({
   params,
 }: PageProps<"/products/[slug]">) {
@@ -116,13 +134,368 @@ export default async function ProductPage({
   const quoteHref = productParam ? `/quote?${productParam}` : "/quote";
   const mockupHref = `/quote?intent=mockup${productParam ? `&${productParam}` : ""}`;
 
-  // The light run between the hero and the dark sample band.
-  const typesTheme: SectionTheme = "white";
-  const useCasesTheme: SectionTheme = product.types ? next(typesTheme) : "white";
-  const optionsTheme = next(useCasesTheme);
-  const materialsTheme = product.materialOptions
-    ? next(optionsTheme)
-    : next(useCasesTheme);
+  const sections: PageSection[] = [];
+
+  if (product.types) {
+    const types = product.types;
+    sections.push({
+      key: "types",
+      render: (theme, index) => (
+        <Section theme={theme} width="work">
+          <SectionHeader
+            eyebrow="Glove types"
+            index={index}
+            title={types.title}
+            description={types.description}
+          />
+          <ul className="mt-[var(--space-7)] grid gap-[var(--space-4)] sm:grid-cols-2 lg:grid-cols-5">
+            {types.items.map((type, i) => (
+              <li
+                key={type.title}
+                className="group relative flex flex-col overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-[var(--space-5)] transition-[border-color,transform] duration-200 ease-standard hover:border-forge-600/60 motion-safe:hover:-translate-y-1"
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-forge-600 transition-transform duration-300 ease-standard group-hover:scale-x-100"
+                />
+                <span
+                  aria-hidden="true"
+                  className="font-display text-heading-3 font-bold tabular-nums text-[var(--color-border-strong)]/50 transition-colors group-hover:text-forge-600"
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-[var(--space-4)] font-body text-body-large font-semibold leading-snug">
+                  {type.title}
+                </h3>
+                <p className="mt-2 text-small text-[var(--color-text-secondary)]">
+                  {type.description}
+                </p>
+                {type.spec ? (
+                  <p className="mt-auto pt-[var(--space-5)]">
+                    <span className="inline-flex rounded-full bg-forge-100 px-3 py-1 text-small font-semibold text-forge-700">
+                      {type.spec}
+                    </span>
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ),
+    });
+  }
+
+  sections.push({
+    key: "use-cases",
+    render: (theme, index) => (
+      <Section theme={theme} width="work">
+        <SectionHeader
+          eyebrow="Use cases"
+          index={index}
+          title={`Where ${noun} are used`}
+          description="The intended use decides the construction, so it is the first thing we confirm."
+        />
+        <ul className="mt-[var(--space-6)] grid gap-[var(--space-5)] sm:grid-cols-2 lg:grid-cols-4">
+          {product.useCases.map((useCase) => (
+            <li
+              key={useCase.title}
+              className="border-l-2 border-forge-600 pl-[var(--space-4)]"
+            >
+              <h3 className="text-heading-4">{useCase.title}</h3>
+              <p className="mt-2 text-small text-[var(--color-text-secondary)]">
+                {useCase.description}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    ),
+  });
+
+  if (product.materialOptions) {
+    const options = product.materialOptions;
+    sections.push({
+      key: "material-options",
+      render: (theme, index) => (
+        <Section theme={theme} width="work">
+          <SectionHeader
+            eyebrow="Materials"
+            index={index}
+            title={options.title}
+            description={options.description}
+          />
+          <div className="relative mt-[var(--space-7)] grid gap-[var(--space-5)] md:grid-cols-2">
+            {/* The "or" between the two, where they meet. */}
+            <span
+              aria-hidden="true"
+              className="absolute left-1/2 top-1/2 z-10 hidden size-12 -translate-1/2 items-center justify-center rounded-full bg-ink-950 font-display text-small font-bold uppercase text-white ring-4 ring-[var(--color-bg)] md:flex"
+            >
+              or
+            </span>
+            {options.options.map((option, i) => (
+              <div
+                key={option.name}
+                className={cn(
+                  "rounded-xl border p-[var(--space-6)]",
+                  i === 0
+                    ? "border-transparent bg-ink-950 text-white [--color-text-secondary:var(--color-mist-300)]"
+                    : "border-[var(--color-border)] bg-[var(--color-surface)]",
+                )}
+              >
+                <h3 className="text-heading-3">{option.name}</h3>
+                <p className="mt-2 text-small text-[var(--color-text-secondary)]">
+                  <span className="font-semibold uppercase tracking-wide">
+                    Best for
+                  </span>{" "}
+                  — {option.bestFor}
+                </p>
+                <ul className="mt-[var(--space-5)] flex flex-col gap-3 border-t border-current/15 pt-[var(--space-5)]">
+                  {option.points.map((point) => (
+                    <li key={point} className="flex gap-3 text-body">
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 16 16"
+                        className="mt-1 size-4 shrink-0 text-forge-600"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.25"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="m3 8.5 3 3 7-7" />
+                      </svg>
+                      <span className="text-[var(--color-text-secondary)]">
+                        {point}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </Section>
+      ),
+    });
+  }
+
+  if (product.customizationShowcase) {
+    sections.push({
+      key: "customization",
+      dark: true,
+      render: (theme, index) => (
+        <Section theme={theme} width="work">
+          <SectionHeader
+            eyebrow="Customization"
+            index={index}
+            title={`Every part of your ${noun.replace(/s$/, "")}, your call.`}
+            description="Branding, colour, construction and packaging are decided with you and fixed on the sample before bulk production."
+          />
+          <div className="mt-[var(--space-8)]">
+            <CustomizationShowcase
+              items={CUSTOMIZATION}
+              image={CUSTOMIZATION_IMAGE}
+              shot={CUSTOMIZATION_SHOT}
+            />
+          </div>
+        </Section>
+      ),
+    });
+  }
+
+  sections.push({
+    key: "specification",
+    render: (theme, index) => (
+      <Section theme={theme} width="work">
+        {product.customizationShowcase ? (
+          // Customization is already shown above, so the specification stands
+          // alone: its header beside the table rather than above it.
+          <div className="grid gap-[var(--space-7)] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+            <SectionHeader
+              eyebrow="Specification"
+              index={index}
+              title="Materials and construction"
+              description="What gets decided before sampling, and what the approved sample then fixes."
+            />
+            <SpecificationTable rows={product.materials} />
+          </div>
+        ) : (
+          <div className="grid gap-[var(--space-8)] lg:grid-cols-2">
+            <div>
+              <SectionHeader
+                eyebrow="Specification"
+                index={index}
+                title="Materials and construction"
+                description="What gets decided before sampling, and what the approved sample then fixes."
+              />
+              <SpecificationTable
+                rows={product.materials}
+                className="mt-[var(--space-5)]"
+              />
+            </div>
+            <div>
+              <SectionHeader
+                title="Customization options"
+                description="The four things you control on every order."
+              />
+              <SpecificationTable
+                rows={product.customization}
+                className="mt-[var(--space-5)]"
+              />
+            </div>
+          </div>
+        )}
+      </Section>
+    ),
+  });
+
+  sections.push({
+    key: "sample",
+    dark: true,
+    render: (theme, index) => (
+      <Section theme={theme} width="work">
+        <SectionHeader
+          eyebrow="Sample and approval"
+          index={index}
+          title="Nothing goes to bulk before you approve a sample."
+        />
+        <ol className="relative mt-[var(--space-7)] grid gap-[var(--space-5)] md:grid-cols-2 lg:grid-cols-4">
+          {/* The route between the steps, from `lg`. */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-[12%] top-5 hidden h-0.5 bg-linear-to-r from-forge-600 to-success-600 lg:block"
+          />
+          {product.sampling.map((step, i) => (
+            <li key={step} className="relative">
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "relative z-10 flex size-10 items-center justify-center rounded-full font-display text-small font-bold tabular-nums text-white ring-4 ring-[var(--color-bg)]",
+                  i === product.sampling.length - 1 ? "bg-success-600" : "bg-forge-600",
+                )}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <p className="mt-[var(--space-4)] text-body text-[var(--color-text-secondary)]">
+                {step}
+              </p>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-[var(--space-7)]">
+          <Button
+            href={mockupHref}
+            variant="inverse"
+            arrow
+            data-analytics="sample_request"
+            data-analytics-product={product.name}
+          >
+            {CTA.sample}
+          </Button>
+        </div>
+      </Section>
+    ),
+  });
+
+  sections.push({
+    key: "quality",
+    render: (theme, index) => (
+      <Section theme={theme} width="work">
+        <div className="grid gap-[var(--space-7)] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <SectionHeader
+            eyebrow="Quality control"
+            index={index}
+            title={`What is checked on ${noun} before dispatch`}
+            // §11: only checks the team will consistently perform and record.
+            description="Every one of these is performed and recorded before the order leaves the workshop."
+          />
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {product.qualityPoints.map((point) => (
+              <li
+                key={point}
+                className="flex gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-[var(--space-4)] text-body text-[var(--color-text-secondary)]"
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex size-6 shrink-0 items-center justify-center rounded-full bg-success-600 text-white"
+                >
+                  <svg
+                    viewBox="0 0 16 16"
+                    className="size-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m3 8.5 3 3 7-7" />
+                  </svg>
+                </span>
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Section>
+    ),
+  });
+
+  if (related.length > 0) {
+    sections.push({
+      key: "related",
+      render: (theme, index) => (
+        <Section theme={theme} width="work">
+          <SectionHeader
+            eyebrow="Also made to order"
+            index={index}
+            title="More custom products"
+          />
+          <div className="mt-[var(--space-6)] grid gap-[var(--space-5)] sm:grid-cols-2 xl:grid-cols-4">
+            {related.map((item) => (
+              <ProductCard
+                key={item.slug}
+                item={productCardItem(item, CTA.products)}
+              />
+            ))}
+          </div>
+        </Section>
+      ),
+    });
+  }
+
+  sections.push({
+    key: "faq",
+    render: (theme, index) => (
+      <Section theme={theme} width="copy">
+        <SectionHeader
+          eyebrow="Questions"
+          index={index}
+          title={`${Noun} — common questions`}
+        />
+        <FAQAccordion
+          items={product.faqs}
+          openFirst
+          className="mt-[var(--space-6)]"
+        />
+      </Section>
+    ),
+  });
+
+  // Surfaces and numbers. The hero is light, so the run starts on white.
+  let lastLight: SectionTheme = "light";
+  const rendered = sections.map((section, i) => {
+    let theme: SectionTheme;
+    if (section.dark) {
+      theme = "dark";
+    } else {
+      theme = lastLight === "light" ? "white" : "light";
+      lastLight = theme;
+    }
+    return (
+      <Fragment key={section.key}>
+        {section.render(theme, String(i + 1).padStart(2, "0"))}
+      </Fragment>
+    );
+  });
 
   return (
     <>
@@ -131,7 +504,7 @@ export default async function ProductPage({
         dangerouslySetInnerHTML={{ __html: jsonLdScript(productJsonLd(product)) }}
       />
 
-      {/* 1 — Breadcrumb and product hero. */}
+      {/* Breadcrumb and product hero. */}
       <Section theme="light" width="work" density="compact">
         <Breadcrumb
           items={[
@@ -171,8 +544,7 @@ export default async function ProductPage({
                 {CTA.quote}
               </Button>
             </div>
-            {/* 2 — Short product overview, beside the gallery. */}
-            <p className="mt-[var(--space-6)] max-w-copy text-body text-[var(--color-text-secondary)]">
+            <p className="mt-[var(--space-6)] max-w-copy border-l-2 border-forge-600 pl-[var(--space-4)] text-body text-[var(--color-text-secondary)]">
               {product.overview}
             </p>
           </div>
@@ -180,203 +552,8 @@ export default async function ProductPage({
         </div>
       </Section>
 
-      {/* 3 — The types within the line. */}
-      {product.types ? (
-        <Section theme={typesTheme} width="work">
-          <SectionHeader
-            eyebrow="Glove types"
-            title={product.types.title}
-            description={product.types.description}
-          />
-          <ul className="mt-[var(--space-6)] grid gap-[var(--space-5)] sm:grid-cols-2 lg:grid-cols-5">
-            {product.types.items.map((type) => (
-              <li
-                key={type.title}
-                className="border-t border-[var(--color-border)] pt-[var(--space-4)]"
-              >
-                <h3 className="text-heading-4">{type.title}</h3>
-                {type.spec ? (
-                  <p className="mt-1 text-small font-semibold text-[var(--color-text)]">
-                    {type.spec}
-                  </p>
-                ) : null}
-                <p className="mt-2 text-small text-[var(--color-text-secondary)]">
-                  {type.description}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </Section>
-      ) : null}
+      {rendered}
 
-      {/* 4 — Where they are used. */}
-      <Section theme={useCasesTheme} width="work">
-        <SectionHeader
-          eyebrow="Use cases"
-          title={`Where ${noun} are used`}
-          description="The intended use decides the construction, so it is the first thing we confirm."
-        />
-        <ul className="mt-[var(--space-6)] grid gap-[var(--space-5)] sm:grid-cols-2 lg:grid-cols-4">
-          {product.useCases.map((useCase) => (
-            <li
-              key={useCase.title}
-              className="border-t border-[var(--color-border)] pt-[var(--space-4)]"
-            >
-              <h3 className="text-heading-4">{useCase.title}</h3>
-              <p className="mt-2 text-small text-[var(--color-text-secondary)]">
-                {useCase.description}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      {/* 5 — The material choice, side by side. */}
-      {product.materialOptions ? (
-        <Section theme={optionsTheme} width="work">
-          <SectionHeader
-            eyebrow="Materials"
-            title={product.materialOptions.title}
-            description={product.materialOptions.description}
-          />
-          <div className="mt-[var(--space-6)] grid gap-[var(--space-5)] md:grid-cols-2">
-            {product.materialOptions.options.map((option) => (
-              <div
-                key={option.name}
-                className="rounded-xl border border-[var(--color-border)] p-[var(--space-6)]"
-              >
-                <h3 className="text-heading-4">{option.name}</h3>
-                <p className="mt-1 text-small text-[var(--color-text-secondary)]">
-                  <span className="font-semibold text-[var(--color-text)]">
-                    Best for:
-                  </span>{" "}
-                  {option.bestFor}
-                </p>
-                <ul className="mt-[var(--space-4)] flex flex-col gap-2">
-                  {option.points.map((point) => (
-                    <li
-                      key={point}
-                      className="flex gap-2 text-body text-[var(--color-text-secondary)]"
-                    >
-                      <span aria-hidden="true" className="mt-2.5 size-1.5 shrink-0 rounded-full bg-forge-600" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </Section>
-      ) : null}
-
-      {/* 6 — Materials and construction; customization options. */}
-      <Section theme={materialsTheme} width="work">
-        <div className="grid gap-[var(--space-8)] lg:grid-cols-2">
-          <div>
-            <SectionHeader
-              eyebrow="Specification"
-              title="Materials and construction"
-              description="What gets decided before sampling, and what the approved sample then fixes."
-            />
-            <SpecificationTable
-              rows={product.materials}
-              className="mt-[var(--space-5)]"
-            />
-          </div>
-          <div>
-            <SectionHeader
-              eyebrow="Customization"
-              title="Customization options"
-              description="The four things you control on every order."
-            />
-            <SpecificationTable
-              rows={product.customization}
-              className="mt-[var(--space-5)]"
-            />
-          </div>
-        </div>
-      </Section>
-
-      {/* 7 — Sample and approval process. */}
-      <Section theme="dark" width="work">
-        <SectionHeader
-          eyebrow="Sample and approval"
-          title="Nothing goes to bulk before you approve a sample."
-        />
-        <ol className="mt-[var(--space-6)] grid gap-[var(--space-5)] md:grid-cols-2 lg:grid-cols-4">
-          {product.sampling.map((step, index) => (
-            <li
-              key={step}
-              className="border-t-2 border-[var(--color-border)] pt-[var(--space-4)]"
-            >
-              <p className="font-display text-heading-4 text-[var(--color-action-text)]">
-                {String(index + 1).padStart(2, "0")}
-              </p>
-              <p className="mt-2 text-body text-[var(--color-text-secondary)]">
-                {step}
-              </p>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-[var(--space-7)]">
-          <Button
-            href={mockupHref}
-            variant="inverse"
-            arrow
-            data-analytics="sample_request"
-            data-analytics-product={product.name}
-          >
-            {CTA.sample}
-          </Button>
-        </div>
-      </Section>
-
-      {/* 8 — Quality-control points. */}
-      <Section theme="white" width="copy">
-        <SectionHeader
-          eyebrow="Quality control"
-          title={`What is checked on ${noun} before dispatch`}
-          // §11: only checks the team will consistently perform and record.
-          description="Every one of these is performed and recorded before the order leaves the workshop."
-        />
-        <ul className="mt-[var(--space-5)] flex flex-col gap-3">
-          {product.qualityPoints.map((point) => (
-            <li
-              key={point}
-              className="border-b border-[var(--color-border)] pb-3 text-body text-[var(--color-text-secondary)]"
-            >
-              {point}
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      {/* 9 — Related products. */}
-      {related.length > 0 ? (
-        <Section theme="light" width="work">
-          <SectionHeader eyebrow="Also made to order" title="More custom products" />
-          <div className="mt-[var(--space-6)] grid gap-[var(--space-5)] sm:grid-cols-2 xl:grid-cols-4">
-            {related.map((item) => (
-              <ProductCard
-                key={item.slug}
-                item={productCardItem(item, CTA.products)}
-              />
-            ))}
-          </div>
-        </Section>
-      ) : null}
-
-      {/* 10 — Product-specific FAQ. */}
-      <Section theme="white" width="copy">
-        <SectionHeader eyebrow="Questions" title={`${Noun} — common questions`} />
-        <FAQAccordion
-          items={product.faqs}
-          openFirst
-          className="mt-[var(--space-6)]"
-        />
-      </Section>
-
-      {/* 11 — Quote or mockup CTA. */}
       <CallToAction
         title={product.closing?.title ?? "Tell us what you want made."}
         description={

@@ -4,10 +4,7 @@ import {
 } from "@/components/content/AudienceCard";
 import { CallToAction } from "@/components/content/CallToAction";
 import { FAQSection } from "@/components/content/FAQSection";
-import {
-  CustomizationShowcase,
-  type CustomizationItem,
-} from "@/components/content/CustomizationShowcase";
+import { CustomizationShowcase } from "@/components/content/CustomizationShowcase";
 import {
   ExpertiseGrid,
   type ExpertiseItem,
@@ -24,6 +21,11 @@ import { CTA } from "@/components/foundation/cta";
 import Image from "next/image";
 import { FAQ_GROUPS, SITE_FAQS } from "@/lib/faq";
 import { COLLECTIONS } from "@/lib/collections";
+import {
+  CUSTOMIZATION,
+  CUSTOMIZATION_IMAGE,
+  CUSTOMIZATION_SHOT,
+} from "@/lib/customization";
 import { PROCESS_STAGES } from "@/lib/process";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 import type { Metadata } from "next";
@@ -62,7 +64,6 @@ import dispatchWarehouse from "../../public/images/packing-and-export.jpg";
 import gymAthletes from "../../public/images/gyms-and-academies.png";
 import labelModels from "../../public/images/private-label.png";
 import factoryFloor from "../../public/images/boxing-glove-factory-floor.jpg";
-import explodedGlove from "../../public/images/exploded-boxing-glove.jpg";
 import mockupToGlove from "../../public/images/logo-mockup-to-finished-glove.jpg";
 
 /**
@@ -166,59 +167,6 @@ const AUDIENCES: AudienceCardItem[] = [
   },
 ];
 
-/**
- * §08 Customization panel, rewritten. The verbatim copy restated each tag as
- * its title ("Branding" / "Your brand") and gave noun lists that could describe
- * any factory; each title now says what the buyer gets, and each line names
- * how it is done. `side` places each card beside the part of the glove it
- * describes, and `hotspot` is that part's position on `exploded-boxing-glove`:
- * the cuff patch and the woven label on the left, the tan leather and the
- * padding layers on the right.
- */
-const CUSTOMIZATION: CustomizationItem[] = [
-  {
-    tag: "Branding",
-    title: "Logo and decoration",
-    description:
-      "Embroidery, print, patches and woven labels, placed where they work on each product.",
-    side: "left",
-    hotspot: { x: 25, y: 21 },
-    detail: {
-      kind: "chips",
-      items: ["Embroidery", "Print", "Patch", "Woven label"],
-    },
-  },
-  {
-    tag: "Colour",
-    title: "Matched to your references",
-    description:
-      "Send colour codes or a physical swatch. Colours are matched on the sample and kept on file for reorders.",
-    side: "right",
-    hotspot: { x: 76, y: 42 },
-    detail: { kind: "swatches" },
-  },
-  {
-    tag: "Construction",
-    title: "Built to your specification",
-    description:
-      "Materials, padding, closure, stitching and sizing — down to hook-and-loop or lace-up on a glove.",
-    side: "right",
-    hotspot: { x: 71, y: 70 },
-    detail: { kind: "chips", items: ["Hook-and-loop", "Lace-up"] },
-  },
-  {
-    tag: "Packaging",
-    title: "Packed under your name",
-    description:
-      "Branded labels, polybags, retail boxes, inserts and export cartons marked to your instruction.",
-    side: "left",
-    hotspot: { x: 18, y: 70 },
-    detail: {
-      kind: "chips",
-      items: ["Polybag", "Retail box", "Export carton"],
-    },
-  },
-];
 
 /**
  * Capability, not procedure.
@@ -508,11 +456,8 @@ export default function Home() {
         <div className="mt-[var(--space-8)]">
           <CustomizationShowcase
             items={CUSTOMIZATION}
-            image={{
-              src: explodedGlove,
-              alt: "A black and tan leather boxing glove shown exploded: the cuff with a blank logo patch, the lace-up closure, a woven label and four padding layers separated from the shell.",
-            }}
-            shot="Exploded boxing glove — strap patch, padding layers and lace visible"
+            image={CUSTOMIZATION_IMAGE}
+            shot={CUSTOMIZATION_SHOT}
           />
         </div>
         <div className="mt-[var(--space-7)]">
