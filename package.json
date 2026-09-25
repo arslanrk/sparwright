@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "brand": "node scripts/build-brand-assets.mjs"
+    "brand": "node scripts/build-brand-assets.mjs",
+    "club-group": "node scripts/compose-club-group.mjs"
   },
   "dependencies": {
     "next": "16.3.4",
