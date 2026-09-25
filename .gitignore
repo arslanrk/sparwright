@@ -56,3 +56,6 @@ logs/
 *.log
 .eslintcache
 .turbo/
+
+# Claude Code local settings
+.claude/settings.local.json
