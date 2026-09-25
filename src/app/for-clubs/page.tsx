@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { FramedPhoto } from "@/components/content/AudienceBlocks";
 import { CallToAction } from "@/components/content/CallToAction";
 import {
   ConceptStudio,
@@ -37,6 +36,11 @@ import {
 } from "@/lib/structured-data";
 import boxingClubsBanner from "../../../public/images/boxing-clubs-banner.jpg";
 import factoryFloor from "../../../public/images/boxing-glove-factory-floor.jpg";
+import rangeApparel from "../../../public/images/for-clubs/team.png";
+import rangeLifting from "../../../public/images/strength-and-lifting.jpg";
+import rangeMma from "../../../public/images/range/range-mma.jpg";
+import rangePads from "../../../public/images/range/range-pads.jpg";
+import rangeProtective from "../../../public/images/range/range-protective.jpg";
 import gloveStrikeWhiteRedBlack from "../../../public/images/concept/boxing-gloves_strike_white-red-black.jpg";
 import gloveStrikeBlackRed from "../../../public/images/concept/boxing-gloves_strike_black-red.jpg";
 import gloveStrikeBlackTan from "../../../public/images/concept/boxing-gloves_strike_black-tan.jpg";
@@ -51,7 +55,6 @@ import roleCoaches from "../../../public/images/for-clubs/coach.jpg";
 import roleTeam from "../../../public/images/for-clubs/team.png";
 import roleFighters from "../../../public/images/mma-fighter.jpg";
 import clubApparelGroup from "../../../public/images/club-apparel-group.webp";
-import gymAthletes from "../../../public/images/gyms-and-academies.png";
 import mmaAcademiesBanner from "../../../public/images/mma-academies-banner.jpg";
 import specExploded from "../../../public/images/exploded-boxing-glove.jpg";
 import specPacking from "../../../public/images/packing-and-export.jpg";
@@ -66,9 +69,9 @@ import specPrinting from "../../../public/images/printing-and-decoration.jpg";
  * Sections run from who the kit is for to what happens after the order:
  *
  *   hero slider dark · 01 who it is for white · 02 what can be specified
- *   light · 03 product lines white · 04 one product or a full kit dark ·
- *   05 sizes and planning light · 06 the brief white · 07 sample before bulk
- *   dark · 08 reorders light · 09 FAQ white · closing CTA action
+ *   light · logo band dark · 03 the range, one product or a kit white ·
+ *   04 sizes and planning light · 05 the brief white · 06 sample before bulk
+ *   dark · 07 reorders light · 08 FAQ white · closing CTA action
  *
  * Two adjacent sections never share a surface. The page's one h1 is the
  * slider's (screen-reader only); every section below opens with an h2.
@@ -502,54 +505,109 @@ const LOGO_TO_SAMPLE = [
 
 /* -- 03 · Equipment and apparel ------------------------------------------- */
 
-const PRODUCT_LINES = [
+/**
+ * The six product lines as a range wall. `size` sets the tile: the anchor
+ * product large, four square, apparel as the wide banner that closes it.
+ */
+const PRODUCT_LINES: {
+  title: string;
+  description: string;
+  includes: string[];
+  link: { label: string; href: string };
+  size: "feature" | "square" | "wide";
+  photo: {
+    src: StaticImageData;
+    alt: string;
+    position?: string;
+    /**
+     * A studio product shot: on a square tile it is shown whole on its own
+     * grey ground above the type, rather than cropped under it — the type
+     * would otherwise sit over the product.
+     */
+    studio?: boolean;
+  };
+}[] = [
   {
     title: "Custom boxing gloves",
     description:
       "Training, sparring, bag, competition and junior boxing gloves can be developed around intended use, agreed construction, club colours and branding.",
+    includes: ["Training", "Sparring", "Bag", "Competition", "Junior"],
     link: { label: CTA.exploreGloves, href: PAGE.gloves },
+    size: "feature",
+    photo: {
+      src: gloveStrikeWhiteRedBlack,
+      alt: "A pair of white custom boxing gloves with an angular red and black strike pattern and black wrist straps.",
+      studio: true,
+    },
   },
   {
     title: "Custom MMA gloves and gear",
     description:
       "Custom options include MMA fight gloves, sparring gloves, grappling and hybrid gloves, shin guards and junior MMA gloves.",
+    includes: ["Fight gloves", "Sparring", "Grappling", "Shin guards"],
     link: { label: CTA.exploreMMA, href: PAGE.mma },
+    size: "square",
+    photo: {
+      src: rangeMma,
+      alt: "A pair of black and red open-palm MMA gloves in front of a pair of matching shin-and-instep guards.",
+      studio: true,
+    },
   },
   {
     title: "Pads, mitts and punch bags",
     description:
       "Build branded training equipment for coaches and gym sessions, including focus mitts, Thai pads, kicking shields, paddle mitts, training sticks and punch bags.",
+    includes: ["Focus mitts", "Thai pads", "Shields", "Punch bags"],
     link: { label: CTA.explorePads, href: PAGE.pads },
+    size: "square",
+    photo: {
+      src: rangePads,
+      alt: "A black and red set: a punch bag, a Thai pad and a pair of curved focus mitts.",
+      studio: true,
+    },
   },
   {
     title: "Protective gear",
     description:
       "Customise equipment such as head guards, chest and body protectors, groin guards, shin and instep guards, hand wraps and other protective products.",
+    includes: ["Head guards", "Body protectors", "Shin guards", "Hand wraps"],
     link: { label: CTA.exploreProtective, href: PAGE.protective },
-  },
-  {
-    title: "Fightwear and club apparel",
-    description:
-      "Carry your identity onto fight shorts, boxing trunks, rashguards, compression wear, T-shirts, hoodies, sweatshirts and tracksuits.",
-    link: { label: CTA.exploreClubApparel, href: PAGE.apparel },
+    size: "square",
+    photo: {
+      src: rangeProtective,
+      alt: "A black and red head guard with cheek protection, matching shin-and-instep guards and rolled hand wraps.",
+      studio: true,
+    },
   },
   {
     title: "Strength and lifting gear",
     description:
       "For facilities that combine combat training with strength work, the range also includes lifting belts, training belts, straps, grips and weightlifting gloves.",
+    includes: ["Lifting belts", "Straps", "Grips", "Gloves"],
     link: { label: CTA.exploreLifting, href: PAGE.lifting },
+    size: "square",
+    photo: {
+      src: rangeLifting,
+      alt: "A lifter chalking his hands, wearing a black leather lifting belt.",
+      position: "center 30%",
+    },
+  },
+  {
+    title: "Fightwear and club apparel",
+    description:
+      "Carry your identity onto fight shorts, boxing trunks, rashguards, compression wear, T-shirts, hoodies, sweatshirts and tracksuits.",
+    includes: ["Fight shorts", "Rashguards", "Compression", "T-shirts", "Hoodies", "Tracksuits"],
+    link: { label: CTA.exploreClubApparel, href: PAGE.apparel },
+    size: "wide",
+    photo: {
+      src: rangeApparel,
+      alt: "Three club members in matching black and red Sparwright training kit.",
+      position: "center 30%",
+    },
   },
 ];
 
 /* -- 04 · One product or a complete club range ---------------------------- */
-
-const SINGLE_STARTS = [
-  "Custom boxing gloves for members",
-  "New pads for coaches",
-  "Protective equipment",
-  "Branded rashguards",
-  "Club hoodies or tracksuits",
-];
 
 const CLUB_KIT = [
   {
@@ -916,111 +974,238 @@ export default function ForClubsPage() {
         </div>
       </Section>
 
-      {/* 03 — The six product lines, each linked to its page. */}
-      <Section theme="white" width="work">
-        <SectionHeader
-          eyebrow="Equipment and apparel"
-          index="03"
-          title="Custom combat-sports products across the gym."
-          description="Start with one product or combine several product lines in the same club brief."
-        />
-        <ul className="mt-[var(--space-7)] grid gap-[var(--space-4)] sm:grid-cols-2 lg:grid-cols-3">
-          {PRODUCT_LINES.map((line, i) => (
+      {/*
+        03 — One product or a complete club range. The six product lines as
+        a range wall — the anchor product large, four squares, apparel as a
+        wide banner — each tile one link to its page and any one of them a
+        valid start; then the coordinated-kit panel for those who combine
+        them. One section rather than a range and a kit section listing the
+        same products twice. White: after the dark logo band.
+      */}
+      <Section theme="white" width="shell">
+        <div className="grid gap-[var(--space-6)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:items-end">
+          <SectionHeader
+            eyebrow="One product or a complete club range"
+            index="03"
+            title="Order what your gym actually needs."
+          />
+          <div className="flex flex-col gap-[var(--space-4)] lg:items-end lg:text-right">
+            <p className="max-w-[28rem] text-body-large text-[var(--color-text-secondary)]">
+              You do not have to build a complete club range to work with
+              Sparwright. Start with one product or combine several product
+              lines in the same club brief.
+            </p>
+            <p className="inline-flex items-center gap-2 rounded-full bg-[var(--color-bg)] px-3 py-1.5 text-small font-semibold text-[var(--color-text)]">
+              <span aria-hidden="true" className="flex size-5 items-center justify-center rounded-full bg-forge-600 text-[0.6875rem] font-bold text-white">
+                6
+              </span>
+              product lines · one brief
+            </p>
+          </div>
+        </div>
+
+        {/*
+          The studio lines as grey cards — the card is the studio: the type at
+          the head in ink, the product large beneath it on the same grey, with
+          nothing laid over it. Apparel, a photograph of people, closes the
+          wall as a dark banner. Every card is one link to its page.
+        */}
+        <ul className="mt-[var(--space-7)] grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {PRODUCT_LINES.filter((line) => line.size !== "wide").map((line, i) => (
             <li
               key={line.title}
-              className="group relative flex flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-[var(--space-5)] transition-[border-color,transform] duration-200 ease-standard hover:border-forge-600/60 motion-safe:hover:-translate-y-1"
+              className={cn(
+                "group relative isolate flex min-h-[26rem] flex-col overflow-hidden rounded-2xl bg-[radial-gradient(120%_90%_at_50%_70%,#d6d7d9,#c2c3c6)] text-ink-950 lg:min-h-[27rem]",
+                line.size === "feature" && "sm:col-span-2 lg:row-span-2 lg:min-h-0",
+              )}
             >
               <span
                 aria-hidden="true"
-                className="font-display text-heading-3 font-bold tabular-nums text-[var(--color-border-strong)]/50 transition-colors group-hover:text-forge-600"
-              >
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <h3 className="mt-[var(--space-4)] font-body text-body-large font-semibold leading-snug">
-                {line.title}
-              </h3>
-              <p className="mt-2 flex-1 text-small text-[var(--color-text-secondary)]">
-                {line.description}
-              </p>
+                className="absolute inset-x-0 top-0 z-10 h-1 origin-left scale-x-0 bg-forge-600 transition-transform duration-300 ease-standard group-hover:scale-x-100"
+              />
+              <div className={cn("relative z-10 p-[var(--space-5)]", line.size === "feature" && "sm:p-[var(--space-7)]")}>
+                <p className="font-display text-small font-bold tabular-nums text-forge-700">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3
+                  className={cn(
+                    "mt-1.5 font-display font-bold leading-[1.1] tracking-[-0.02em] [text-wrap:balance]",
+                    line.size === "feature" ? "text-[clamp(1.75rem,2.6vw,2.5rem)]" : "text-heading-4",
+                  )}
+                >
+                  {line.title}
+                </h3>
+                {line.size === "feature" ? (
+                  <>
+                    <p className="mt-3 max-w-[30rem] text-body text-steel-700">{line.description}</p>
+                    <ul className="mt-[var(--space-4)] flex flex-wrap gap-1.5">
+                      {line.includes.map((item) => (
+                        <li
+                          key={item}
+                          className="rounded-full border border-ink-950/15 bg-white/50 px-2.5 py-1 text-[0.75rem] font-medium"
+                        >
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-2 text-small text-steel-700">{line.includes.join(" · ")}</p>
+                    <p className="sr-only">{line.description}</p>
+                  </>
+                )}
+              </div>
+
+              {/* The product, on the card's own grey. */}
+              <div className="relative flex-1">
+                <Image
+                  src={line.photo.src}
+                  alt={line.photo.alt}
+                  fill
+                  sizes={line.size === "feature" ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 25vw, 50vw"}
+                  className={cn(
+                    "transition-transform duration-700 ease-standard motion-safe:group-hover:scale-[1.04]",
+                    line.photo.studio
+                      ? "object-contain [mask-image:radial-gradient(farthest-side,black_80%,transparent)]"
+                      : "rounded-t-xl object-cover",
+                  )}
+                  style={{ objectPosition: line.photo.position ?? "center bottom" }}
+                />
+              </div>
+
               {/* The link's ::after covers the card, so the card is the target. */}
               <Link
                 href={line.link.href}
-                className="mt-[var(--space-5)] inline-flex items-center gap-2 text-small font-semibold text-forge-700 after:absolute after:inset-0 after:rounded-xl"
+                aria-label={line.link.label}
+                className="absolute bottom-[var(--space-4)] right-[var(--space-4)] z-10 flex size-11 items-center justify-center rounded-full bg-ink-950 text-white shadow-[0_8px_20px_-8px_rgb(0_0_0/0.5)] transition-colors after:absolute after:-inset-[100rem] group-hover:bg-forge-600"
               >
-                {line.link.label}
                 <Arrow />
               </Link>
             </li>
           ))}
         </ul>
-      </Section>
 
-      {/* 04 — One product or the whole kit. Dark, with the coordinated kit laid out. */}
-      <Section theme="dark" width="work">
-        <div className="grid items-center gap-[var(--space-8)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        {PRODUCT_LINES.filter((line) => line.size === "wide").map((line) => (
+          <div
+            key={line.title}
+            data-theme="dark"
+            className="group relative isolate mt-3 flex min-h-[20rem] flex-col justify-end overflow-hidden rounded-2xl bg-ink-950 text-white lg:justify-center"
+          >
+            <div className="absolute inset-0 -z-10 lg:left-auto lg:w-[62%] lg:[mask-image:linear-gradient(to_right,transparent,black_35%)]">
+              <Image
+                src={line.photo.src}
+                alt={line.photo.alt}
+                fill
+                sizes="(min-width: 1024px) 62vw, 100vw"
+                className="object-cover transition-transform duration-700 ease-standard motion-safe:group-hover:scale-[1.03]"
+                style={{ objectPosition: line.photo.position }}
+              />
+            </div>
+            <span aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-t from-ink-950 via-ink-950/70 via-50% to-ink-950/0 lg:hidden" />
+            <div className="p-[var(--space-5)] sm:p-[var(--space-7)] lg:max-w-[42%]">
+              <p className="font-display text-small font-bold tabular-nums text-white/60">
+                {String(PRODUCT_LINES.length).padStart(2, "0")}
+              </p>
+              <h3 className="mt-2 font-display text-[clamp(1.6rem,2.4vw,2.25rem)] font-bold leading-[1.1] tracking-[-0.02em]">
+                {line.title}
+              </h3>
+              <p className="mt-3 text-body text-mist-300">{line.description}</p>
+              <ul className="mt-[var(--space-4)] flex flex-wrap gap-1.5">
+                {line.includes.map((item) => (
+                  <li
+                    key={item}
+                    className="rounded-full border border-white/20 bg-white/5 px-2.5 py-1 text-[0.75rem] font-medium backdrop-blur-sm"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={line.link.href}
+                className="mt-[var(--space-5)] inline-flex items-center gap-2 text-small font-semibold after:absolute after:inset-0 after:rounded-2xl"
+              >
+                {line.link.label}
+                <span aria-hidden="true" className="flex size-7 items-center justify-center rounded-full bg-white/10 transition-colors group-hover:bg-forge-600">
+                  <Arrow />
+                </span>
+              </Link>
+            </div>
+          </div>
+        ))}
+
+        {/*
+          Combining the lines: the message left, the three kit groups right as
+          short rows — the tiles above already show the products, so the
+          groups name them rather than list them again at length.
+        */}
+        <div
+          data-theme="dark"
+          className="mt-3 grid gap-[var(--space-7)] rounded-2xl bg-[var(--color-bg)] p-[var(--space-6)] text-[var(--color-text)] sm:p-[var(--space-7)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-[var(--space-9)]"
+        >
           <div>
-            <SectionHeader
-              eyebrow="One product or a complete club range"
-              index="04"
-              title="Order what your gym actually needs."
-              description="You do not have to build a complete club range to work with Sparwright."
-            />
-            <p className="mt-[var(--space-6)] text-body text-[var(--color-text-secondary)]">
-              Some gyms may begin with one clearly defined requirement:
+            <p className="inline-flex rounded-sm bg-forge-600 px-2.5 py-1 text-eyebrow font-semibold uppercase tracking-[0.14em] text-white">
+              Or combine them
             </p>
-            <Chips items={SINGLE_STARTS} tone="dark" className="mt-[var(--space-4)]" />
-            <p className="mt-[var(--space-5)] text-body text-[var(--color-text-secondary)]">
-              Others may want several products developed together.
+            <h3 className="mt-[var(--space-4)] text-heading-3">Build a coordinated club kit when it makes sense.</h3>
+            <p className="mt-[var(--space-4)] text-body text-[var(--color-text-secondary)]">
+              If you do want a broader club kit, your equipment and apparel can
+              be planned around the same identity. The products do not need to
+              be identical: the aim is to carry the agreed club identity across
+              the range while giving each item the construction and
+              specification appropriate to its use.
             </p>
+            <div className="mt-[var(--space-6)]">
+              <Button
+                href="/quote?intent=mockup"
+                variant="primary"
+                arrow
+                data-analytics="hero_mockup_click"
+                data-analytics-surface="clubs_kit"
+              >
+                {CTA.clubKit}
+              </Button>
+            </div>
           </div>
-          <FramedPhoto
-            src={gymAthletes}
-            alt="A boxer and a club member in matching custom kit, both carrying the same club emblem."
-            ratio="aspect-[5/4]"
-            cutout
-          />
-        </div>
 
-        <div className="mt-[var(--space-8)] rounded-xl border border-[var(--color-border)] bg-white/[0.03] p-[var(--space-6)] sm:p-[var(--space-7)]">
-          <h3 className="text-heading-3">Build a coordinated club kit when it makes sense.</h3>
-          <p className="mt-[var(--space-4)] max-w-copy text-body text-[var(--color-text-secondary)]">
-            If you do want a broader club kit, your equipment and apparel can be
-            planned around the same identity. For example:
-          </p>
-          <div className="mt-[var(--space-6)] grid gap-[var(--space-5)] md:grid-cols-3">
-            {CLUB_KIT.map((group) => (
-              <div key={group.title} className="border-t-2 border-forge-600 pt-[var(--space-4)]">
-                <h4 className="font-body text-body font-semibold">{group.title}</h4>
-                <TickList items={group.items} className="mt-[var(--space-3)]" />
-              </div>
-            ))}
-          </div>
-          <div className="mt-[var(--space-6)] grid gap-[var(--space-5)] border-t border-[var(--color-border)] pt-[var(--space-5)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-            <p className="max-w-copy text-body text-[var(--color-text-secondary)]">
-              The products do not need to be identical. The aim is to carry the
-              agreed club identity across the range while giving each item the
-              construction and specification appropriate to its use.
-            </p>
-            <Button
-              href="/quote?intent=mockup"
-              variant="inverse"
-              arrow
-              data-analytics="hero_mockup_click"
-              data-analytics-surface="clubs_kit"
-            >
-              {CTA.clubKit}
-            </Button>
+          <div>
+            <p className="text-eyebrow uppercase tracking-[0.14em] text-[var(--color-text-muted)]">For example</p>
+            <ul className="mt-[var(--space-4)] flex flex-col">
+              {CLUB_KIT.map((group, i) => (
+                <li
+                  key={group.title}
+                  className="grid gap-2 border-t border-white/10 py-[var(--space-4)] sm:grid-cols-[9.5rem_minmax(0,1fr)] sm:gap-[var(--space-5)]"
+                >
+                  <p className="flex items-center gap-3 font-body text-body font-semibold">
+                    <span aria-hidden="true" className="font-display text-small tabular-nums text-forge-600">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {group.title}
+                  </p>
+                  <ul className="flex flex-wrap gap-1.5">
+                    {group.items.map((item) => (
+                      <li
+                        key={item}
+                        className="rounded-full border border-white/15 px-2.5 py-1 text-small text-[var(--color-text-secondary)]"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </Section>
 
-      {/* 05 — Sizes and order planning. */}
+      {/* 04 — Sizes and order planning. */}
       <Section theme="light" width="work">
         <div className="grid gap-[var(--space-8)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div>
             <SectionHeader
               eyebrow="Sizes and order planning"
-              index="05"
+              index="04"
               title="Plan the order around the people who will use it."
               description="Club orders often include more variation than a single standard product."
             />
@@ -1053,13 +1238,13 @@ export default function ForClubsPage() {
         </div>
       </Section>
 
-      {/* 06 — Start with your brief: what to send, and what happens to it. */}
+      {/* 05 — Start with your brief: what to send, and what happens to it. */}
       <Section theme="white" width="work">
         <div className="grid gap-[var(--space-8)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <div>
             <SectionHeader
               eyebrow="Start with your brief"
-              index="06"
+              index="05"
               title="Tell us what you want to make."
               description="You do not need a finished tech pack to begin. A useful first enquiry can be simple."
             />
@@ -1111,13 +1296,13 @@ export default function ForClubsPage() {
         </div>
       </Section>
 
-      {/* 07 — Sample before bulk: the five stages, and where they happen. */}
+      {/* 06 — Sample before bulk: the five stages, and where they happen. */}
       <Section theme="dark" width="work">
         <div className="grid gap-[var(--space-8)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div>
             <SectionHeader
               eyebrow="Sample before bulk"
-              index="07"
+              index="06"
               title="Approve what is being made before the full order is produced."
               description="For an overseas manufacturing relationship, confidence should come from an agreed product — not from vague promises."
             />
@@ -1185,13 +1370,13 @@ export default function ForClubsPage() {
         </div>
       </Section>
 
-      {/* 08 — Reorders. */}
+      {/* 07 — Reorders. */}
       <Section theme="light" width="work">
         <div className="grid gap-[var(--space-8)] lg:grid-cols-2 lg:items-start">
           <div>
             <SectionHeader
               eyebrow="Reorders"
-              index="08"
+              index="07"
               title="Your next order should not begin from zero."
               description="A useful manufacturing relationship continues after the first order."
             />
@@ -1225,11 +1410,11 @@ export default function ForClubsPage() {
         </div>
       </Section>
 
-      {/* 09 — Club questions. */}
+      {/* 08 — Club questions. */}
       <Section theme="white" width="copy">
         <SectionHeader
           eyebrow="Gyms & academies FAQ"
-          index="09"
+          index="08"
           title="Questions about custom equipment for your club."
         />
         <FAQAccordion
