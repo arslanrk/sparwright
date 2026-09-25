@@ -115,7 +115,10 @@ export function HeroSlider({ slides, top, label }: HeroSliderProps) {
             // faded into the Ink. The type sits on the dark third the banner
             // was composed with, in a column that ends before its figures.
             full &&
-              "xl:inset-x-0 xl:top-1/2 xl:bottom-auto xl:w-full xl:-translate-y-1/2 xl:aspect-[var(--banner-ratio)] xl:[mask-image:linear-gradient(to_bottom,transparent,black_14%,black_86%,transparent)]",
+              // 92% of the width, anchored right, so a banner whose figures
+              // start early still clears the type column; its left edge fades
+              // into the Ink with the top and bottom.
+              "xl:left-auto xl:right-0 xl:top-1/2 xl:bottom-auto xl:w-[92%] xl:-translate-y-1/2 xl:aspect-[var(--banner-ratio)] xl:[mask-image:linear-gradient(to_bottom,transparent,black_14%,black_86%,transparent),linear-gradient(to_right,transparent,black_10%)] xl:[mask-composite:intersect]",
             index === active ? "opacity-100" : "opacity-0",
           )}
           style={

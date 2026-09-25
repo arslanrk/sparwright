@@ -24,7 +24,7 @@ import factoryFloor from "../../../public/images/boxing-glove-factory-floor.jpg"
 import clubApparelGroup from "../../../public/images/club-apparel-group.webp";
 import gymAthletes from "../../../public/images/gyms-and-academies.png";
 import mockupToGlove from "../../../public/images/logo-mockup-to-finished-glove.jpg";
-import mmaFighter from "../../../public/images/mma-fighter.jpg";
+import mmaAcademiesBanner from "../../../public/images/mma-academies-banner.jpg";
 
 /**
  * Gyms & Academies — Design System §11 For Clubs template.
@@ -119,9 +119,12 @@ const HERO_SLIDES: HeroSlide[] = [
     ],
     action: <MockupAction slide="mma" />,
     photo: {
-      src: mmaFighter,
-      alt: "An MMA fighter throwing a jab in black open-palm MMA gloves with red wrist straps, in front of a training cage.",
-      position: "center 40%",
+      src: mmaAcademiesBanner,
+      alt: "Martial artists in a caged training gym: an MMA fighter in fight shorts and hand wraps, a woman in open-palm MMA gloves, a kickboxer, a fighter at the heavy bag and a martial artist wrapping his hands.",
+      // Shown whole from xl; where it is cropped (the right-hand area, or a
+      // strip on a phone) it centres on the woman in MMA gloves.
+      position: "58% center",
+      layout: "full",
     },
   },
   {
