@@ -1,12 +1,27 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { FramedPhoto } from "@/components/content/AudienceBlocks";
 import { CallToAction } from "@/components/content/CallToAction";
+import {
+  ConceptStudio,
+  type Colourway,
+  type ConceptLogo,
+  type ConceptProduct,
+} from "@/components/content/ConceptStudio";
 import { FAQAccordion } from "@/components/content/FAQAccordion";
 import { HeroSlider, type HeroSlide } from "@/components/content/HeroSlider";
 import { RolePanels, type RolePanel } from "@/components/content/RolePanels";
+import {
+  ColourStudy,
+  IconTiles,
+  PointList,
+  SpecPhoto,
+  SpecSheet,
+  type SpecArea,
+  type SpecIcon,
+} from "@/components/content/SpecSheet";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
@@ -22,14 +37,25 @@ import {
 } from "@/lib/structured-data";
 import boxingClubsBanner from "../../../public/images/boxing-clubs-banner.jpg";
 import factoryFloor from "../../../public/images/boxing-glove-factory-floor.jpg";
+import gloveStrikeWhiteRedBlack from "../../../public/images/concept/boxing-gloves_strike_white-red-black.jpg";
+import gloveStrikeBlackRed from "../../../public/images/concept/boxing-gloves_strike_black-red.jpg";
+import gloveStrikeBlackTan from "../../../public/images/concept/boxing-gloves_strike_black-tan.jpg";
+import gloveClassicWhiteRedBlack from "../../../public/images/concept/boxing-gloves_classic_white-red-black.jpg";
+import gloveClassicBlackRed from "../../../public/images/concept/boxing-gloves_classic_black-red.jpg";
+import gloveClassicBlackTan from "../../../public/images/concept/boxing-gloves_classic_black-tan.jpg";
+import gloveCrackleWhiteRedBlack from "../../../public/images/concept/boxing-gloves_crackle_white-red-black.jpg";
+import gloveCrackleBlackRed from "../../../public/images/concept/boxing-gloves_crackle_black-red.jpg";
+import gloveCrackleBlackTan from "../../../public/images/concept/boxing-gloves_crackle_black-tan.jpg";
 import roleMembers from "../../../public/images/for-clubs/members.jpg";
 import roleCoaches from "../../../public/images/for-clubs/coach.jpg";
 import roleTeam from "../../../public/images/for-clubs/team.png";
 import roleFighters from "../../../public/images/mma-fighter.jpg";
 import clubApparelGroup from "../../../public/images/club-apparel-group.webp";
 import gymAthletes from "../../../public/images/gyms-and-academies.png";
-import mockupToGlove from "../../../public/images/logo-mockup-to-finished-glove.jpg";
 import mmaAcademiesBanner from "../../../public/images/mma-academies-banner.jpg";
+import specExploded from "../../../public/images/exploded-boxing-glove.jpg";
+import specPacking from "../../../public/images/packing-and-export.jpg";
+import specPrinting from "../../../public/images/printing-and-decoration.jpg";
 
 /**
  * Gyms & Academies — Design System §11 For Clubs template.
@@ -236,13 +262,13 @@ const ROLES: RolePanel[] = [
 
 /* -- 02 · Made to your requirements --------------------------------------- */
 
-const BRANDING_METHODS = [
-  "Print",
-  "Embroidery",
-  "Sublimation",
-  "Embossing",
-  "Patches",
-  "Woven labels",
+const BRANDING_METHODS: { label: string; icon: SpecIcon }[] = [
+  { label: "Print", icon: "print" },
+  { label: "Embroidery", icon: "embroidery" },
+  { label: "Sublimation", icon: "sublimation" },
+  { label: "Embossing", icon: "embossing" },
+  { label: "Patches", icon: "patch" },
+  { label: "Woven labels", icon: "label" },
 ];
 
 const CONSTRUCTION_POINTS = [
@@ -253,6 +279,225 @@ const CONSTRUCTION_POINTS = [
   "Sizing",
   "Finish",
   "Branding placement",
+];
+
+const PACKAGING_ITEMS: { label: string; icon: SpecIcon }[] = [
+  { label: "Polybags", icon: "polybag" },
+  { label: "Retail boxes", icon: "box" },
+  { label: "Inserts", icon: "insert" },
+  { label: "Labels", icon: "tag" },
+  { label: "Export cartons", icon: "carton" },
+];
+
+/** The four areas of a club specification, as sheet tabs. */
+const SPEC_AREAS: SpecArea[] = [
+  {
+    code: "BR",
+    title: "Club branding",
+    summary: "Crest, wordmark and sponsors",
+    body: (
+      <>
+        <p>
+          Add your club crest, wordmark, sponsor artwork or other approved
+          branding. Depending on the product and material, available methods
+          can include:
+        </p>
+        <IconTiles items={BRANDING_METHODS} columns={2} />
+      </>
+    ),
+    visual: (
+      <SpecPhoto
+        src={specPrinting}
+        alt="An operator at a wide-format sublimation printer as a printed club design feeds out."
+        tag="Decoration"
+        position="center 40%"
+      />
+    ),
+  },
+  {
+    code: "CO",
+    title: "Club colours",
+    summary: "Matched to your references",
+    body: (
+      <>
+        <p>Supply colour codes or a physical colour reference where available.</p>
+        <p>
+          Because different materials can reproduce colour differently, the
+          relevant appearance is confirmed through the product and sample
+          process.
+        </p>
+      </>
+    ),
+    visual: <ColourStudy />,
+  },
+  {
+    code: "CN",
+    title: "Product construction",
+    summary: "What it is made of, and how",
+    body: (
+      <>
+        <p>Depending on the product, your specification may cover:</p>
+        <PointList items={CONSTRUCTION_POINTS} />
+      </>
+    ),
+    visual: (
+      <SpecPhoto
+        src={specExploded}
+        alt="A leather boxing glove shown exploded into its cuff, lace closure, woven label and padding layers."
+        tag="Construction"
+        position="center 45%"
+      />
+    ),
+  },
+  {
+    code: "PK",
+    title: "Packaging",
+    summary: "How it arrives",
+    body: (
+      <>
+        <p>
+          Where required, the manufacturing brief can also define polybags,
+          retail boxes, inserts, labels and export cartons.
+        </p>
+        <IconTiles items={PACKAGING_ITEMS} columns={2} />
+      </>
+    ),
+    visual: (
+      <SpecPhoto
+        src={specPacking}
+        alt="Shelves of packed and labelled export cartons in the Sparwright warehouse."
+        tag="Packing"
+        position="center 40%"
+      />
+    ),
+  },
+];
+
+/*
+ * The concept studio: sample logos (club marks, not real clubs) and the
+ * product concepts it switches between. Each concept is one photograph in
+ * public/images/concept; `patches` are where its logo label sits, in percent
+ * of the square frame — they also cover the marks the source photographs
+ * carry.
+ */
+const CONCEPT_LOGOS: ConceptLogo[] = [
+  {
+    id: "crest",
+    label: "Crest",
+    mark: (
+      <svg viewBox="0 0 40 40" className="h-full w-auto" fill="none">
+        <path d="M20 3 6 8v11c0 9 6 15 14 18 8-3 14-9 14-18V8Z" fill="currentColor" />
+        <path d="M13 24 27 12" stroke="#D83A20" strokeWidth="4" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    id: "monogram",
+    label: "Monogram",
+    mark: (
+      <svg viewBox="0 0 40 40" className="h-full w-auto" fill="none">
+        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" />
+        <path d="M13 13v14M13 20l7-7M13 20l7 7M24 13v14h5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    id: "wordmark",
+    label: "Wordmark",
+    mark: (
+      <svg viewBox="0 0 64 28" className="h-full w-auto" fill="none">
+        <path d="M4 4h56L54 14l6 10H4l6-10Z" fill="#D83A20" />
+        <text x="32" y="18" textAnchor="middle" fontFamily="Arial, sans-serif" fontSize="10" fontWeight="800" fill="currentColor" letterSpacing="1">CLUB</text>
+      </svg>
+    ),
+  },
+];
+
+/** The nine glove photographs, one per design and colourway. */
+const GLOVE_PHOTOS: Record<string, StaticImageData> = {
+  "strike_white-red-black": gloveStrikeWhiteRedBlack,
+  "strike_black-red": gloveStrikeBlackRed,
+  "strike_black-tan": gloveStrikeBlackTan,
+  "classic_white-red-black": gloveClassicWhiteRedBlack,
+  "classic_black-red": gloveClassicBlackRed,
+  "classic_black-tan": gloveClassicBlackTan,
+  "crackle_white-red-black": gloveCrackleWhiteRedBlack,
+  "crackle_black-red": gloveCrackleBlackRed,
+  "crackle_black-tan": gloveCrackleBlackTan,
+};
+
+const GLOVE_DESIGNS = [
+  { id: "strike", label: "Strike" },
+  { id: "classic", label: "Classic" },
+  { id: "crackle", label: "Crackle" },
+];
+
+const GLOVE_COLOURWAYS: Colourway[] = [
+  { id: "white-red-black", label: "White, red and black", swatches: ["#F4F2EE", "#9E1F1F", "#0B0D10"] },
+  { id: "black-red", label: "Black and fight red", swatches: ["#0B0D10", "#E0281E", "#5A5E66"] },
+  // The tan strap takes a dark logo; light would disappear on it.
+  { id: "black-tan", label: "Black and tan", swatches: ["#0B0D10", "#B98A57", "#EFE3CF"], logoInk: "#1A1510" },
+];
+
+const GLOVE_DESIGN_TEXT: Record<string, string> = {
+  strike: "an angular strike pattern",
+  classic: "a plain shell and a thin piped edge",
+  crackle: "an all-over crackle pattern",
+};
+const GLOVE_COLOUR_TEXT: Record<string, string> = {
+  "white-red-black": "White boxing gloves in deep red and black",
+  "black-red": "Black boxing gloves in fight red",
+  "black-tan": "Black boxing gloves with tan detailing and tan wrist straps",
+};
+
+const CONCEPT_PRODUCTS: ConceptProduct[] = [
+  {
+    id: "gloves",
+    label: "Boxing gloves",
+    designs: GLOVE_DESIGNS,
+    colourways: GLOVE_COLOURWAYS,
+    // Every glove photograph shares one framing; the wrist panels are blank,
+    // so the logo sits on them directly.
+    patches: [
+      { x: 27.5, y: 73.5, w: 20, h: 12.5, ground: "transparent", ink: "#E8E8E8" },
+      { x: 72.2, y: 73.5, w: 20, h: 12.5, ground: "transparent", ink: "#E8E8E8" },
+    ],
+    photos: Object.fromEntries(
+      GLOVE_DESIGNS.flatMap((d) =>
+        GLOVE_COLOURWAYS.map((c) => [
+          `${d.id}_${c.id}`,
+          {
+            src: GLOVE_PHOTOS[`${d.id}_${c.id}`],
+            alt: `${GLOVE_COLOUR_TEXT[c.id]}, ${GLOVE_DESIGN_TEXT[d.id]}, the club logo on each wrist strap.`,
+          },
+        ]),
+      ),
+    ),
+  },
+];
+
+/** Icons for the three steps from a logo to a sample: send, define, approve. */
+const STEP_ICONS = [
+  <svg key="send" viewBox="0 0 24 24" className="size-[1.125rem]" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 15V4M7.5 8.5 12 4l4.5 4.5" />
+    <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+  </svg>,
+  <svg key="define" viewBox="0 0 24 24" className="size-[1.125rem]" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12" />
+    <circle cx="16" cy="6" r="2" />
+    <circle cx="10" cy="12" r="2" />
+    <circle cx="18" cy="18" r="2" />
+  </svg>,
+  <svg key="approve" viewBox="0 0 24 24" className="size-[1.125rem]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </svg>,
+];
+
+/** From only a logo and an idea to an approved sample. */
+const LOGO_TO_SAMPLE = [
+  { title: "Send what you have", description: "The product, your logo, a rough quantity, any colours or references." },
+  { title: "Define what is left", description: "The remaining product decisions are identified with you." },
+  { title: "Approve the sample", description: "Nothing goes to bulk until the sample is signed off." },
 ];
 
 /* -- 03 · Equipment and apparel ------------------------------------------- */
@@ -548,99 +793,125 @@ export default function ForClubsPage() {
         </div>
       </Section>
 
-      {/* 02 — What can be specified, and a start from only a logo. */}
-      <Section theme="light" width="work">
-        <div className="grid gap-[var(--space-6)] lg:grid-cols-2 lg:items-end lg:gap-[var(--space-8)]">
-          <SectionHeader
-            eyebrow="Made to your requirements"
-            index="02"
-            title="Your club should not have to fit an off-the-shelf product."
-            description="Custom manufacturing starts with defining what you actually need."
-          />
-          <Prose>
-            <p>
-              That may be as simple as adding your club identity to an
-              established product type, or it may involve decisions about
-              materials, construction, sizing, branding and packaging.
-            </p>
-            <p>
-              You do not need every detail decided before you contact us. The
-              purpose of the first brief is to establish what is already known
-              and what still needs to be defined before sampling.
-            </p>
-          </Prose>
+      {/*
+        02 — What can be specified. The four areas of a brief as a tech-pack
+        sheet, one tab each with a visual of its own.
+        Light: between the white 01 and the white 03.
+      */}
+      <Section theme="light" width="shell">
+        <SectionHeader
+          eyebrow="Made to your requirements"
+          index="02"
+          title="Your club should not have to fit an off-the-shelf product."
+          description="Custom manufacturing starts with defining what you actually need. That may be as simple as adding your club identity to an established product type, or it may involve decisions about materials, construction, sizing, branding and packaging."
+          className="lg:max-w-[52rem]"
+        />
+
+        <div className="mt-[var(--space-8)]">
+          <SpecSheet areas={SPEC_AREAS} label="What a club specification covers" />
         </div>
 
-        <ul className="mt-[var(--space-7)] grid gap-[var(--space-4)] md:grid-cols-2">
-          <SpecCard title="Club branding">
-            <p>
-              Add your club crest, wordmark, sponsor artwork or other approved
-              branding. Depending on the product and material, available methods
-              can include:
-            </p>
-            <Chips items={BRANDING_METHODS} />
-          </SpecCard>
-          <SpecCard title="Club colours">
-            <p>Supply colour codes or a physical colour reference where available.</p>
-            <p>
-              Because different materials can reproduce colour differently, the
-              relevant appearance is confirmed through the product and sample
-              process.
-            </p>
-          </SpecCard>
-          <SpecCard title="Product construction">
-            <p>Depending on the product, your specification may cover:</p>
-            <Chips items={CONSTRUCTION_POINTS} />
-          </SpecCard>
-          <SpecCard title="Packaging">
-            <p>
-              Where required, the manufacturing brief can also define polybags,
-              retail boxes, inserts, labels and export cartons.
-            </p>
-          </SpecCard>
-        </ul>
+      </Section>
 
-        {/* The reassurance, with the mockup that shows where it leads. */}
-        <div
-          data-theme="dark"
-          className="mt-[var(--space-7)] grid overflow-hidden rounded-xl bg-[var(--color-bg)] text-[var(--color-text)] lg:grid-cols-2"
-        >
-          <div className="relative aspect-[16/10] bg-ink-950 lg:aspect-auto">
-            <Image
-              src={mockupToGlove}
-              alt="A flat mockup of a black and tan glove with a shield emblem beside the finished glove, the emblem embroidered on the cuff."
-              fill
-              sizes="(min-width: 1024px) 600px, 100vw"
-              className="object-contain p-[var(--space-5)]"
-            />
-          </div>
-          <div className="p-[var(--space-6)] sm:p-[var(--space-7)]">
-            <h3 className="text-heading-3">Starting with only a logo and an idea?</h3>
-            <p className="mt-[var(--space-4)] text-body-large text-[var(--color-text-secondary)]">
-              That is a valid starting point.
+      {/*
+        Between 02 and 03, unnumbered: a logo and an idea are enough to start.
+        Its own band rather than part of the specification, since it answers
+        a different question — not "what can we decide?" but "do we have to
+        decide it all first?". The studio on the left shows it: a logo, a
+        colour and a design idea in, a finished product out.
+        Dark: between the light 02 and the white 03.
+      */}
+      <Section theme="dark" width="shell">
+        <div className="grid items-center gap-[var(--space-7)] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] lg:gap-[var(--space-8)]">
+          <ConceptStudio products={CONCEPT_PRODUCTS} logos={CONCEPT_LOGOS} />
+          <div>
+            <p className="inline-flex rounded-sm bg-forge-600 px-2.5 py-1 text-eyebrow font-semibold uppercase tracking-[0.14em]">
+              Starting point
             </p>
-            <Prose className="mt-[var(--space-4)]">
-              <p>
-                Send the product you are considering, your club logo,
-                approximate quantity and any colours or references you already
-                have.
-              </p>
-              <p>
-                The remaining product decisions can then be identified before a
-                sample is approved.
-              </p>
-            </Prose>
-            <div className="mt-[var(--space-6)]">
+            <h3 className="mt-[var(--space-4)] font-display text-[clamp(2rem,3vw,2.75rem)] font-bold leading-[1.05] tracking-[-0.03em] [text-wrap:balance]">
+              Starting with only a logo and an idea?
+            </h3>
+            <p className="mt-[var(--space-4)] text-body-large text-mist-300">
+              <span className="font-semibold text-white">That is a valid starting point.</span>{" "}
+              You do not need every detail decided before you contact us.
+            </p>
+
+            {/* Points at the studio: left of it on a desktop, above on a phone. */}
+            <p className="mt-[var(--space-4)] inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] py-1.5 pl-1.5 pr-4 text-small text-mist-300">
+              <span aria-hidden="true" className="flex size-7 items-center justify-center rounded-full bg-forge-600 text-white">
+                <svg viewBox="0 0 16 16" className="size-3.5 -rotate-90 lg:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
+                </svg>
+              </span>
+              Try it: pick a logo, colourway and design.
+            </p>
+
+            {/* The route from here, as a connected track: brief to sample. */}
+            <ol className="mt-[var(--space-6)] flex flex-col gap-[var(--space-4)]">
+              {LOGO_TO_SAMPLE.map((step, i) => {
+                const last = i === LOGO_TO_SAMPLE.length - 1;
+                return (
+                  <li key={step.title} className="relative flex gap-[var(--space-4)]">
+                    {/* The track to the next step; none after the last. */}
+                    {!last ? (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "absolute left-5 top-10 -bottom-[var(--space-4)] w-px",
+                          i === LOGO_TO_SAMPLE.length - 2
+                            ? "bg-linear-to-b from-forge-600 to-success-600"
+                            : "bg-forge-600/70",
+                        )}
+                      />
+                    ) : null}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full ring-4 ring-[var(--color-bg)]",
+                        last ? "bg-success-600 text-white" : "border border-forge-600/70 bg-ink-950 text-forge-600",
+                      )}
+                    >
+                      {STEP_ICONS[i]}
+                    </span>
+                    <div className="pt-1">
+                      <p className="flex items-baseline gap-2 font-body text-body font-semibold">
+                        <span className="font-display text-small tabular-nums text-mist-300">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        {step.title}
+                      </p>
+                      <p className="mt-1 text-small text-mist-300">{step.description}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+
+            <div className="mt-[var(--space-6)] flex flex-wrap items-center gap-x-[var(--space-5)] gap-y-3">
               <Button
                 href="/quote?intent=mockup"
-                variant="inverse"
+                variant="primary"
                 arrow
                 data-analytics="hero_mockup_click"
                 data-analytics-surface="clubs_requirements"
               >
                 {CTA.mockup}
               </Button>
+              <Link
+                href="/quote"
+                data-analytics="hero_quote_click"
+                data-analytics-surface="clubs_requirements"
+                className="text-small font-semibold text-white underline decoration-white/30 underline-offset-4 transition-colors hover:decoration-forge-600"
+              >
+                or {CTA.brief.toLowerCase()}
+              </Link>
             </div>
+            <p className="mt-[var(--space-4)] flex items-center gap-2 text-small text-mist-300">
+              <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 shrink-0 text-success-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m3 8.5 3 3 7-7" />
+              </svg>
+              Reviewed by a person, not an automated quote.
+            </p>
           </div>
         </div>
       </Section>
@@ -1070,18 +1341,6 @@ function TickList({
         </li>
       ))}
     </ul>
-  );
-}
-
-/** One specification area in section 02. */
-function SpecCard({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <li className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-[var(--space-5)] sm:p-[var(--space-6)]">
-      <h3 className="font-body text-body-large font-semibold">{title}</h3>
-      <div className="mt-[var(--space-3)] flex flex-col gap-[var(--space-3)] text-body text-[var(--color-text-secondary)]">
-        {children}
-      </div>
-    </li>
   );
 }
 
