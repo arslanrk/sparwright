@@ -6,6 +6,7 @@ import { FramedPhoto } from "@/components/content/AudienceBlocks";
 import { CallToAction } from "@/components/content/CallToAction";
 import { FAQAccordion } from "@/components/content/FAQAccordion";
 import { HeroSlider, type HeroSlide } from "@/components/content/HeroSlider";
+import { RolePanels, type RolePanel } from "@/components/content/RolePanels";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
@@ -21,6 +22,10 @@ import {
 } from "@/lib/structured-data";
 import boxingClubsBanner from "../../../public/images/boxing-clubs-banner.jpg";
 import factoryFloor from "../../../public/images/boxing-glove-factory-floor.jpg";
+import roleMembers from "../../../public/images/for-clubs/members.jpg";
+import roleCoaches from "../../../public/images/for-clubs/coach.jpg";
+import roleTeam from "../../../public/images/for-clubs/team.png";
+import roleFighters from "../../../public/images/mma-fighter.jpg";
 import clubApparelGroup from "../../../public/images/club-apparel-group.webp";
 import gymAthletes from "../../../public/images/gyms-and-academies.png";
 import mockupToGlove from "../../../public/images/logo-mockup-to-finished-glove.jpg";
@@ -154,31 +159,78 @@ const HERO_SLIDES: HeroSlide[] = [
 
 /* -- 01 · For the way your club trains ------------------------------------ */
 
-/** Who in the club the kit is for — each a different requirement. */
-const EQUIP = [
+/**
+ * The four people a club kits out — each a different requirement, each a
+ * panel in the section's expanding strip, with the products it points to.
+ * Full-size photographs: the MMA fighter is the site's own original, the
+ * member, the coach and the team supplied for this section.
+ */
+const ROLES: RolePanel[] = [
   {
     label: "Members",
-    title: "Equip your members",
+    title: "Equip the people who train every week.",
     description:
-      "Customise training equipment around the products, sizes and intended uses your members need. That can include boxing gloves, MMA gloves, protective gear and other products used during regular club sessions.",
+      "Gloves, protective gear and other training products planned around use, size and session requirements.",
+    products: [
+      { label: "Boxing gloves", href: PAGE.gloves },
+      { label: "MMA gloves", href: PAGE.mma },
+      { label: "Protective gear", href: PAGE.protective },
+    ],
+    photo: {
+      src: roleMembers,
+      alt: "A club member in blue boxing gloves working a heavy bag among rows of punch bags in the gym.",
+      position: "42% 40%",
+      side: "right",
+    },
   },
   {
     label: "Coaches",
-    title: "Equip your coaches",
+    title: "Give coaches the right tools for drills.",
     description:
-      "Build the equipment used for drills and coaching, including focus mitts, Thai pads, kicking shields, training sticks and punch bags.",
+      "Focus mitts, Thai pads, kicking shields, training sticks and punch bags for everyday coaching.",
+    products: [
+      { label: "Focus mitts", href: PAGE.pads },
+      { label: "Thai pads", href: PAGE.pads },
+      { label: "Punch bags", href: PAGE.pads },
+    ],
+    photo: {
+      src: roleCoaches,
+      alt: "A coach in a black vest and red shin guards holding up focus mitts in the gym.",
+      // Cropped to the coach alone; weighted right so he clears the type.
+      position: "70% 25%",
+    },
   },
   {
     label: "Fighters",
-    title: "Equip your fighters",
+    title: "Separate training, sparring and competition needs.",
     description:
-      "Where the product line allows it, define different requirements for training, sparring and competition use rather than treating every glove or piece of equipment as interchangeable.",
+      "Different uses can require different glove weights, protection and equipment specifications.",
+    products: [
+      { label: "Sparring gloves", href: PAGE.gloves },
+      { label: "MMA gloves", href: PAGE.mma },
+      { label: "Shin guards", href: PAGE.mma },
+    ],
+    photo: {
+      src: roleFighters,
+      alt: "An MMA fighter throwing a jab in open-palm MMA gloves with red wrist straps, in front of a training cage.",
+      position: "center 30%",
+    },
   },
   {
     label: "Team",
-    title: "Equip your team",
+    title: "Carry the club identity beyond the training floor.",
     description:
-      "Carry the club identity beyond training equipment with fight shorts, rashguards, T-shirts, hoodies, tracksuits and other club apparel.",
+      "Fight shorts, rashguards, T-shirts, hoodies and tracksuits built around the same club colours and branding.",
+    products: [
+      { label: "Fight shorts", href: PAGE.apparel },
+      { label: "Rashguards", href: PAGE.apparel },
+      { label: "Hoodies & tracksuits", href: PAGE.apparel },
+    ],
+    photo: {
+      src: roleTeam,
+      alt: "Three club members in matching black and red Sparwright training kit — a sports bra and shorts, a T-shirt and shorts, and a long-sleeve top and leggings.",
+      position: "52% 30%",
+    },
   },
 ];
 
@@ -471,53 +523,28 @@ export default function ForClubsPage() {
         }
       />
 
-      {/* 01 — Who the kit is for. Intro left, the four people it serves right. */}
-      <Section theme="white" width="work">
-        <div className="grid gap-[var(--space-8)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <div>
-            <SectionHeader
-              eyebrow="For the way your club trains"
-              index="01"
-              title="The right equipment depends on who is using it and how they train."
-              description="A boxing club, MMA gym or martial-arts academy rarely has one equipment requirement."
-            />
-            <Prose className="mt-[var(--space-5)]">
-              <p>
-                Members may need training gloves. Fighters may need different
-                equipment for sparring and competition preparation. Coaches work
-                with pads, mitts and shields. Junior sessions bring their own
-                size requirements. Outside the training floor, the club may also
-                want fightwear and apparel carrying the same identity.
-              </p>
-              <p>
-                Your manufacturing brief can reflect those differences instead
-                of forcing every product into one standard specification.
-              </p>
-            </Prose>
-            <div className="mt-[var(--space-6)]">
-              <Button href="/quote" variant="primary" arrow>
-                {CTA.brief}
-              </Button>
-            </div>
-          </div>
-          <ul className="grid gap-[var(--space-4)] sm:grid-cols-2">
-            {EQUIP.map((item) => (
-              <li
-                key={item.title}
-                className="flex flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-[var(--space-5)]"
-              >
-                <span className="inline-flex self-start rounded-sm bg-forge-100 px-2 py-1 text-eyebrow uppercase text-forge-700">
-                  {item.label}
-                </span>
-                <h3 className="mt-[var(--space-4)] font-body text-body-large font-semibold leading-snug">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-small text-[var(--color-text-secondary)]">
-                  {item.description}
-                </p>
-              </li>
-            ))}
-          </ul>
+      {/*
+        01 — Who the kit is for. The heading, the four roles as an expanding
+        strip of photographs, then the one action beneath them. White: it follows the dark
+        hero and precedes the light section 02.
+      */}
+      <Section theme="white" width="shell">
+        <SectionHeader
+          eyebrow="For the way your club trains"
+          index="01"
+          title="The right equipment depends on who is using it and how they train."
+          className="lg:max-w-[46rem]"
+        />
+
+        <div className="mt-[var(--space-8)]">
+          <RolePanels panels={ROLES} />
+        </div>
+
+        {/* The one action, under the panels it follows from. */}
+        <div className="mt-[var(--space-7)] flex justify-center">
+          <Button href="/quote" variant="primary" arrow>
+            {CTA.brief}
+          </Button>
         </div>
       </Section>
 
