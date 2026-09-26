@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import {
   Answer,
   BriefSheet,
@@ -11,7 +12,7 @@ import {
   type BriefField,
   type RouteStep,
 } from "@/components/content/BriefBoard";
-import { CallToAction } from "@/components/content/CallToAction";
+import { ClubStarter, type StarterProduct } from "@/components/content/ClubStarter";
 import {
   ConceptStudio,
   type Colourway,
@@ -45,6 +46,7 @@ import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
 import { CTA } from "@/components/foundation/cta";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
+import { whatsappHref } from "@/components/navigation/nav";
 import { cn } from "@/lib/cn";
 import { pageMetadata } from "@/lib/metadata";
 import type { ProductFaq } from "@/lib/products";
@@ -76,7 +78,7 @@ import roleTeam from "../../../public/images/for-clubs/team.png";
 import roleFighters from "../../../public/images/mma-fighter.jpg";
 import clubApparelGroup from "../../../public/images/club-apparel-group.webp";
 import mmaAcademiesBanner from "../../../public/images/mma-academies-banner.jpg";
-import specExploded from "../../../public/images/exploded-boxing-glove.jpg";
+import specConstruction from "../../../public/images/spec/construction-exploded.jpg";
 import specPacking from "../../../public/images/packing-and-export.jpg";
 import specPrinting from "../../../public/images/printing-and-decoration.jpg";
 import stageBrief from "../../../public/images/design-and-tech-pack-development.jpg";
@@ -368,10 +370,10 @@ const SPEC_AREAS: SpecArea[] = [
     ),
     visual: (
       <SpecPhoto
-        src={specExploded}
-        alt="A leather boxing glove shown exploded into its cuff, lace closure, woven label and padding layers."
+        src={specConstruction}
+        alt="A black and red boxing glove beside its layers laid out in a line: the leather shell, three grades of foam padding, the lining, the wrist strap and a blank woven label."
         tag="Construction"
-        position="center 45%"
+        position="center"
       />
     ),
   },
@@ -874,21 +876,57 @@ const FAQS: ProductFaq[] = [
   },
 ];
 
-/** The closing ticket: what happens after the brief, as section 06 says. */
-const CLOSING_STEPS = [
+const FAQ_ICON = "size-5";
+
+/** The questions by what a club is deciding; numbered through in this order. */
+const FAQ_GROUPS: { id: string; title: string; icon: ReactNode; items: ProductFaq[] }[] = [
   {
-    title: "Send what you know",
-    description: "The product, approximate quantity, logo and destination.",
+    id: "branding",
+    title: "Branding and products",
+    items: FAQS.slice(0, 4),
+    icon: (
+      <svg viewBox="0 0 24 24" className={FAQ_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3 4.5 6v6c0 4.5 3.2 7.7 7.5 9 4.3-1.3 7.5-4.5 7.5-9V6Z" />
+        <path d="m9 12 2 2 4-4.5" />
+      </svg>
+    ),
   },
   {
-    title: "A person reviews it",
-    description: "Every brief is read before the next step is decided.",
+    id: "sizes",
+    title: "Sizes and quantities",
+    items: FAQS.slice(4, 6),
+    icon: (
+      <svg viewBox="0 0 24 24" className={FAQ_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3.5 8.5h17v7h-17Z" />
+        <path d="M7.5 8.5v3M11.5 8.5v4M15.5 8.5v3" />
+      </svg>
+    ),
   },
   {
-    title: "The next step is defined",
-    description: "A mockup, a manufacturing quote or the questions still open.",
+    id: "process",
+    title: "Timing, samples and reorders",
+    items: FAQS.slice(6),
+    icon: (
+      <svg viewBox="0 0 24 24" className={FAQ_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 7.5V12l3 2" />
+      </svg>
+    ),
   },
 ];
+
+/** The closing band's picker: each opens a mockup request with the product chosen. */
+const STARTER_PRODUCTS: StarterProduct[] = [
+  { label: "Boxing gloves", product: "Boxing Gloves", photo: gloveStrikeBlackRed },
+  { label: "MMA gear", product: "MMA Gloves", photo: rangeMma },
+  { label: "Pads and bags", product: "Focus Mitts and Pads", photo: rangePads },
+  { label: "Protective gear", product: "Protective Gear", photo: rangeProtective },
+  { label: "Club apparel", product: "Club T-Shirts", photo: rangeApparel, fill: true },
+  { label: "Lifting gear", product: "Lifting Belts and Gear", photo: rangeLifting },
+];
+
+/** Only when a real number is configured — never a dead link. */
+const WHATSAPP = whatsappHref();
 
 export default function ForClubsPage() {
   return (
@@ -1462,48 +1500,149 @@ export default function ForClubsPage() {
         </div>
       </Section>
 
-      {/* 08 — Club questions. */}
-      <Section theme="white" width="copy">
-        <SectionHeader
-          eyebrow="Gyms & academies FAQ"
-          index="08"
-          title="Questions about custom equipment for your club."
-        />
-        <FAQAccordion
-          items={FAQS}
-          name="clubs-faq"
-          openFirst
-          className="mt-[var(--space-6)]"
-        />
+      {/*
+        08 — Club questions, grouped by what a club is deciding. A sticky rail
+        holds the header, the topics as jump links and a way to ask what is
+        not listed; the groups run beside it as one accordion, numbered
+        through. White: between the light 07 and the closing action band.
+      */}
+      <Section theme="white" width="shell">
+        <div className="grid grid-cols-1 gap-[var(--space-8)] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-[var(--space-9)]">
+          <div className="lg:sticky lg:top-[calc(var(--header-height)+var(--space-6))] lg:self-start">
+            <SectionHeader
+              eyebrow="Gyms & academies FAQ"
+              index="08"
+              title="Questions about custom equipment for your club."
+            />
+
+            <nav aria-label="FAQ topics" className="mt-[var(--space-6)] hidden lg:block">
+              <ol className="flex flex-col gap-2">
+                {FAQ_GROUPS.map((group) => (
+                  <li key={group.id}>
+                    <a
+                      href={`#faq-${group.id}`}
+                      className="group flex items-center gap-4 rounded-xl border border-[var(--color-border)] p-3 pr-[var(--space-4)] transition-colors hover:border-forge-600/50 hover:bg-[var(--color-surface)]"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-surface)] text-forge-600 transition-colors group-hover:bg-forge-600 group-hover:text-white"
+                      >
+                        {group.icon}
+                      </span>
+                      <span className="flex-1">
+                        <span className="block font-body text-body font-semibold">{group.title}</span>
+                        <span className="block text-small text-[var(--color-text-secondary)]">
+                          {group.items.length} questions
+                        </span>
+                      </span>
+                      <span aria-hidden="true" className="text-[var(--color-text-muted)] transition-colors group-hover:text-forge-600">
+                        <svg viewBox="0 0 16 16" className="size-4 rotate-90" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
+                        </svg>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+
+            <NotListed className="mt-[var(--space-5)] hidden lg:block" />
+          </div>
+
+          <div className="flex flex-col gap-[var(--space-7)]">
+            {FAQ_GROUPS.map((group, g) => (
+              <div key={group.id} id={`faq-${group.id}`} className="scroll-mt-[calc(var(--header-height)+var(--space-5))]">
+                <h3 className="flex items-center gap-3 border-b border-[var(--color-border)] pb-[var(--space-3)] text-eyebrow uppercase tracking-[0.16em] text-[var(--color-text-muted)]">
+                  <span aria-hidden="true" className="h-0.5 w-6 bg-forge-600" />
+                  {group.title}
+                </h3>
+                <FAQAccordion
+                  items={group.items}
+                  name="clubs-faq"
+                  start={FAQ_GROUPS.slice(0, g).reduce((n, prev) => n + prev.items.length, 1)}
+                  openFirst={g === 0}
+                  className="mt-[var(--space-4)]"
+                />
+              </div>
+            ))}
+            <NotListed className="lg:hidden" />
+          </div>
+        </div>
       </Section>
 
       {/*
-        The closing band keeps to a heading and one short paragraph — §04 rules
-        out long copy on red — so the brief's five questions are folded into
-        one line, and the ticket carries what happens after the click.
+        Closing band. The red side keeps to a heading, one short line and the
+        actions (§04); the dark panel beside it turns the range into a place
+        to start — each product opens the mockup request with it chosen.
       */}
-      <CallToAction
+      <ClubStarter
+        eyebrow="Start your order"
         title="Start with the gear your club needs now."
-        description="Gloves for your members, pads and protective equipment for the gym, fightwear for your fighters, club apparel — or several products under one identity. Start with the requirement you have today."
-        steps={CLOSING_STEPS}
-        action={{
-          label: CTA.mockup,
-          href: "/quote?intent=mockup",
-          analytics: "hero_mockup_click",
-          surface: "clubs_cta",
+        description="One product or the whole kit, under your club's identity. Start with the requirement you have today."
+        surface="clubs_cta_product"
+        products={STARTER_PRODUCTS}
+        several={{
+          label: "Several products under one identity",
+          description: "Gloves, pads, protection and apparel in one brief.",
+          product: "Multiple Products",
         }}
-        secondaryAction={{
-          label: CTA.quote,
-          href: "/quote",
-          analytics: "hero_quote_click",
-          surface: "clubs_cta",
-        }}
+        actions={
+          <>
+            <Button
+              href="/quote?intent=mockup"
+              variant="inverse"
+              arrow
+              data-analytics="hero_mockup_click"
+              data-analytics-surface="clubs_cta"
+            >
+              {CTA.mockup}
+            </Button>
+            <Button
+              href="/quote"
+              variant="secondary"
+              data-analytics="hero_quote_click"
+              data-analytics-surface="clubs_cta"
+            >
+              {CTA.quote}
+            </Button>
+          </>
+        }
+        footnote={
+          WHATSAPP ? (
+            <>
+              Prefer to talk first?{" "}
+              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-4">
+                Message us on WhatsApp
+              </a>
+            </>
+          ) : null
+        }
       />
     </>
   );
 }
 
 /* -- Page-local building blocks ------------------------------------------- */
+
+/** The FAQ's way out: for whatever the list does not cover. */
+function NotListed({ className }: { className?: string }) {
+  return (
+    <div
+      data-theme="dark"
+      className={cn("relative overflow-hidden rounded-2xl bg-[var(--color-bg)] p-[var(--space-6)] text-[var(--color-text)]", className)}
+    >
+      <span aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-forge-600/25 blur-3xl" />
+      <p className="relative font-body text-body-large font-semibold">Question not listed?</p>
+      <p className="relative mt-2 text-small text-[var(--color-text-secondary)]">
+        Put it in your brief — every request is read by a person — or{" "}
+        <Link href="/contact" className="font-semibold text-white underline decoration-forge-600 decoration-2 underline-offset-4 hover:text-forge-600">
+          contact the team
+        </Link>
+        .
+      </p>
+    </div>
+  );
+}
 
 function Arrow() {
   return (

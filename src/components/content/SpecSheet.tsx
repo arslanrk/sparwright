@@ -3,6 +3,9 @@
 import Image, { type StaticImageData } from "next/image";
 import { useId, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import colourCotton from "../../../public/images/spec/colour-cotton.jpg";
+import colourLeather from "../../../public/images/spec/colour-leather.jpg";
+import colourPolyester from "../../../public/images/spec/colour-polyester.jpg";
 
 /**
  * SpecSheet — the club's decisions laid out as a tech-pack sheet.
@@ -247,30 +250,21 @@ export function PointList({ items }: { items: string[] }) {
  * sample rather than promised from a code.
  */
 export function ColourStudy() {
-  const materials = [
+  const materials: { name: string; note: string; photo: StaticImageData }[] = [
     {
       name: "Leather",
       note: "Deeper, with sheen",
-      style: {
-        background:
-          "radial-gradient(120% 90% at 30% 20%, rgb(255 255 255 / 0.28), transparent 45%), linear-gradient(160deg, #c2331c, #8f2414)",
-      },
+      photo: colourLeather,
     },
     {
       name: "Polyester",
       note: "Brighter when sublimated",
-      style: {
-        background:
-          "repeating-linear-gradient(90deg, rgb(255 255 255 / 0.06) 0 2px, transparent 2px 4px), linear-gradient(160deg, #ec4a2c, #d83a20)",
-      },
+      photo: colourPolyester,
     },
     {
       name: "Cotton",
       note: "Softer, more matt",
-      style: {
-        background:
-          "repeating-linear-gradient(45deg, rgb(0 0 0 / 0.06) 0 1px, transparent 1px 3px), linear-gradient(160deg, #cf5a44, #b9452f)",
-      },
+      photo: colourCotton,
     },
   ];
   return (
@@ -286,7 +280,9 @@ export function ColourStudy() {
       <ul className="mt-[var(--space-5)] grid grid-cols-3 gap-2">
         {materials.map((material) => (
           <li key={material.name}>
-            <span aria-hidden="true" className="block aspect-[4/5] rounded-lg ring-1 ring-white/10" style={material.style} />
+            <span aria-hidden="true" className="relative block aspect-[4/5] overflow-hidden rounded-lg ring-1 ring-white/10">
+              <Image src={material.photo} alt="" fill sizes="(min-width: 1024px) 120px, 30vw" className="object-cover" />
+            </span>
             <p className="mt-2 text-small font-semibold">{material.name}</p>
             <p className="text-[0.75rem] leading-snug text-mist-300">{material.note}</p>
           </li>

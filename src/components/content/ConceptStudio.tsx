@@ -103,7 +103,7 @@ export function ConceptStudio({
         </span>
       </div>
 
-      <div className="grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+      <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         {/* Before: the brief. */}
         <div className="flex flex-col gap-[var(--space-5)] p-[var(--space-5)] md:border-r md:border-white/10">
           <StepLabel step="Before" title="Your brief" />
@@ -139,14 +139,15 @@ export function ConceptStudio({
                   key={l.id}
                   selected={l.id === logoId}
                   onSelect={() => setLogoId(l.id)}
-                  className="flex-col gap-1.5 rounded-lg border px-2 py-2.5"
+                  className="min-w-0 flex-col gap-1.5 rounded-lg border px-1.5 py-2.5"
                   selectedClass="border-forge-600 bg-forge-600/10 text-white"
                   idleClass="border-white/10 text-mist-300 hover:border-white/30"
                 >
                   <span aria-hidden="true" className="flex h-8 items-center text-white">
                     {l.mark}
                   </span>
-                  <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em]">{l.label}</span>
+                  {/* Sentence case: spaced capitals overran the narrow tiles. */}
+                  <span className="max-w-full truncate text-[0.75rem] font-semibold">{l.label}</span>
                 </Option>
               ))}
             </div>
@@ -199,9 +200,9 @@ export function ConceptStudio({
         {/* After: the finished product. First on a phone, so a choice shows
             where it lands without scrolling past the brief. */}
         <div className="order-first flex flex-col gap-[var(--space-4)] border-b border-white/10 p-[var(--space-5)] md:order-none md:border-b-0">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
             <StepLabel step="After" title="Finished product" />
-            <span className="flex items-center gap-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-success-600">
+            <span className="flex items-center gap-1.5 whitespace-nowrap text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-success-600">
               <span aria-hidden="true" className="size-1.5 animate-pulse rounded-full bg-success-600 motion-reduce:animate-none" />
               Live preview
             </span>
@@ -278,7 +279,7 @@ function StepLabel({ step, title }: { step: string; title: string }) {
       <span className="rounded-sm bg-white/10 px-1.5 py-0.5 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-mist-300">
         {step}
       </span>
-      <span className="font-body text-body font-semibold text-white">{title}</span>
+      <span className="whitespace-nowrap font-body text-body font-semibold text-white">{title}</span>
     </p>
   );
 }
