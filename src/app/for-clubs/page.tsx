@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import {
+  Answer,
+  BriefSheet,
+  LogoFile,
+  ReviewRoute,
+  Swatches,
+  Thumbs,
+  type BriefField,
+  type RouteStep,
+} from "@/components/content/BriefBoard";
 import { CallToAction } from "@/components/content/CallToAction";
 import {
   ConceptStudio,
@@ -19,6 +28,7 @@ import {
   SizesVisual,
   UsesVisual,
 } from "@/components/content/PlanningCards";
+import { ReferenceFile, ReorderNeeds, type ReorderNeed } from "@/components/content/ReorderFile";
 import { RolePanels, type RolePanel } from "@/components/content/RolePanels";
 import {
   ColourStudy,
@@ -29,6 +39,7 @@ import {
   type SpecArea,
   type SpecIcon,
 } from "@/components/content/SpecSheet";
+import { StageTimeline, type Stage } from "@/components/content/StageTimeline";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
@@ -68,6 +79,10 @@ import mmaAcademiesBanner from "../../../public/images/mma-academies-banner.jpg"
 import specExploded from "../../../public/images/exploded-boxing-glove.jpg";
 import specPacking from "../../../public/images/packing-and-export.jpg";
 import specPrinting from "../../../public/images/printing-and-decoration.jpg";
+import stageBrief from "../../../public/images/design-and-tech-pack-development.jpg";
+import stageConcept from "../../../public/images/review-the-concept.jpg";
+import stageSample from "../../../public/images/approve-the-sample.jpg";
+import stageProduction from "../../../public/images/quality-testing.jpg";
 
 /**
  * Gyms & Academies — Design System §11 For Clubs template.
@@ -644,46 +659,101 @@ const PLANNING = [
 
 /* -- 06 · Start with your brief ------------------------------------------- */
 
-const BRIEF_ITEMS = [
-  "The product or products",
-  "Approximate quantity",
-  "Club or academy logo",
-  "Destination country",
-  "Intended use",
-  "Preferred colours",
-  "Reference photographs or products",
-  "Material or construction preferences, if known",
+/** What to send, each with an example answer; two are left open on purpose. */
+const BRIEF_FIELDS: BriefField[] = [
+  {
+    label: "The product or products",
+    value: (
+      <>
+        <Answer strong>Boxing gloves</Answer>
+        <Answer>Pads</Answer>
+        <Answer>T-shirts</Answer>
+      </>
+    ),
+  },
+  { label: "Approximate quantity", value: <Answer>Not sure yet</Answer> },
+  { label: "Club or academy logo", value: <LogoFile mark={CONCEPT_LOGOS[0].mark} name="club-crest.svg" /> },
+  { label: "Destination country", value: <Answer>United Kingdom</Answer> },
+  {
+    label: "Intended use",
+    value: (
+      <>
+        <Answer>Bag work</Answer>
+        <Answer>Sparring</Answer>
+      </>
+    ),
+  },
+  { label: "Preferred colours", value: <Swatches colours={["#111111", "#D83A20", "#F4F1E8"]} /> },
+  {
+    label: "Reference photographs or products",
+    value: <Thumbs shots={[gloveStrikeBlackRed, gloveClassicWhiteRedBlack]} />,
+  },
+  { label: "Material or construction preferences, if known" },
 ];
 
-const NEXT_STEPS = [
-  { title: "A mockup", description: "Your branding on the product, before anything is made." },
-  { title: "A manufacturing quote", description: "When the requirement is clear enough to price." },
+const ROUTE_ICON = "size-5";
+
+const NEXT_STEPS: RouteStep[] = [
+  {
+    title: "A mockup",
+    description: "Your branding on the product, before anything is made.",
+    icon: (
+      <svg viewBox="0 0 24 24" className={ROUTE_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="m3 16 5-5 4 4 3-3 6 6" />
+        <circle cx="15.5" cy="8.5" r="1.5" />
+      </svg>
+    ),
+  },
+  {
+    title: "A manufacturing quote",
+    description: "When the requirement is clear enough to price.",
+    icon: (
+      <svg viewBox="0 0 24 24" className={ROUTE_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z" />
+        <path d="M14 3v6h6M8 13h8M8 17h5" />
+      </svg>
+    ),
+  },
   {
     title: "Questions",
     description: "The details still needed to complete the specification.",
+    icon: (
+      <svg viewBox="0 0 24 24" className={ROUTE_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2Z" />
+        <path d="M10 8.5a2 2 0 1 1 2.8 1.8c-.5.3-.8.7-.8 1.2M12 13.5h.01" />
+      </svg>
+    ),
   },
 ];
 
 /* -- 07 · Sample before bulk ---------------------------------------------- */
 
-const STAGES: { title: string; description: string; checks?: string[] }[] = [
+const STAGES: Stage[] = [
   {
     title: "Share your requirements",
+    photo: { src: stageBrief, alt: "A pattern maker working from a glove drawing, with material swatches and the product's panels on screen." },
     description:
       "Product, approximate quantity, logo, intended use and destination form the starting brief. Add colours, references and product requirements where you already know them.",
   },
   {
     title: "Review the concept",
+    photo: { src: stageConcept, alt: "A designer reviewing one glove design in three colourways on screen and in print, beside leather swatches and a colour fan." },
     description:
       "The initial product direction is aligned, including branding, colour and the specifications that need to be defined.",
   },
   {
     title: "Approve the sample",
+    photo: {
+      src: stageSample,
+      alt: "A quality inspector checking a single sample boxing glove beside a scale, a tape measure and a ticked checklist.",
+    },
     description:
       "Materials, construction, sizing and finish are confirmed through the physical sample before bulk production.",
   },
   {
     title: "Production and quality control",
+    photo: { src: stageProduction, alt: "Gloves checked and sorted into crates on the Sparwright production floor." },
     description:
       "The order is produced against the approved specification. Quality-control checks can include:",
     checks: [
@@ -696,6 +766,7 @@ const STAGES: { title: string; description: string; checks?: string[] }[] = [
   },
   {
     title: "Packing and delivery",
+    photo: { src: specPacking, alt: "Packed cartons of finished gear on warehouse racking, ready for export." },
     description:
       "Final quantities, packing requirements and shipment documentation are completed for the order.",
   },
@@ -703,12 +774,54 @@ const STAGES: { title: string; description: string; checks?: string[] }[] = [
 
 /* -- 08 · Reorders -------------------------------------------------------- */
 
-const REORDER_NEEDS = [
-  "Replace regularly used equipment",
-  "Add products for new members",
-  "Order another run of apparel",
-  "Expand into another product line",
-  "Return to an existing approved design",
+const REORDER_ICON = "size-5";
+
+const REORDER_NEEDS: ReorderNeed[] = [
+  {
+    text: "Replace regularly used equipment",
+    icon: (
+      <svg viewBox="0 0 24 24" className={REORDER_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4" />
+      </svg>
+    ),
+  },
+  {
+    text: "Add products for new members",
+    icon: (
+      <svg viewBox="0 0 24 24" className={REORDER_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="8" r="3.5" />
+        <path d="M2.5 20c.8-3.5 3.3-5.5 6.5-5.5s5.7 2 6.5 5.5M19 8v6M16 11h6" />
+      </svg>
+    ),
+  },
+  {
+    text: "Order another run of apparel",
+    icon: (
+      <svg viewBox="0 0 24 24" className={REORDER_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8.5 3.5 4 5.5 2.5 10l3 1.2V20.5h13V11.2l3-1.2L20 5.5l-4.5-2a3.5 3.5 0 0 1-7 0Z" />
+      </svg>
+    ),
+  },
+  {
+    text: "Expand into another product line",
+    icon: (
+      <svg viewBox="0 0 24 24" className={REORDER_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+        <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+        <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+        <path d="M17 14v6M14 17h6" />
+      </svg>
+    ),
+  },
+  {
+    text: "Return to an existing approved design",
+    icon: (
+      <svg viewBox="0 0 24 24" className={REORDER_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 3H6.5A2.5 2.5 0 0 0 4 5.5v13A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5V9Z" />
+        <path d="M14 3v6h6M8.5 14.5l2.5 2.5 4.5-5" />
+      </svg>
+    ),
+  },
 ];
 
 /* -- 09 · FAQ -------------------------------------------------------------- */
@@ -861,7 +974,7 @@ export default function ForClubsPage() {
         Dark: between the light 02 and the white 03.
       */}
       <Section theme="dark" width="shell">
-        <div className="grid items-center gap-[var(--space-7)] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] lg:gap-[var(--space-8)]">
+        <div className="grid items-center gap-[var(--space-7)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-[var(--space-8)]">
           <ConceptStudio products={CONCEPT_PRODUCTS} logos={CONCEPT_LOGOS} />
           <div>
             <p className="inline-flex rounded-sm bg-forge-600 px-2.5 py-1 text-eyebrow font-semibold uppercase tracking-[0.14em]">
@@ -1188,154 +1301,152 @@ export default function ForClubsPage() {
         </div>
       </Section>
 
-      {/* 05 — Start with your brief: what to send, and what happens to it. */}
-      <Section theme="white" width="work">
-        <div className="grid gap-[var(--space-8)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <div>
-            <SectionHeader
-              eyebrow="Start with your brief"
-              index="05"
-              title="Tell us what you want to make."
-              description="You do not need a finished tech pack to begin. A useful first enquiry can be simple."
-            />
-            <h3 className="mt-[var(--space-7)] font-body text-body-large font-semibold">
-              Send what you already know
-            </h3>
-            <TickList items={BRIEF_ITEMS} columns={2} className="mt-[var(--space-4)]" />
-            <p className="mt-[var(--space-6)] border-l-2 border-forge-600 pl-[var(--space-4)] text-body text-[var(--color-text-secondary)]">
-              If something is undecided, say so. The purpose of the request is to
-              establish the requirement, not to pretend every decision has already
-              been made.
-            </p>
-          </div>
+      {/*
+        05 — Start with your brief. A club brief as it might arrive, filled in
+        with example answers and two fields left open; beside it, the route
+        it takes: one person reviews it, then one of three next steps.
+        White: between the light 04 and the dark 06.
+      */}
+      <Section theme="white" width="shell">
+        <div className="grid gap-[var(--space-6)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:items-end lg:gap-[var(--space-9)]">
+          <SectionHeader
+            eyebrow="Start with your brief"
+            index="05"
+            title="Tell us what you want to make."
+            description="You do not need a finished tech pack to begin. A useful first enquiry can be simple."
+          />
+          <p className="text-body text-[var(--color-text-secondary)]">
+            Send what you already know — a product, a logo and where it is
+            going is enough to begin.{" "}
+            <span className="font-semibold text-[var(--color-text)]">
+              The rest can be settled together.
+            </span>
+          </p>
+        </div>
 
-          <div
-            data-theme="dark"
-            className="self-start rounded-xl bg-[var(--color-bg)] p-[var(--space-6)] text-[var(--color-text)] sm:p-[var(--space-7)]"
-          >
-            <h3 className="text-heading-3">A person reviews every request.</h3>
-            <p className="mt-[var(--space-4)] text-body text-[var(--color-text-secondary)]">
-              Your submission is reviewed before the next step is decided.
-              Depending on the brief, that next step may be:
-            </p>
-            <ul className="mt-[var(--space-5)] flex flex-col gap-3">
-              {NEXT_STEPS.map((step) => (
-                <li
-                  key={step.title}
-                  className="rounded-lg border border-[var(--color-border)] p-[var(--space-4)]"
-                >
-                  <p className="font-body text-body font-semibold">{step.title}</p>
-                  <p className="mt-1 text-small text-[var(--color-text-secondary)]">
-                    {step.description}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-[var(--space-6)]">
+        <div className="mt-[var(--space-7)] grid gap-3">
+          <BriefSheet
+            title="Send what you already know"
+            fields={BRIEF_FIELDS}
+            footnote={
+              <>
+                <span className="font-semibold text-[var(--color-text)]">If something is undecided, say so.</span>{" "}
+                The purpose of the request is to establish the requirement, not
+                to pretend every decision has already been made.
+              </>
+            }
+          />
+          <ReviewRoute
+            title="A person reviews every request."
+            intro="Your submission is reviewed before the next step is decided. Depending on the brief, that next step may be:"
+            steps={NEXT_STEPS}
+            action={
               <Button
                 href="/quote?intent=mockup"
-                variant="inverse"
+                variant="primary"
                 arrow
                 data-analytics="hero_mockup_click"
                 data-analytics-surface="clubs_brief"
               >
                 {CTA.mockup}
               </Button>
-            </div>
-          </div>
+            }
+          />
         </div>
       </Section>
 
-      {/* 06 — Sample before bulk: the five stages, and where they happen. */}
-      <Section theme="dark" width="work">
-        <div className="grid gap-[var(--space-8)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-          <div>
-            <SectionHeader
-              eyebrow="Sample before bulk"
-              index="06"
-              title="Approve what is being made before the full order is produced."
-              description="For an overseas manufacturing relationship, confidence should come from an agreed product — not from vague promises."
-            />
-            <p className="mt-[var(--space-5)] text-body text-[var(--color-text-secondary)]">
+      {/*
+        06 — Sample before bulk. The five stages as one rail, split by a gate
+        at the sample: before it, one product; after it, the full order. Each
+        stage opens with its own photograph. Then Sialkot, and the process
+        link. Dark: between the white 05 and the light 07.
+      */}
+      <Section theme="dark" width="shell">
+        <div className="grid gap-[var(--space-6)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:items-end lg:gap-[var(--space-9)]">
+          <SectionHeader
+            eyebrow="Sample before bulk"
+            index="06"
+            title="Approve what is being made before the full order is produced."
+          />
+          <p className="text-body text-[var(--color-text-secondary)]">
+            For an overseas manufacturing relationship, confidence should come
+            from an agreed product — not from vague promises.{" "}
+            <span className="font-semibold text-[var(--color-text)]">
               The Sparwright process moves through five stages.
-            </p>
+            </span>
+          </p>
+        </div>
 
-            <div className="mt-[var(--space-7)] overflow-hidden rounded-xl border border-[var(--color-border)]">
-              <div className="relative aspect-[16/10]">
-                <Image
-                  src={factoryFloor}
-                  alt="Machinists at sewing benches on the Sparwright production floor in Sialkot."
-                  fill
-                  sizes="(min-width: 1024px) 480px, 100vw"
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-[var(--space-5)]">
-                <h3 className="font-body text-body-large font-semibold">Made in Sialkot</h3>
-                <p className="mt-2 text-small text-[var(--color-text-secondary)]">
-                  Sparwright&apos;s manufacturing is based in Sialkot, Pakistan. The
-                  product moves from specification and sampling through
-                  production, quality control and packing against the agreed
-                  requirements.
-                </p>
-                <div className="mt-[var(--space-5)]">
-                  <Button href="/manufacturing" variant="inverse" arrow>
-                    {CTA.process}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="mt-[var(--space-7)]">
+          <StageTimeline stages={STAGES} gateAfter={2} label="The five stages, from brief to delivery" />
+        </div>
 
-          <ol className="relative flex flex-col gap-[var(--space-5)]">
-            <span
-              aria-hidden="true"
-              className="absolute bottom-6 left-5 top-6 w-0.5 bg-linear-to-b from-forge-600 to-success-600"
+        {/* Where it happens. */}
+        <div className="mt-3 grid items-center gap-[var(--space-5)] rounded-2xl border border-[var(--color-border)] p-[var(--space-5)] sm:grid-cols-[auto_minmax(0,1fr)] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-[var(--space-6)]">
+          <div className="relative hidden h-20 w-32 overflow-hidden rounded-lg sm:block">
+            <Image
+              src={factoryFloor}
+              alt="Machinists at sewing benches on the Sparwright production floor in Sialkot."
+              fill
+              sizes="128px"
+              className="object-cover"
             />
-            {STAGES.map((stage, i) => (
-              <li key={stage.title} className="relative flex gap-[var(--space-5)]">
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full font-display text-small font-bold tabular-nums text-white ring-4 ring-[var(--color-bg)]",
-                    i === STAGES.length - 1 ? "bg-success-600" : "bg-forge-600",
-                  )}
-                >
-                  {i + 1}
-                </span>
-                <div className="flex-1 rounded-xl border border-[var(--color-border)] bg-white/[0.03] p-[var(--space-5)]">
-                  <h3 className="font-body text-body-large font-semibold leading-snug">
-                    {stage.title}
-                  </h3>
-                  <p className="mt-2 text-small text-[var(--color-text-secondary)]">
-                    {stage.description}
-                  </p>
-                  {stage.checks ? (
-                    <Chips items={stage.checks} tone="dark" className="mt-[var(--space-4)]" />
-                  ) : null}
-                </div>
-              </li>
-            ))}
-          </ol>
+          </div>
+          <div>
+            <h3 className="font-body text-body-large font-semibold">Made in Sialkot</h3>
+            <p className="mt-1.5 text-small text-[var(--color-text-secondary)]">
+              Sparwright&apos;s manufacturing is based in Sialkot, Pakistan. The
+              product moves from specification and sampling through production,
+              quality control and packing against the agreed requirements.
+            </p>
+          </div>
+          <Button href="/manufacturing" variant="inverse" arrow>
+            {CTA.process}
+          </Button>
         </div>
       </Section>
 
-      {/* 07 — Reorders. */}
-      <Section theme="light" width="work">
-        <div className="grid gap-[var(--space-8)] lg:grid-cols-2 lg:items-start">
+      {/*
+        07 — Reorders. The approved product kept on file — a record card with
+        the orders that followed from it — beside the reasons a club comes
+        back, and what a repeat order may still need to confirm.
+        Light: between the dark 06 and the white 08.
+      */}
+      <Section theme="light" width="shell">
+        <div className="grid gap-[var(--space-6)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:items-end lg:gap-[var(--space-9)]">
+          <SectionHeader
+            eyebrow="Reorders"
+            index="07"
+            title="Your next order should not begin from zero."
+            description="A useful manufacturing relationship continues after the first order."
+          />
+          <p className="text-body text-[var(--color-text-secondary)]">
+            Once artwork and product specifications have been approved,{" "}
+            <span className="font-semibold text-[var(--color-text)]">
+              they can be kept as the reference for future orders.
+            </span>
+          </p>
+        </div>
+
+        <div className="mt-[var(--space-8)] grid grid-cols-1 gap-[var(--space-8)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:gap-[var(--space-9)]">
           <div>
-            <SectionHeader
-              eyebrow="Reorders"
-              index="07"
-              title="Your next order should not begin from zero."
-              description="A useful manufacturing relationship continues after the first order."
+            <ReferenceFile
+              photo={gloveStrikeBlackRed}
+              product="Club sparring glove"
+              approved={["Artwork and branding", "Colours", "Specification", "Sample"]}
+              orders={["First order", "Reorder", "Next reorder"]}
             />
-            <Prose className="mt-[var(--space-5)]">
-              <p>
-                Once artwork and product specifications have been approved, they
-                can be kept as the reference for future orders.
-              </p>
-            </Prose>
+            <p className="mt-[var(--space-6)] border-l-2 border-forge-600 pl-[var(--space-4)] text-small text-[var(--color-text-secondary)]">
+              A repeat order may still need confirmation if materials, colours,
+              sizing, quantity or construction have changed.{" "}
+              <span className="font-semibold text-[var(--color-text)]">
+                But the agreed product has a documented starting point.
+              </span>
+            </p>
+          </div>
+
+          <div>
+            <ReorderNeeds intro="That matters when your club needs to:" needs={REORDER_NEEDS} />
             <div className="mt-[var(--space-6)]">
               <Button
                 href="/quote"
@@ -1347,15 +1458,6 @@ export default function ForClubsPage() {
                 {CTA.quote}
               </Button>
             </div>
-          </div>
-          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-[var(--space-6)]">
-            <p className="font-body text-body font-semibold">That matters when your club needs to:</p>
-            <TickList items={REORDER_NEEDS} className="mt-[var(--space-4)]" />
-            <p className="mt-[var(--space-5)] border-t border-[var(--color-border)] pt-[var(--space-4)] text-small text-[var(--color-text-secondary)]">
-              A repeat order may still need confirmation if materials, colours,
-              sizing, quantity or construction have changed. But the agreed
-              product has a documented starting point.
-            </p>
           </div>
         </div>
       </Section>
@@ -1402,82 +1504,6 @@ export default function ForClubsPage() {
 }
 
 /* -- Page-local building blocks ------------------------------------------- */
-
-/** Stacked paragraphs in the section's secondary text colour. */
-function Prose({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <div
-      className={cn(
-        "flex max-w-copy flex-col gap-[var(--space-4)] text-body text-[var(--color-text-secondary)]",
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-/** Short labels as tags: branding methods, construction points, checks. */
-function Chips({
-  items,
-  tone = "light",
-  className,
-}: {
-  items: string[];
-  tone?: "light" | "dark";
-  className?: string;
-}) {
-  return (
-    <ul className={cn("flex flex-wrap gap-2", className)}>
-      {items.map((item) => (
-        <li
-          key={item}
-          className={cn(
-            "rounded-full border px-3 py-1 text-small font-medium",
-            tone === "dark"
-              ? "border-white/20 bg-white/5 text-white"
-              : "border-[var(--color-border-strong)]/40 bg-[var(--color-surface)] text-[var(--color-text)]",
-          )}
-        >
-          {item}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/** A plain ticked list — lighter than `CheckList`'s bordered cards. */
-function TickList({
-  items,
-  columns = 1,
-  className,
-}: {
-  items: string[];
-  columns?: 1 | 2;
-  className?: string;
-}) {
-  return (
-    <ul className={cn("grid gap-x-[var(--space-6)] gap-y-2.5", columns === 2 && "sm:grid-cols-2", className)}>
-      {items.map((item) => (
-        <li key={item} className="flex items-start gap-2.5 text-body text-[var(--color-text-secondary)]">
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 16 16"
-            className="mt-1 size-4 shrink-0 text-forge-600"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="m3.5 8.5 3 3 6-7" />
-          </svg>
-          {item}
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 function Arrow() {
   return (
