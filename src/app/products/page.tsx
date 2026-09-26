@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
-import Image, { type StaticImageData } from "next/image";
-import Link from "next/link";
-import { CallToAction } from "@/components/content/CallToAction";
-import { FAQAccordion } from "@/components/content/FAQAccordion";
-import { HeroBanner } from "@/components/content/HeroBanner";
+import type { ReactNode } from "react";
+import { CatalogueExplorer } from "@/components/content/CatalogueExplorer";
+import { FAQGroups, type FAQGroup } from "@/components/content/FAQGroups";
+import { KitFinder, type KitBuyer } from "@/components/content/KitFinder";
+import { LineSlider, type SliderCard } from "@/components/content/LineSlider";
+import { Marquee } from "@/components/content/Marquee";
+import { ProductStage, type StageLine } from "@/components/content/ProductStage";
+import { SpecHotspots, type SpecSpot } from "@/components/content/SpecHotspots";
+import { RangeStarter, type StarterProduct } from "@/components/content/RangeStarter";
 import { Button } from "@/components/foundation/Button";
 import { Section } from "@/components/foundation/Container";
 import { SectionHeader } from "@/components/foundation/SectionHeader";
 import { CTA } from "@/components/foundation/cta";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
-import { MEGA_MENU } from "@/components/navigation/nav";
+import { MEGA_MENU, whatsappHref } from "@/components/navigation/nav";
 import { pageMetadata } from "@/lib/metadata";
+import { LINE_SHOTS } from "@/lib/product-shots";
 import {
   PRODUCTS,
   getProduct,
@@ -19,13 +24,11 @@ import {
 } from "@/lib/products";
 import { siteUrl } from "@/lib/site";
 import { jsonLdScript } from "@/lib/structured-data";
+import apparelGroup from "../../../public/images/range/fightwear-and-apparel-group.webp";
+import boxingGroup from "../../../public/images/range/boxing-gloves-group.webp";
+import liftingGroup from "../../../public/images/range/lifting-gear-group.webp";
 import boxingAthlete from "../../../public/images/boxing-athlete.jpg";
-import factoryFloor from "../../../public/images/boxing-glove-factory-floor.jpg";
-import boxingGloves from "../../../public/images/boxing-gloves.jpg";
-import clubTeamKit from "../../../public/images/club-team-kit.jpg";
-import gymWear from "../../../public/images/gym-wear.jpg";
-import mmaFighter from "../../../public/images/mma-fighter.jpg";
-import strengthLifting from "../../../public/images/strength-and-lifting.jpg";
+import specConstruction from "../../../public/images/spec/construction-exploded.jpg";
 
 /**
  * Products index — Design System §11 Information architecture.
@@ -34,8 +37,9 @@ import strengthLifting from "../../../public/images/strength-and-lifting.jpg";
  * "View All Products" all land here. Sections run in the order a buyer's
  * questions arrive, from broad to exact:
  *
- *   hero dark · 01 categories light · 02 by buyer white ·
- *   03 full product list light · 04 specification dark · 05 FAQ white · CTA
+ *   hero stage dark · marquee red · 01 line slider light · 02 kit finder
+ *   dark · 03 catalogue index white · 04 specification hotspots dark ·
+ *   05 grouped FAQ light · closing picker
  *
  * 01 answers "do you make my kind of thing?", 02 routes a buyer who thinks in
  * terms of their gym rather than a product, 03 answers "do you make my exact
@@ -58,48 +62,141 @@ export const metadata: Metadata = pageMetadata({
   path: "/products",
   title: "Custom Fight Gear and Apparel Manufacturer",
   description:
-    "Custom boxing and MMA gloves, fightwear, protective gear, punch bags and lifting belts from an OEM and private label manufacturer in Sialkot, Pakistan.",
+    "Custom boxing and MMA gloves, fightwear, protective gear, punch bags and lifting belts, made in Sialkot, Pakistan for gyms, clubs and private label brands.",
 });
 
 const PAGE_DESCRIPTION =
-  "Boxing and MMA gloves, fightwear, protective gear, pads and bags, and lifting gear — made in Sialkot, Pakistan for gyms, clubs and private label brands, each to a specification you approve on a sample before bulk production.";
+  "Boxing and MMA gloves, fightwear, protective gear, pads and bags, and lifting gear, made in Sialkot, Pakistan for gyms, clubs and private label brands. Each product is made to a specification you approve on a physical sample before bulk production.";
+
+/** The giant word behind each line on the hero's stage, by slug. */
+const STAGE_WORDS: Record<string, string> = {
+  "custom-boxing-gloves": "BOXING",
+  "fightwear-club-apparel": "APPAREL",
+  "custom-mma-gloves": "MMA",
+  "custom-lifting-belts": "LIFTING",
+  "custom-protective-gear": "GUARD",
+  "custom-pads-bags-mitts": "PADS",
+};
+
+/** Lines whose stage shows a group of models wearing them (scripts/compose-line-group.mjs). */
+const STAGE_GROUPS: Record<string, typeof apparelGroup> = {
+  "custom-boxing-gloves": boxingGroup,
+  "fightwear-club-apparel": apparelGroup,
+  "custom-lifting-belts": liftingGroup,
+};
+
+/**
+ * The six lines for the hero's stage — from `PRODUCTS`, with each line's
+ * studio shot from `LINE_SHOTS`, so a line added there appears here.
+ */
+const LINES: StageLine[] = PRODUCTS.flatMap((product) => {
+  const shot = LINE_SHOTS[product.slug];
+  if (!shot) return [];
+  // Lines shown on people: the model group, as a cut-out.
+  const group = STAGE_GROUPS[product.slug];
+  return [
+    {
+      label: product.category,
+      name: product.name,
+      word: STAGE_WORDS[product.slug] ?? product.category.toUpperCase(),
+      href: productHref(product),
+      shot: group ?? shot.src,
+      scene: group ? false : shot.scene,
+      cutout: Boolean(group),
+      types: product.types?.items.slice(0, 3).map((item) => item.title) ?? [],
+    },
+  ];
+});
+
+/** The strip under the hero: the range, by the names buyers search. */
+const MARQUEE = [
+  "Boxing gloves",
+  "MMA gloves",
+  "Fight shorts",
+  "Rashguards",
+  "Head guards",
+  "Shin guards",
+  "Focus mitts",
+  "Punch bags",
+  "Lifting belts",
+  "Club hoodies",
+];
+
+const kitLine = (slug: string) => {
+  const product = getProduct(slug);
+  const shot = LINE_SHOTS[slug];
+  if (!product || !shot) return [];
+  return [{ name: product.name, label: product.category, href: productHref(product), shot: shot.src, scene: shot.scene }];
+};
+
+const KIT_ICON = "size-5";
 
 /**
  * Buyers who know their gym better than our category names. Each lists the
- * pages that kit is usually built from; slugs, so a renamed page follows.
+ * lines that kit is usually built from; slugs, so a renamed page follows.
  */
-const BY_BUYER: {
-  title: string;
-  description: string;
-  slugs: string[];
-  /** The audience page written for this buyer. */
-  audience: { label: string; href: string };
-}[] = [
+const KIT_BUYERS: KitBuyer[] = [
   {
     title: "Boxing gyms and clubs",
-    description: "Gloves for members, pads for coaches, and protection for sparring.",
-    slugs: ["custom-boxing-gloves", "custom-pads-bags-mitts", "custom-protective-gear"],
+    description: "Gloves for members, pads for coaches and protection for sparring.",
+    icon: (
+      <svg viewBox="0 0 24 24" className={KIT_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 14V8.5C7 5.5 9.2 3.5 12.5 3.5S18 5.5 18 8.5v4c0 1.5-.8 2.6-2 3" />
+        <path d="M7 10c-1.7 0-3 1.3-3 3s1.3 3 3 3" />
+        <path d="M6.5 16h10v4.5h-10Z" />
+      </svg>
+    ),
+    lines: ["custom-boxing-gloves", "custom-pads-bags-mitts", "custom-protective-gear"].flatMap(kitLine),
     audience: { label: CTA.gymManufacturing, href: "/for-clubs" },
   },
   {
     title: "MMA and kickboxing gyms",
     description: "Open-palm gloves and shin guards, with fightwear to match.",
-    slugs: ["custom-mma-gloves", "fightwear-club-apparel", "custom-protective-gear"],
+    icon: (
+      <svg viewBox="0 0 24 24" className={KIT_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 10V6.5a1.5 1.5 0 0 1 3 0V10M9 9.5V5a1.5 1.5 0 0 1 3 0v4.5M12 9.5V5.5a1.5 1.5 0 0 1 3 0v4M15 9.5V7a1.5 1.5 0 0 1 3 0v6.5c0 3.5-2.5 6-6 6H11c-3 0-5-2-5-5V10" />
+      </svg>
+    ),
+    lines: ["custom-mma-gloves", "fightwear-club-apparel", "custom-protective-gear"].flatMap(kitLine),
     audience: { label: CTA.gymManufacturing, href: "/for-clubs" },
   },
   {
     title: "Strength and fitness gyms",
-    description: "Belts, straps and gloves for the floor, and training wear to go with them.",
-    slugs: ["custom-lifting-belts", "fightwear-club-apparel"],
+    description: "Belts, straps and gloves for the lifting floor, and training wear to go with them.",
+    icon: (
+      <svg viewBox="0 0 24 24" className={KIT_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11" />
+      </svg>
+    ),
+    lines: ["custom-lifting-belts", "fightwear-club-apparel"].flatMap(kitLine),
     audience: { label: CTA.gymManufacturing, href: "/for-clubs" },
   },
   {
-    title: "Brands and private label",
-    description: "Any line, under your own name, labels and packaging.",
-    slugs: ["custom-boxing-gloves", "fightwear-club-apparel", "custom-lifting-belts"],
+    title: "Private label brands",
+    description: "Any product line, under your own name, labels and packaging, as one product or a range.",
+    icon: (
+      <svg viewBox="0 0 24 24" className={KIT_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3.5 12.5V4.5a1 1 0 0 1 1-1h8l8 8-9 9Z" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+      </svg>
+    ),
+    lines: ["custom-boxing-gloves", "fightwear-club-apparel", "custom-lifting-belts"].flatMap(kitLine),
     audience: { label: CTA.privateLabel, href: "/private-label" },
   },
 ];
+
+/** The closing band's picker: each opens a brief with the product chosen. */
+const STARTER_PRODUCTS: StarterProduct[] = [
+  { label: "Boxing gloves", product: "Boxing Gloves", photo: LINE_SHOTS["custom-boxing-gloves"].src },
+  { label: "MMA gear", product: "MMA Gloves", photo: LINE_SHOTS["custom-mma-gloves"].src },
+  { label: "Pads and bags", product: "Focus Mitts and Pads", photo: LINE_SHOTS["custom-pads-bags-mitts"].src },
+  { label: "Protective gear", product: "Protective Gear", photo: LINE_SHOTS["custom-protective-gear"].src },
+  { label: "Fightwear", product: "Fight Shorts", photo: LINE_SHOTS["fightwear-club-apparel"].src, fill: true },
+  { label: "Lifting gear", product: "Lifting Belts and Gear", photo: LINE_SHOTS["custom-lifting-belts"].src },
+];
+
+/** Only when a real number is configured — never a dead link. */
+const WHATSAPP = whatsappHref();
 
 /**
  * The full product list — the mega menu's groups, flattened, so the page and
@@ -111,46 +208,80 @@ const BY_BUYER: {
  */
 const CATALOGUE = MEGA_MENU.flat();
 
-const opensBrief = (href: string) => href.startsWith("/quote");
-
 /**
  * What a buyer can specify on any line. Every point is already a commitment
  * made elsewhere — branding methods on the product pages and the expertise
  * grid, colour and packaging in `customization.ts`, grading in `expertise.ts`
  * — so nothing here is a new claim (#5, #6).
  */
-const SPECIFICATION: { title: string; description: string }[] = [
+const SPEC_ICON = "size-5";
+
+/**
+ * Where each point sits on the exploded glove, in percent of the photograph:
+ * the shell's colour, the foam, the lining, the strap's branding, the woven
+ * label and the finished glove.
+ */
+const SPEC_AT: Record<string, { x: number; y: number }> = {
+  "Colours matched to yours": { x: 7, y: 42 },
+  "Materials and construction": { x: 33, y: 40 },
+  "Kids' to adult sizing": { x: 47, y: 44 },
+  "Logo and branding": { x: 63, y: 66 },
+  "Private label and packaging": { x: 77.5, y: 64 },
+  "A sample before bulk": { x: 86, y: 45 },
+};
+
+const SPECIFICATION: (Omit<SpecSpot, "at"> & { icon: ReactNode })[] = [
   {
     title: "Logo and branding",
+    icon: (
+      <svg viewBox="0 0 24 24" className={SPEC_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 12.5V4.5a1 1 0 0 1 1-1h8l8 8-9 9Z" /><circle cx="8.5" cy="8.5" r="1.5" /></svg>
+    ),
     description:
       "Embroidery, print, sublimation, embossing, patches or woven labels — the method chosen for each product and material.",
   },
   {
     title: "Colours matched to yours",
+    icon: (
+      <svg viewBox="0 0 24 24" className={SPEC_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.5s6 6.2 6 10.5a6 6 0 0 1-12 0c0-4.3 6-10.5 6-10.5Z" /></svg>
+    ),
     description:
-      "Send colour codes or a physical swatch. Colours are matched on the sample and kept on file for reorders.",
+      "Send colour codes or a physical swatch. The colour is confirmed on the sample and kept on file for reorders.",
   },
   {
     title: "Materials and construction",
+    icon: (
+      <svg viewBox="0 0 24 24" className={SPEC_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3 9 5-9 5-9-5Z" /><path d="m3 13 9 5 9-5" /></svg>
+    ),
     description:
-      "Leather or synthetic, padding, fabrics, closures and stitching, chosen against how the product will be used.",
+      "Leather or synthetic, padding, fabrics, closures and stitching, chosen for how the product will be used.",
   },
   {
     title: "Kids' to adult sizing",
+    icon: (
+      <svg viewBox="0 0 24 24" className={SPEC_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8.5h17v7h-17Z" /><path d="M7.5 8.5v3M11.5 8.5v4M15.5 8.5v3" /></svg>
+    ),
     description:
-      "Patterns graded across the full size run, so a club can order for every member in one kit.",
+      "Junior and adult sizing can be included where available, with the size mix confirmed in the product specification.",
   },
   {
     title: "Private label and packaging",
+    icon: (
+      <svg viewBox="0 0 24 24" className={SPEC_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5Z" /><path d="m3 8 9 5 9-5M12 13v8" /></svg>
+    ),
     description:
       "Your labels, polybags, retail boxes, inserts and export cartons, so the product arrives under your name.",
   },
   {
     title: "A sample before bulk",
+    icon: (
+      <svg viewBox="0 0 24 24" className={SPEC_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8.5" /><path d="m8.5 12.5 2.5 2.5 4.5-5" /></svg>
+    ),
     description:
-      "A mockup, then a physical sample of each product. Bulk production is made and checked against the one you approve.",
+      "A physical sample is approved before bulk production begins, and bulk is made and checked against it.",
   },
 ];
+
+const SPEC_SPOTS: SpecSpot[] = SPECIFICATION.map((point) => ({ ...point, at: SPEC_AT[point.title] ?? { x: 50, y: 50 } }));
 
 /**
  * Questions about ordering across lines — the ones a buyer comparing six
@@ -161,205 +292,105 @@ const ORDERING_FAQS: ProductFaq[] = [
   {
     question: "Can one order include several product lines?",
     answer:
-      "Yes. Gloves, fightwear, pads, protective gear and lifting gear can go into one brief and be quoted together, so a club or brand orders its whole kit at once.",
+      "Yes. Gloves, fightwear, pads, protective gear and lifting gear can go into one brief and be quoted together, so a club or brand can order several products at once.",
   },
   {
     question: "Is the minimum order per product or per order?",
     answer:
-      "Minimums are set per product, because they depend on its material, construction and branding method. We confirm the minimum for each item in your order with your quote, before you commit to anything.",
+      "Minimum quantities depend on each product and its specification, including materials, construction and branding. The applicable requirement is confirmed with your quote, before you commit.",
   },
   {
     question: "Does each product need its own sample?",
     answer:
-      "Yes. A sample is made for each product in the order, and bulk production of that product starts only once you have approved it.",
+      "Products that require sampling are approved before their bulk production begins. Which products need a sample is confirmed with your quote.",
   },
   {
     question: "Can one logo and colour scheme carry across everything?",
     answer:
-      "Yes. One colour reference and one logo treatment are carried across every line in the order and checked on each sample, so gloves, shorts and hoodies read as one kit.",
+      "Yes. One colour reference and one logo treatment can be applied across every line in the order. Different materials reproduce colour differently, so the match is confirmed product by product.",
   },
   {
     question: "Can we start with one line and add others later?",
     answer:
-      "Yes. Your approved artwork, colour references and specifications stay on file, so a line added later is made to match the first.",
+      "Yes. Approved artwork, colour references and specifications can be kept on file, so a line added later is developed against the same reference.",
   },
   {
     question: "Do you make kids' boxing gloves and gear?",
     answer:
-      "Yes. Kids' boxing, MMA and grappling gloves, head guards, punch bags and boxing sets are made alongside the adult ranges, in the same colours and branding, so a club can kit out its junior members to match.",
+      "Yes. Kids' boxing, MMA and grappling gloves, head guards, punch bags and boxing sets can be made alongside the adult range, in the same colours and branding.",
   },
   {
     question: "Do you make products that are not listed here?",
     answer:
-      "Often, yes. The list above is what we make most often. If your product is not on it, send a brief with a reference product or a description and we confirm what is practical.",
+      "If the product is not listed, send a reference or a description. We can confirm whether it fits Sparwright's manufacturing capability before you proceed.",
   },
 ];
 
-/**
- * The six categories under the banner — named the way a buyer browses, not
- * the way the product pages are titled. Each goes to the page that covers it;
- * Fitness and Yoga has no page of its own, so it opens the brief with the
- * line named. Fitness and Yoga are one card because yoga, once the moulded
- * mats and blocks are excluded, is a single item (straps). Protective gear
- * has no photograph of its own, so it rides in the Training card — one
- * training floor, pads and guards together — with its line linking to its
- * own page, so the grid still reaches all six product pages.
- *
- * Titles name the product, not just the sport: each card is an h3 and the
- * main body link to its page, so "Boxing Gloves" carries the term the page
- * ranks for where "Boxing" carried none.
- */
-type Category = {
-  title: string;
-  /**
-   * A few of the products inside, in the buyer's words. An item with an
-   * `href` links to a different page from the card's own.
-   */
-  items: (string | { label: string; href: string })[];
-  href: string;
-  photo: { src: StaticImageData; alt: string };
-};
+const FAQ_ICON = "size-5";
 
-const CATEGORIES: Category[] = [
+/** The ordering questions, by what a mixed order raises. */
+const FAQ_GROUPS: FAQGroup[] = [
   {
-    title: "Boxing Gloves",
-    items: ["Training and sparring gloves", "Bag and competition gloves", "Kids' boxing gloves"],
-    href: "/products/custom-boxing-gloves",
-    photo: {
-      src: boxingGloves,
-      alt: "A pair of matte black custom boxing gloves with a red crackle pattern.",
-    },
+    id: "mixed",
+    title: "Mixed orders",
+    icon: (
+      <svg viewBox="0 0 24 24" className={FAQ_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+        <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+        <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+        <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+      </svg>
+    ),
+    items: ORDERING_FAQS.slice(0, 4),
   },
   {
-    title: "MMA Gloves and Gear",
-    items: ["MMA fight and sparring gloves", "Grappling gloves", "Shin guards"],
-    href: "/products/custom-mma-gloves",
-    photo: {
-      src: mmaFighter,
-      alt: "An MMA fighter throwing a jab in black open-palm MMA gloves.",
-    },
-  },
-  {
-    title: "Fitness and Yoga",
-    items: ["Jump ropes", "Fitness sandbags", "Leg stretchers and yoga straps"],
-    href: `/quote?product=${encodeURIComponent("Fitness and yoga accessories")}`,
-    photo: {
-      src: gymWear,
-      alt: "An athlete in training wear standing in a gym with a jump rope at her feet.",
-    },
-  },
-  {
-    title: "Fightwear and Apparel",
-    items: ["Fight shorts and rashguards", "Compression and training wear", "Club hoodies and tracksuits"],
-    href: "/products/fightwear-club-apparel",
-    photo: {
-      src: clubTeamKit,
-      alt: "Three club members in matching black hoodies and T-shirts with the same red shield.",
-    },
-  },
-  {
-    title: "Training and Protective Gear",
-    items: [
-      "Punch bags and focus mitts",
-      "Thai pads and kicking shields",
-      {
-        label: "Head guards, shin guards and wraps",
-        href: "/products/custom-protective-gear",
-      },
-    ],
-    href: "/products/custom-pads-bags-mitts",
-    photo: {
-      src: boxingAthlete,
-      alt: "A boxer in a gym holding a guard in custom boxing gloves.",
-    },
-  },
-  {
-    title: "Lifting Belts and Gear",
-    items: ["Leather and nylon lifting belts", "Lifting straps and grips", "Weightlifting gloves"],
-    href: "/products/custom-lifting-belts",
-    photo: {
-      src: strengthLifting,
-      alt: "A lifter chalking his hands, wearing a black leather lifting belt.",
-    },
+    id: "range",
+    title: "Your range",
+    icon: (
+      <svg viewBox="0 0 24 24" className={FAQ_ICON} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4" />
+      </svg>
+    ),
+    items: ORDERING_FAQS.slice(4),
   },
 ];
 
+type Category = SliderCard;
+
 /**
- * A photo card: the image fills the card, a scrim carries the text at the
- * foot, and the whole card is the link. The photograph eases in on hover.
- *
- * The whole-card link is the title's, stretched over the card by its
- * `::after` — not a wrapping `<a>`, because an item may link to another page
- * and links cannot nest. The card is its own stacking context (`isolate`) so
- * the photograph and scrim can sit at -z-10 beneath the text; an item link
- * rises above the stretched area with `z-10`.
+ * The six cards, one per product line, in the order a buyer browses — built
+ * from PRODUCTS so each card is its line's page and a renamed page follows.
+ * Lines with no page of their own (fitness, kit bags, uniforms) stay in the
+ * full list (03), where brief-only products belong.
  */
-function CategoryCard({ category }: { category: Category }) {
-  return (
-    <div className="group relative isolate flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-xl bg-ink-950 p-[var(--space-6)] text-white">
-      <Image
-        src={category.photo.src}
-        alt={category.photo.alt}
-        fill
-        sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
-        className="-z-10 object-cover transition-transform duration-500 ease-standard motion-safe:group-hover:scale-105"
-      />
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-linear-to-t from-ink-950 via-ink-950/60 via-45% to-transparent"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-forge-600 transition-transform duration-300 ease-standard group-hover:scale-x-100"
-      />
-      <div>
-        <h3 className="font-display text-heading-3">
-          <Link href={category.href} className="after:absolute after:inset-0">
-            {category.title}
-          </Link>
-        </h3>
-        <ul className="mt-[var(--space-3)] flex flex-col gap-1 text-small text-mist-300">
-          {category.items.map((item) => (
-            <li
-              key={typeof item === "string" ? item : item.label}
-              className="flex items-center gap-2"
-            >
-              <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-forge-600" />
-              {typeof item === "string" ? (
-                item
-              ) : (
-                <Link
-                  href={item.href}
-                  className="relative z-10 text-white underline decoration-forge-600 decoration-2 underline-offset-4 transition-colors hover:text-forge-100"
-                >
-                  {item.label}
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
-        <span
-          aria-hidden="true"
-          className="mt-[var(--space-5)] inline-flex items-center gap-2 text-small font-semibold"
-        >
-          Explore {category.title}
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 16 16"
-            className="size-4 text-forge-600 transition-transform motion-safe:group-hover:translate-x-1"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
-          </svg>
-        </span>
-      </div>
-    </div>
-  );
-}
+const CARD_ORDER: { slug: string; title: string; photo?: Category["photo"] }[] = [
+  { slug: "custom-boxing-gloves", title: "Boxing Gloves" },
+  { slug: "custom-mma-gloves", title: "MMA Gloves & Gear" },
+  { slug: "fightwear-club-apparel", title: "Fightwear & Club Apparel" },
+  { slug: "custom-protective-gear", title: "Protective Gear" },
+  {
+    slug: "custom-pads-bags-mitts",
+    title: "Pads, Bags & Mitts",
+    // The training floor, rather than the line's workshop photograph, which
+    // the page already shows in other places.
+    photo: { src: boxingAthlete, alt: "A boxer in a gym holding a guard, ready for pad and bag work." },
+  },
+  { slug: "custom-lifting-belts", title: "Lifting Belts & Gear" },
+];
+
+const CATEGORIES: Category[] = CARD_ORDER.flatMap(({ slug, title, photo }) => {
+  const product = getProduct(slug);
+  const src = photo ?? product?.cardPhoto;
+  if (!product || !src) return [];
+  return [
+    {
+      title,
+      items: product.types?.items.slice(0, 3).map((item) => item.title) ?? [],
+      href: productHref(product),
+      photo: { src: src.src, alt: src.alt },
+    },
+  ];
+});
 
 function productsJsonLd() {
   const base = siteUrl();
@@ -417,19 +448,11 @@ export default function ProductsPage() {
       />
 
       {/*
-        The same photographic banner as the homepage: a full-bleed backdrop
-        with the copy over it from `lg`, the photograph below the copy on a
-        phone (§12). A different photograph from the homepage's, so the two
-        heroes do not restate each other; the breadcrumb and the jump links
-        sit inside the band.
+        Hero — a showroom stage: one line at a time, large, with its word
+        behind it and its card in front; six thumbnails choose the line.
       */}
-      <HeroBanner
-        compact
-        image={{
-          src: factoryFloor,
-          alt: "Machinists at sewing benches on the Sialkot workshop floor, with finished boxing gloves, pads and fightwear hanging along the walls.",
-        }}
-        top={<Breadcrumb items={[{ label: "Products" }]} />}
+      <ProductStage
+        breadcrumb={<Breadcrumb items={[{ label: "Products" }]} />}
         eyebrow="Custom products"
         title="Custom fight gear, lifting gear and apparel."
         // Names the lines and the buyers in the first lines a search engine
@@ -451,242 +474,162 @@ export default function ProductsPage() {
             </Button>
           </>
         }
-        footer={
-          // Jump straight to a line.
-          <nav aria-label="Product lines">
-            <ul className="flex flex-wrap gap-2">
-              {PRODUCTS.map((product) => (
-                <li key={product.slug}>
-                  <Link
-                    href={productHref(product)}
-                    className="inline-flex rounded-full border border-white/25 bg-white/5 px-3.5 py-1.5 text-small font-medium text-white backdrop-blur-sm transition-colors hover:border-forge-600 hover:bg-forge-600"
-                  >
-                    {product.category}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        }
+        lines={LINES}
       />
 
-      <Section theme="light" width="work">
-        {/* "Shop" is retail language on a manufacturer's page, and the old
-            title was an instruction with no product term in it. */}
-        <SectionHeader
-          eyebrow="Product categories"
-          index="01"
-          title="Custom boxing, MMA, fitness and lifting gear."
-        />
-        <ul className="mt-[var(--space-7)] grid gap-[var(--space-5)] sm:grid-cols-2 lg:grid-cols-3">
-          {CATEGORIES.map((category) => (
-            <li key={category.title}>
-              <CategoryCard category={category} />
-            </li>
-          ))}
-        </ul>
-      </Section>
+      <Marquee items={MARQUEE} />
 
-      {/* By buyer — for a gym that knows what it runs, not what we call it. */}
-      <Section theme="white" width="work">
-        <SectionHeader
-          eyebrow="Find your kit"
-          index="02"
-          title="Not sure which page fits? Start from your gym."
-          description="Most orders draw on more than one line. These are the pages a kit is usually built from — one quote covers all of them."
-        />
-        {/* From `lg` each card is a subgrid over four shared rows — title,
-            description, links, audience page — so every row lines up across the four cards
-            however long its text runs. */}
-        <ul className="mt-[var(--space-7)] grid gap-[var(--space-5)] md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[auto_auto_auto_auto] lg:gap-y-0">
-          {BY_BUYER.map((buyer) => (
-            <li
-              key={buyer.title}
-              className="flex flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-[var(--space-5)] lg:row-span-4 lg:grid lg:grid-rows-subgrid"
-            >
-              <h3 className="font-body text-body-large font-semibold leading-snug">
-                {buyer.title}
-              </h3>
-              <p className="mb-[var(--space-5)] mt-2 text-small text-[var(--color-text-secondary)]">
-                {buyer.description}
-              </p>
-              <ul className="flex flex-col gap-1 border-t border-[var(--color-border)] pt-[var(--space-4)]">
-                {buyer.slugs.map((slug) => {
-                  const product = getProduct(slug);
-                  if (!product) return null;
-                  return (
-                    <li key={slug}>
-                      <Link
-                        href={productHref(product)}
-                        className="group flex items-center justify-between gap-2 rounded-sm py-1 text-small font-semibold text-[var(--color-text)] transition-colors hover:text-forge-700"
-                      >
-                        {/* The short category name: the full page names
-                            wrapped to two lines in a quarter-width card. */}
-                        {product.category}
-                        <svg
-                          aria-hidden="true"
-                          viewBox="0 0 16 16"
-                          className="size-3.5 shrink-0 text-forge-600 transition-transform motion-safe:group-hover:translate-x-0.5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
-                        </svg>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-              {/* The page written for this buyer, below the product pages. */}
-              <Link
-                href={buyer.audience.href}
-                // A text link, not a button: in a quarter-width card a button
-                // either stretched to the full width or wrapped its label.
-                className="group mt-[var(--space-4)] inline-flex items-center gap-2 self-start justify-self-start border-t-2 border-forge-600 pt-[var(--space-3)] text-small font-semibold text-forge-700 underline-offset-4 transition-colors hover:text-ink-950 hover:underline"
-              >
-                {buyer.audience.label}
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 16 16"
-                  className="size-3.5 shrink-0 transition-transform motion-safe:group-hover:translate-x-0.5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
-                </svg>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      {/* 01 — The six lines, as a slider of tall photo cards. Light. */}
+      <Section theme="light" width="shell">
+        <div className="grid gap-[var(--space-6)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:items-end lg:gap-[var(--space-9)]">
+          {/* "Shop" is retail language on a manufacturer's page, and the old
+              title was an instruction with no product term in it. */}
+          <SectionHeader
+            eyebrow="Product categories"
+            index="01"
+            title="Custom boxing, MMA, fightwear, protective and lifting gear."
+          />
+          <p className="text-body text-[var(--color-text-secondary)]">
+            Six product lines,{" "}
+            <span className="font-semibold text-[var(--color-text)]">
+              each specified, sampled and branded in the same way.
+            </span>
+          </p>
+        </div>
+        <div className="mt-[var(--space-7)]">
+          <LineSlider cards={CATEGORIES} />
+        </div>
       </Section>
 
       {/*
-        The full product list — "do you make my exact item?", after the
-        broader category and buyer routes. Light, between the white buyer band
-        and the dark specification band. Columns rather than a grid: the groups
-        run from two lines to seventeen, and columns pack them without gaps.
+        02 — By buyer: choose the gym, and the lines it usually needs
+        assemble as an equation, equal to one quote. Dark.
       */}
-      <Section theme="light" width="work">
+      <Section theme="dark" width="work">
+        <SectionHeader
+          eyebrow="Start from your gym"
+          index="02"
+          title="Find the products that fit your gym or brand."
+          description="Not every buyer starts with a product category. Choose the gym, club or brand closest to yours to see which product lines usually fit. One quote can cover all of them."
+        />
+        <div className="mt-[var(--space-7)]">
+          <KitFinder
+            buyers={KIT_BUYERS}
+            label="Kind of gym or brand"
+            quoteHref={`/quote?product=${encodeURIComponent("Multiple Products")}`}
+          />
+        </div>
+      </Section>
+
+      {/*
+        03 — The full product list as a searchable index: a sticky category
+        rail and one large search. Every product stays in the HTML as a
+        crawlable link; filtering only hides. White.
+      */}
+      <Section theme="white" width="shell">
         <SectionHeader
           eyebrow="Full product list"
           index="03"
           title="Everything we make to order."
-          description="Every product links to its page. Those marked + have no page of their own yet — choosing one opens a brief with it already named."
+          description="Search the list or filter by category. Products with their own page link to it; those marked Brief open a request with the product already named."
         />
-        <div className="mt-[var(--space-7)] gap-x-[var(--space-6)] sm:columns-2 lg:columns-4">
-          {CATALOGUE.map((group) => (
-            <div key={group.heading} className="mb-[var(--space-6)] break-inside-avoid">
-              <h3 className="border-b border-[var(--color-border)] pb-2 font-body text-body font-semibold">
-                {group.href ? (
-                  <Link href={group.href} className="transition-colors hover:text-forge-700">
-                    {group.heading}
-                  </Link>
-                ) : (
-                  group.heading
-                )}
-              </h3>
-              <ul className="mt-2 flex flex-col">
-                {group.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="group flex items-center justify-between gap-2 py-1 text-small text-[var(--color-text-secondary)] transition-colors hover:text-forge-700"
-                    >
-                      {link.label}
-                      {opensBrief(link.href) ? (
-                        <span
-                          aria-hidden="true"
-                          className="text-[var(--color-text-muted)] transition-colors group-hover:text-forge-700"
-                        >
-                          +
-                        </span>
-                      ) : null}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div className="mt-[var(--space-7)]">
+          <CatalogueExplorer groups={CATALOGUE} />
         </div>
       </Section>
 
       {/*
-        What can be specified on any line, and who makes it. The page had no
-        customisation content and no statement of what Sparwright is — the two
-        things a buyer comparing manufacturers checks — and it is where the
-        page says "OEM", "private label" and "Sialkot" in body copy. Dark,
-        between the light product list and the white FAQ.
+        04 — What can be specified on any line, shown on the glove opened
+        out: a pulsing point on each part, the detail beside it. Dark.
       */}
-      <Section theme="dark" width="work">
-        <div className="grid gap-[var(--space-7)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
-          <div>
-            <SectionHeader
-              eyebrow="Made to your specification"
-              index="04"
-              title="One OEM and private label manufacturer for every line."
-              description="Sparwright makes custom fight gear, lifting gear and apparel in Sialkot, Pakistan, for gyms, clubs and brands in the UK and Europe. Every product on this page is specified the same way, so one colour reference and one logo treatment carry across the whole order."
-            />
-            <div className="mt-[var(--space-6)]">
-              <Button href="/manufacturing" variant="inverse" arrow>
-                {CTA.manufacturing}
-              </Button>
-            </div>
-          </div>
-          <ul className="grid gap-[var(--space-5)] sm:grid-cols-2">
-            {SPECIFICATION.map((point) => (
-              <li
-                key={point.title}
-                className="border-t-2 border-forge-600 pt-[var(--space-4)]"
-              >
-                <h3 className="font-body text-body-large font-semibold leading-snug">
-                  {point.title}
-                </h3>
-                <p className="mt-2 text-small text-[var(--color-text-secondary)]">
-                  {point.description}
-                </p>
-              </li>
-            ))}
-          </ul>
+      <Section theme="dark" width="shell">
+        <div className="grid gap-[var(--space-6)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:items-end lg:gap-[var(--space-9)]">
+          <SectionHeader
+            eyebrow="Made to your specification"
+            index="04"
+            title="One OEM and private label manufacturer for every line."
+          />
+          <p className="text-body text-[var(--color-text-secondary)]">
+            Sparwright makes custom fight gear, lifting gear and apparel in Sialkot, Pakistan, for gyms, clubs and
+            brands in the UK and Europe.{" "}
+            <span className="font-semibold text-[var(--color-text)]">
+              Every product on this page is specified in the same way, so one colour reference and one logo
+              treatment can carry across a whole order.
+            </span>
+          </p>
+        </div>
+        <div className="mt-[var(--space-7)]">
+          <SpecHotspots
+            photo={{
+              src: specConstruction,
+              alt: "A black and red boxing glove beside its layers laid out in a line: the leather shell, three grades of foam padding, the lining, the wrist strap and a blank woven label.",
+            }}
+            spots={SPEC_SPOTS}
+            label="What can be specified"
+          />
+        </div>
+        <div className="mt-[var(--space-7)]">
+          <Button href="/manufacturing" variant="inverse" arrow>
+            {CTA.manufacturing}
+          </Button>
         </div>
       </Section>
 
-      {/* Ordering across lines — white, after the dark specification band. */}
-      <Section theme="white" width="copy">
-        <SectionHeader
-          eyebrow="Ordering"
-          index="05"
-          title="Ordering custom gear across product lines"
-          description="How a mixed order works — minimums, samples, kids' sizes and one identity across everything."
-        />
-        <FAQAccordion
-          items={ORDERING_FAQS}
-          name="products-faq"
-          openFirst
-          className="mt-[var(--space-6)]"
-        />
-      </Section>
+      {/* 05 — Ordering across lines, grouped. Light. */}
+      <FAQGroups
+        theme="light"
+        eyebrow="Ordering"
+        index="05"
+        title="Ordering custom gear across product lines"
+        groups={FAQ_GROUPS}
+        name="products-faq"
+      />
 
-      <CallToAction
+      {/* Closing — the range as a place to start a brief. */}
+      <RangeStarter
+        eyebrow="Start your order"
         title="Tell us what you want made."
-        description="Send the product, your logo, a rough quantity and where it ships. A person replies — with any questions left, not an automated quote."
-        action={{
-          label: CTA.quote,
-          href: "/quote",
-          analytics: "hero_quote_click",
-          surface: "products_cta",
+        description="Send the product, your logo, a rough quantity and where it ships. A person reads every brief and replies with any questions left."
+        surface="products_cta_product"
+        intent="quote"
+        pickerNote="Pick one to start a brief"
+        products={STARTER_PRODUCTS}
+        several={{
+          label: "Several products in one order",
+          description: "A full kit or range, quoted together.",
+          product: "Multiple Products",
         }}
-        secondaryAction={{
-          label: CTA.mockup,
-          href: "/quote?intent=mockup",
-          analytics: "hero_mockup_click",
-          surface: "products_cta",
-        }}
+        actions={
+          <>
+            <Button
+              href="/quote"
+              variant="inverse"
+              arrow
+              data-analytics="hero_quote_click"
+              data-analytics-surface="products_cta"
+            >
+              {CTA.quote}
+            </Button>
+            <Button
+              href="/quote?intent=mockup"
+              variant="secondary"
+              data-analytics="hero_mockup_click"
+              data-analytics-surface="products_cta"
+            >
+              {CTA.mockup}
+            </Button>
+          </>
+        }
+        footnote={
+          WHATSAPP ? (
+            <>
+              Prefer to talk first?{" "}
+              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-4">
+                Message us on WhatsApp
+              </a>
+            </>
+          ) : null
+        }
       />
     </>
   );

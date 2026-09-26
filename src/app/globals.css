@@ -500,6 +500,41 @@
   }
 }
 
+/* ProductStage: the line's word sweeping in behind the product. */
+@keyframes word-in {
+  from {
+    opacity: 0;
+    transform: translateX(6%);
+    letter-spacing: 0.04em;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ProductStage: the line's card rising into place. */
+@keyframes card-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Marquee: two identical runs of the track, so a half-width shift loops. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 /* StageTimeline: a stage's photograph settling in as it is chosen. */
 @keyframes stage-in {
   from {
