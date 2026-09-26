@@ -2,15 +2,19 @@
 
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import { useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 /**
  * HeroSlider — a full-bleed photographic hero whose content changes by slide.
  *
- * Manual, never automatic: §07 rules out auto-rotating carousels, because a
- * slide that moves while it is being read is a slide that is not read. The
- * buyer moves it with the dots, the arrows, the arrow keys or a swipe.
+ * Advances on its own every `interval` ms — a deliberate exception to §07,
+ * held whenever the pointer is over the band or focus is
+ * inside it (so a slide being read or clicked never moves), no auto-advance
+ * at all under prefers-reduced-motion, and none while the tab is hidden.
+ * The buyer can still move it with the dots, the arrows, the arrow keys or
+ * a swipe; doing so restarts the timer. The active dot fills as the timer
+ * runs, so the next change is never a surprise.
  *
  * Every slide is in the markup, stacked in one grid cell, so a search engine
  * reads all of them and the band is as tall as its tallest slide — changing
@@ -52,23 +56,68 @@ type HeroSliderProps = {
   top?: ReactNode;
   /** Accessible name for the carousel. */
   label: string;
+  /** Auto-advance interval in ms; 0 turns it off. */
+  interval?: number;
 };
 
-export function HeroSlider({ slides, top, label }: HeroSliderProps) {
+export function HeroSlider({ slides, top, label, interval = 7000 }: HeroSliderProps) {
   const [active, setActive] = useState(0);
   const touchStart = useRef<number | null>(null);
   const count = slides.length;
 
+  // Auto-advance, held while the pointer is over the band or focus is inside it.
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  // Bumped on every manual move, so the timer (and the dot's fill) restart.
+  const [cycle, setCycle] = useState(0);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener("change", update);
+    const visibility = () => setHidden(document.hidden);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      media.removeEventListener("change", update);
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, []);
+
+  const autoplayAvailable = interval > 0 && count > 1 && !reducedMotion;
+  const running = autoplayAvailable && !hovered && !focused && !hidden;
+
+  useEffect(() => {
+    if (!running) return;
+    const timer = window.setTimeout(() => {
+      setActive((current) => (current + 1) % count);
+    }, interval);
+    return () => window.clearTimeout(timer);
+  }, [running, active, cycle, interval, count]);
+
   // Functional updates, so two quick clicks move two slides, not one.
-  const goTo = (index: number) => setActive((index + count) % count);
-  const step = (delta: number) =>
+  const goTo = (index: number) => {
+    setActive((index + count) % count);
+    setCycle((c) => c + 1);
+  };
+  const step = (delta: number) => {
     setActive((current) => (current + delta + count) % count);
+    setCycle((c) => c + 1);
+  };
 
   return (
     <section
       data-theme="dark"
       aria-roledescription="carousel"
       aria-label={label}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
+      }}
       onKeyDown={(event) => {
         if (event.key === "ArrowRight") step(1);
         if (event.key === "ArrowLeft") step(-1);
@@ -261,15 +310,28 @@ export function HeroSlider({ slides, top, label }: HeroSliderProps) {
                 >
                   <span
                     className={cn(
-                      "block h-1 rounded-full transition-all duration-300 ease-standard",
-                      index === active ? "w-10 bg-forge-600" : "w-5 bg-white/30 hover:bg-white/60",
+                      "relative block h-1 overflow-hidden rounded-full transition-all duration-300 ease-standard",
+                      index === active
+                        ? cn("w-10", autoplayAvailable ? "bg-white/25" : "bg-forge-600")
+                        : "w-5 bg-white/30 hover:bg-white/60",
                     )}
-                  />
+                  >
+                    {index === active && autoplayAvailable ? (
+                      <span
+                        key={`${active}-${cycle}`}
+                        className="absolute inset-y-0 left-0 w-full origin-left bg-forge-600 [animation:hero-progress_linear_forwards]"
+                        style={{
+                          animationDuration: `${interval}ms`,
+                          animationPlayState: running ? "running" : "paused",
+                        }}
+                      />
+                    ) : null}
+                  </span>
                 </button>
               </li>
             ))}
           </ol>
-          <p className="ml-auto font-display text-small font-bold tabular-nums text-mist-300" aria-live="polite">
+          <p className="ml-auto font-display text-small font-bold tabular-nums text-mist-300" aria-live={running ? "off" : "polite"}>
             <span className="text-white">{String(active + 1).padStart(2, "0")}</span>
             {" / "}
             {String(count).padStart(2, "0")}

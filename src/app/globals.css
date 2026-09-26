@@ -489,3 +489,13 @@
     display: none !important;
   }
 }
+
+/* The hero slider's active dot filling over its auto-advance interval. */
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

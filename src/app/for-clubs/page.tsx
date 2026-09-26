@@ -11,6 +11,14 @@ import {
 } from "@/components/content/ConceptStudio";
 import { FAQAccordion } from "@/components/content/FAQAccordion";
 import { HeroSlider, type HeroSlide } from "@/components/content/HeroSlider";
+import {
+  PlanningCards,
+  ProductsVisual,
+  QuantityChips,
+  SizeTagsVisual,
+  SizesVisual,
+  UsesVisual,
+} from "@/components/content/PlanningCards";
 import { RolePanels, type RolePanel } from "@/components/content/RolePanels";
 import {
   ColourStudy,
@@ -29,6 +37,7 @@ import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { cn } from "@/lib/cn";
 import { pageMetadata } from "@/lib/metadata";
 import type { ProductFaq } from "@/lib/products";
+import { QUANTITY_CHOICES } from "@/lib/quote";
 import {
   breadcrumbJsonLd,
   faqJsonLd,
@@ -36,8 +45,8 @@ import {
 } from "@/lib/structured-data";
 import boxingClubsBanner from "../../../public/images/boxing-clubs-banner.jpg";
 import factoryFloor from "../../../public/images/boxing-glove-factory-floor.jpg";
-import rangeApparel from "../../../public/images/for-clubs/team.png";
-import rangeLifting from "../../../public/images/strength-and-lifting.jpg";
+import rangeApparel from "../../../public/images/range/fightwear-and-club-apparel.jpg";
+import rangeLifting from "../../../public/images/range/range-lifting.jpg";
 import rangeMma from "../../../public/images/range/range-mma.jpg";
 import rangePads from "../../../public/images/range/range-pads.jpg";
 import rangeProtective from "../../../public/images/range/range-protective.jpg";
@@ -77,8 +86,7 @@ import specPrinting from "../../../public/images/printing-and-decoration.jpg";
  * slider's (screen-reader only); every section below opens with an h2.
  *
  * Every product line links to its page (03), and every action goes where the
- * internal linking plan sends it: mockups and "Build Your Club Kit" to
- * /quote?intent=mockup, briefs and quotes to /quote, the process to
+ * internal linking plan sends it: mockups to /quote?intent=mockup, briefs and quotes to /quote, the process to
  * /manufacturing. No MOQ, price, lead time or certification anywhere —
  * non-negotiables #5 and #6; the FAQ answers both by saying how they are set.
  */
@@ -588,8 +596,8 @@ const PRODUCT_LINES: {
     size: "square",
     photo: {
       src: rangeLifting,
-      alt: "A lifter chalking his hands, wearing a black leather lifting belt.",
-      position: "center 30%",
+      alt: "A black and red lifting set: a leather lever-buckle belt, weightlifting gloves, lifting straps and wrist wraps.",
+      studio: true,
     },
   },
   {
@@ -601,40 +609,13 @@ const PRODUCT_LINES: {
     size: "wide",
     photo: {
       src: rangeApparel,
-      alt: "Three club members in matching black and red Sparwright training kit.",
-      position: "center 30%",
+      alt: "Three club members in black and red Sparwright kit: a quarter-zip top and joggers, a sports bra with fight shorts and MMA gloves, and a sports bra with leggings.",
+      position: "right 20%",
     },
   },
 ];
 
 /* -- 04 · One product or a complete club range ---------------------------- */
-
-const CLUB_KIT = [
-  {
-    title: "Training floor",
-    items: [
-      "Boxing gloves",
-      "MMA gloves",
-      "Focus mitts",
-      "Thai pads",
-      "Punch bags",
-      "Protective gear",
-    ],
-  },
-  {
-    title: "Fighters",
-    items: [
-      "Sparring equipment",
-      "Fight shorts",
-      "Rashguards",
-      "Protective equipment",
-    ],
-  },
-  {
-    title: "Club apparel",
-    items: ["T-shirts", "Hoodies", "Sweatshirts", "Tracksuits"],
-  },
-];
 
 /* -- 05 · Sizes and order planning ---------------------------------------- */
 
@@ -978,9 +959,8 @@ export default function ForClubsPage() {
         03 — One product or a complete club range. The six product lines as
         a range wall — the anchor product large, four squares, apparel as a
         wide banner — each tile one link to its page and any one of them a
-        valid start; then the coordinated-kit panel for those who combine
-        them. One section rather than a range and a kit section listing the
-        same products twice. White: after the dark logo band.
+        valid start, and the intro says they can be combined in one brief.
+        White: after the dark logo band.
       */}
       <Section theme="white" width="shell">
         <div className="grid gap-[var(--space-6)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:items-end">
@@ -1134,104 +1114,74 @@ export default function ForClubsPage() {
           </div>
         ))}
 
-        {/*
-          Combining the lines: the message left, the three kit groups right as
-          short rows — the tiles above already show the products, so the
-          groups name them rather than list them again at length.
-        */}
-        <div
-          data-theme="dark"
-          className="mt-3 grid gap-[var(--space-7)] rounded-2xl bg-[var(--color-bg)] p-[var(--space-6)] text-[var(--color-text)] sm:p-[var(--space-7)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-[var(--space-9)]"
-        >
-          <div>
-            <p className="inline-flex rounded-sm bg-forge-600 px-2.5 py-1 text-eyebrow font-semibold uppercase tracking-[0.14em] text-white">
-              Or combine them
-            </p>
-            <h3 className="mt-[var(--space-4)] text-heading-3">Build a coordinated club kit when it makes sense.</h3>
-            <p className="mt-[var(--space-4)] text-body text-[var(--color-text-secondary)]">
-              If you do want a broader club kit, your equipment and apparel can
-              be planned around the same identity. The products do not need to
-              be identical: the aim is to carry the agreed club identity across
-              the range while giving each item the construction and
-              specification appropriate to its use.
-            </p>
-            <div className="mt-[var(--space-6)]">
-              <Button
-                href="/quote?intent=mockup"
-                variant="primary"
-                arrow
-                data-analytics="hero_mockup_click"
-                data-analytics-surface="clubs_kit"
-              >
-                {CTA.clubKit}
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-eyebrow uppercase tracking-[0.14em] text-[var(--color-text-muted)]">For example</p>
-            <ul className="mt-[var(--space-4)] flex flex-col">
-              {CLUB_KIT.map((group, i) => (
-                <li
-                  key={group.title}
-                  className="grid gap-2 border-t border-white/10 py-[var(--space-4)] sm:grid-cols-[9.5rem_minmax(0,1fr)] sm:gap-[var(--space-5)]"
-                >
-                  <p className="flex items-center gap-3 font-body text-body font-semibold">
-                    <span aria-hidden="true" className="font-display text-small tabular-nums text-forge-600">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    {group.title}
-                  </p>
-                  <ul className="flex flex-wrap gap-1.5">
-                    {group.items.map((item) => (
-                      <li
-                        key={item}
-                        className="rounded-full border border-white/15 px-2.5 py-1 text-small text-[var(--color-text-secondary)]"
-                      >
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
       </Section>
 
-      {/* 04 — Sizes and order planning. */}
-      <Section theme="light" width="work">
-        <div className="grid gap-[var(--space-8)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-          <div>
-            <SectionHeader
-              eyebrow="Sizes and order planning"
-              index="04"
-              title="Plan the order around the people who will use it."
-              description="Club orders often include more variation than a single standard product."
-            />
-            <Prose className="mt-[var(--space-5)]">
-              <p>
-                You may need different glove weights, junior and adult products,
-                several apparel sizes or separate equipment for members, fighters
-                and coaches.
-              </p>
-              <p>Those requirements should be identified before production.</p>
-            </Prose>
-          </div>
-          <NumberedCardList items={PLANNING} />
+      {/*
+        04 — Sizes and order planning. Four cards, one per thing to plan,
+        each headed by a picture of it on the studio grey; then one slim dark
+        strip: not sure of the quantity, and the form's own "Not sure".
+        Light: between the white 03 and the white 05.
+      */}
+      <Section theme="light" width="shell">
+        <div className="grid gap-[var(--space-6)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:items-end lg:gap-[var(--space-9)]">
+          <SectionHeader
+            eyebrow="Sizes and order planning"
+            index="04"
+            title="Plan the order around the people who will use it."
+            description="Club orders often include more variation than a single standard product."
+          />
+          <p className="text-body text-[var(--color-text-secondary)]">
+            You may need different glove weights, junior and adult products,
+            several apparel sizes or separate equipment for members, fighters
+            and coaches.{" "}
+            <span className="font-semibold text-[var(--color-text)]">
+              Those requirements should be identified before production.
+            </span>
+          </p>
         </div>
 
-        {/* "Not sure" is a real answer — said plainly, with the way in. */}
-        <div className="mt-[var(--space-7)] grid gap-[var(--space-5)] rounded-xl border border-forge-600/30 bg-forge-100/60 p-[var(--space-6)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="mt-[var(--space-7)]">
+          <PlanningCards
+            cards={[
+              {
+                ...PLANNING[0],
+                visual: (
+                  <UsesVisual
+                    gloves={[
+                      { src: gloveClassicWhiteRedBlack, use: "Bag", weight: "10 oz" },
+                      { src: gloveStrikeWhiteRedBlack, use: "Training", weight: "12 oz" },
+                      { src: gloveCrackleWhiteRedBlack, use: "Sparring", weight: "16 oz" },
+                    ]}
+                  />
+                ),
+              },
+              { ...PLANNING[1], visual: <SizesVisual glove={gloveStrikeBlackRed} /> },
+              { ...PLANNING[2], visual: <SizeTagsVisual /> },
+              {
+                ...PLANNING[3],
+                visual: <ProductsVisual shots={[gloveStrikeWhiteRedBlack, rangeMma, rangePads, rangeLifting]} />,
+              },
+            ]}
+          />
+        </div>
+
+        {/* "Not sure" is a real answer — said plainly, and shown. */}
+        <div
+          data-theme="dark"
+          className="mt-3 grid items-center gap-[var(--space-5)] rounded-2xl bg-[var(--color-bg)] p-[var(--space-6)] text-[var(--color-text)] lg:grid-cols-[minmax(0,1.1fr)_auto_auto] lg:gap-[var(--space-7)]"
+        >
           <div>
-            <h3 className="text-heading-4">Not sure about quantity yet?</h3>
-            <p className="mt-2 max-w-copy text-body text-[var(--color-text-secondary)]">
-              You can still start. The enquiry form accepts Not sure as a
-              quantity option. Minimum quantities depend on the product and
-              specification and are confirmed as part of the quote rather than
-              published as one number for every order.
+            <h3 className="font-body text-body-large font-semibold">
+              Not sure about quantity yet? <span className="text-forge-600">You can still start.</span>
+            </h3>
+            <p className="mt-1.5 text-small text-[var(--color-text-secondary)]">
+              The enquiry form accepts Not sure as a quantity option. Minimum
+              quantities depend on the product and specification and are
+              confirmed as part of the quote rather than published as one number
+              for every order.
             </p>
           </div>
+          <QuantityChips choices={QUANTITY_CHOICES.slice(0, 3)} />
           <Button href="/quote" variant="primary" arrow>
             {CTA.brief}
           </Button>
@@ -1523,31 +1473,6 @@ function TickList({
             <path d="m3.5 8.5 3 3 6-7" />
           </svg>
           {item}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/** Numbered planning cards, stacked in two columns beside the section intro. */
-function NumberedCardList({ items }: { items: { title: string; description: string }[] }) {
-  return (
-    <ul className="grid gap-[var(--space-4)] sm:grid-cols-2">
-      {items.map((item, i) => (
-        <li
-          key={item.title}
-          className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-[var(--space-5)]"
-        >
-          <span
-            aria-hidden="true"
-            className="font-display text-heading-4 font-bold tabular-nums text-forge-600"
-          >
-            {String(i + 1).padStart(2, "0")}
-          </span>
-          <h3 className="mt-[var(--space-3)] font-body text-body-large font-semibold leading-snug">
-            {item.title}
-          </h3>
-          <p className="mt-2 text-small text-[var(--color-text-secondary)]">{item.description}</p>
         </li>
       ))}
     </ul>
