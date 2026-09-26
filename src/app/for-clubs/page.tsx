@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
 import {
   Answer,
   BriefSheet,
@@ -12,14 +11,14 @@ import {
   type BriefField,
   type RouteStep,
 } from "@/components/content/BriefBoard";
-import { ClubStarter, type StarterProduct } from "@/components/content/ClubStarter";
+import { RangeStarter, type StarterProduct } from "@/components/content/RangeStarter";
 import {
   ConceptStudio,
   type Colourway,
   type ConceptLogo,
   type ConceptProduct,
 } from "@/components/content/ConceptStudio";
-import { FAQAccordion } from "@/components/content/FAQAccordion";
+import { FAQGroups, type FAQGroup } from "@/components/content/FAQGroups";
 import { HeroSlider, type HeroSlide } from "@/components/content/HeroSlider";
 import {
   PlanningCards,
@@ -879,7 +878,7 @@ const FAQS: ProductFaq[] = [
 const FAQ_ICON = "size-5";
 
 /** The questions by what a club is deciding; numbered through in this order. */
-const FAQ_GROUPS: { id: string; title: string; icon: ReactNode; items: ProductFaq[] }[] = [
+const FAQ_GROUPS: FAQGroup[] = [
   {
     id: "branding",
     title: "Branding and products",
@@ -1506,76 +1505,21 @@ export default function ForClubsPage() {
         not listed; the groups run beside it as one accordion, numbered
         through. White: between the light 07 and the closing action band.
       */}
-      <Section theme="white" width="shell">
-        <div className="grid grid-cols-1 gap-[var(--space-8)] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-[var(--space-9)]">
-          <div className="lg:sticky lg:top-[calc(var(--header-height)+var(--space-6))] lg:self-start">
-            <SectionHeader
-              eyebrow="Gyms & academies FAQ"
-              index="08"
-              title="Questions about custom equipment for your club."
-            />
-
-            <nav aria-label="FAQ topics" className="mt-[var(--space-6)] hidden lg:block">
-              <ol className="flex flex-col gap-2">
-                {FAQ_GROUPS.map((group) => (
-                  <li key={group.id}>
-                    <a
-                      href={`#faq-${group.id}`}
-                      className="group flex items-center gap-4 rounded-xl border border-[var(--color-border)] p-3 pr-[var(--space-4)] transition-colors hover:border-forge-600/50 hover:bg-[var(--color-surface)]"
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-surface)] text-forge-600 transition-colors group-hover:bg-forge-600 group-hover:text-white"
-                      >
-                        {group.icon}
-                      </span>
-                      <span className="flex-1">
-                        <span className="block font-body text-body font-semibold">{group.title}</span>
-                        <span className="block text-small text-[var(--color-text-secondary)]">
-                          {group.items.length} questions
-                        </span>
-                      </span>
-                      <span aria-hidden="true" className="text-[var(--color-text-muted)] transition-colors group-hover:text-forge-600">
-                        <svg viewBox="0 0 16 16" className="size-4 rotate-90" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
-                        </svg>
-                      </span>
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-
-            <NotListed className="mt-[var(--space-5)] hidden lg:block" />
-          </div>
-
-          <div className="flex flex-col gap-[var(--space-7)]">
-            {FAQ_GROUPS.map((group, g) => (
-              <div key={group.id} id={`faq-${group.id}`} className="scroll-mt-[calc(var(--header-height)+var(--space-5))]">
-                <h3 className="flex items-center gap-3 border-b border-[var(--color-border)] pb-[var(--space-3)] text-eyebrow uppercase tracking-[0.16em] text-[var(--color-text-muted)]">
-                  <span aria-hidden="true" className="h-0.5 w-6 bg-forge-600" />
-                  {group.title}
-                </h3>
-                <FAQAccordion
-                  items={group.items}
-                  name="clubs-faq"
-                  start={FAQ_GROUPS.slice(0, g).reduce((n, prev) => n + prev.items.length, 1)}
-                  openFirst={g === 0}
-                  className="mt-[var(--space-4)]"
-                />
-              </div>
-            ))}
-            <NotListed className="lg:hidden" />
-          </div>
-        </div>
-      </Section>
+      <FAQGroups
+        theme="white"
+        eyebrow="Gyms & academies FAQ"
+        index="08"
+        title="Questions about custom equipment for your club."
+        groups={FAQ_GROUPS}
+        name="clubs-faq"
+      />
 
       {/*
         Closing band. The red side keeps to a heading, one short line and the
         actions (§04); the dark panel beside it turns the range into a place
         to start — each product opens the mockup request with it chosen.
       */}
-      <ClubStarter
+      <RangeStarter
         eyebrow="Start your order"
         title="Start with the gear your club needs now."
         description="One product or the whole kit, under your club's identity. Start with the requirement you have today."
@@ -1623,26 +1567,6 @@ export default function ForClubsPage() {
 }
 
 /* -- Page-local building blocks ------------------------------------------- */
-
-/** The FAQ's way out: for whatever the list does not cover. */
-function NotListed({ className }: { className?: string }) {
-  return (
-    <div
-      data-theme="dark"
-      className={cn("relative overflow-hidden rounded-2xl bg-[var(--color-bg)] p-[var(--space-6)] text-[var(--color-text)]", className)}
-    >
-      <span aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-forge-600/25 blur-3xl" />
-      <p className="relative font-body text-body-large font-semibold">Question not listed?</p>
-      <p className="relative mt-2 text-small text-[var(--color-text-secondary)]">
-        Put it in your brief — every request is read by a person — or{" "}
-        <Link href="/contact" className="font-semibold text-white underline decoration-forge-600 decoration-2 underline-offset-4 hover:text-forge-600">
-          contact the team
-        </Link>
-        .
-      </p>
-    </div>
-  );
-}
 
 function Arrow() {
   return (

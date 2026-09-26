@@ -5,7 +5,8 @@ import { Section } from "@/components/foundation/Container";
 import { cn } from "@/lib/cn";
 
 /**
- * ClubStarter — the Gyms & Academies closing band. The shared
+ * RangeStarter — a closing band that turns the range into a place to start.
+ * First written for Gyms & Academies; The shared
  * `CallToAction` ends on "what happens next", which this page has already
  * shown twice (05, 06); so here the right-hand side answers the page's own
  * closing line instead — "start with the gear your club needs now" — with
@@ -28,7 +29,7 @@ export type StarterProduct = {
   fill?: boolean;
 };
 
-export function ClubStarter({
+export function RangeStarter({
   eyebrow,
   title,
   description,
@@ -37,6 +38,8 @@ export function ClubStarter({
   products,
   several,
   surface,
+  intent = "mockup",
+  pickerNote = "Pick one to begin a mockup request",
 }: {
   eyebrow: string;
   title: string;
@@ -47,7 +50,13 @@ export function ClubStarter({
   several: { label: string; description: string; product: string };
   /** Analytics placement for the tiles. */
   surface: string;
+  /** Which request the tiles open: the mockup, or the product brief. */
+  intent?: "mockup" | "quote";
+  pickerNote?: string;
 }) {
+  const href = (product: string) =>
+    `/quote?${intent === "mockup" ? "intent=mockup&" : ""}product=${encodeURIComponent(product)}`;
+  const event = intent === "mockup" ? "hero_mockup_click" : "hero_quote_click";
   return (
     <Section theme="action" width="shell" className="relative isolate overflow-hidden">
       {/* A shadow to seat the panel, and one stitched seam across the band. */}
@@ -86,15 +95,15 @@ export function ClubStarter({
 
           <div className="relative flex flex-col gap-0.5 px-1 pb-[var(--space-4)] pt-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
             <p className="font-body text-body-large font-semibold">Start with…</p>
-            <p className="text-small text-[var(--color-text-secondary)]">Pick one to begin a mockup request</p>
+            <p className="text-small text-[var(--color-text-secondary)]">{pickerNote}</p>
           </div>
 
           <ul className="relative grid grid-cols-2 gap-2 sm:grid-cols-3">
             {products.map((item) => (
               <li key={item.label}>
                 <Link
-                  href={`/quote?intent=mockup&product=${encodeURIComponent(item.product)}`}
-                  data-analytics="hero_mockup_click"
+                  href={href(item.product)}
+                  data-analytics={event}
                   data-analytics-surface={surface}
                   className="group block overflow-hidden rounded-xl bg-white/[0.06] transition-colors hover:bg-forge-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
@@ -125,8 +134,8 @@ export function ClubStarter({
             {/* Or all of it, under one identity. */}
             <li className="col-span-2 sm:col-span-3">
               <Link
-                href={`/quote?intent=mockup&product=${encodeURIComponent(several.product)}`}
-                data-analytics="hero_mockup_click"
+                href={href(several.product)}
+                data-analytics={event}
                 data-analytics-surface={surface}
                 className="group flex items-center gap-4 rounded-xl border border-dashed border-white/25 px-[var(--space-4)] py-3 transition-colors hover:border-forge-600 hover:bg-white/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
